@@ -1,36 +1,27 @@
-import { useState } from 'react';
-import {
-  IconDownload,
-  IconReport,
-  IconSettings,
-  IconHome,
-} from '@tabler/icons-react';
 import classes from './sidebar.module.css';
 import { Anchor } from '@mantine/core';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation'
+import { WithNavLinkProps } from '../layout';
+import { brandNav } from '@/lib/branding/constants';
 
-const data = [
-  { link: 'start', label: 'Start', icon: IconHome },
-  { link: 'download', label: 'Download Site(s)', icon: IconDownload },
-  { link: 'local', label: 'Local Questionairre(s)', icon: IconReport },
-  { link: 'preferences', label: 'Preferences', icon: IconSettings },
-];
 
-export default function Sidebar() {
-  const [active, setActive] = useState('Start');
+export default function Sidebar({navLinks}: WithNavLinkProps) {
+  const pathname = usePathname();
+  const pathNameArray = pathname.split('/');
+  // Remove Top Level from links
+  const sideBarLinks = [...navLinks];
+  sideBarLinks.splice(sideBarLinks.findIndex(n => n.href === brandNav.href), 1);
 
-  const links = data.map((item) => (
+  const links = sideBarLinks.map((item) => (
     <Anchor component={Link}
       className={classes.link}
-      data-active={item.label === active || undefined}
-      href={item.link}
-      key={item.label}
-      onClick={(event) => {
-        setActive(item.label);
-      }}
+      data-active={pathNameArray.includes(item.href) || undefined}
+      href={item.href}
+      key={item.title}
     >
       <item.icon className={classes.linkIcon} stroke={1.5} />
-      <span>{item.label}</span>
+      <span>{item.title}</span>
     </Anchor>
   ));
 
