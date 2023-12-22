@@ -4,6 +4,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'] })
 import '@mantine/core/styles.css';
 import { ColorSchemeScript, MantineProvider, Burger, Group, Skeleton  } from '@mantine/core';
+import { variantColorResolver } from '@/lib/constants/maritineTheme';
 
 
 export const metadata: Metadata = {
@@ -23,7 +24,7 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body className={inter.className}>
-        <MantineProvider>
+        <MantineProvider theme={{ variantColorResolver }}>
          {children}
         </MantineProvider>
       </body>

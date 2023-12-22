@@ -19,24 +19,24 @@ export default function LoginForm() {
 
   return (
     <form onSubmit={form.onSubmit((values) => redirect('the-survey-app/start'))} className="w-100">
-    <TextInput
-        className="mb-4"
-        withAsterisk
-        label="eMail:"
-        placeholder="your@email.com"
-        {...form.getInputProps('email')}
-    />
+      <TextInput
+          className="mb-4"
+          withAsterisk
+          label="eMail:"
+          placeholder="your@email.com"
+          {...form.getInputProps('email')}
+      />
 
-    <PasswordInput
-        withAsterisk
-        label="Password:"
-        placeholder="Your password"
-        {...form.getInputProps('password')}
-        />
+      <PasswordInput
+          withAsterisk
+          label="Password:"
+          placeholder="Your password"
+          {...form.getInputProps('password')}
+          />
 
-    <Group justify="flex-start" mt="md">
-        <Button type="submit">Submit</Button>
-    </Group>
+      <Group justify="flex-start" mt="md">
+          <Button type="submit">Submit</Button>
+      </Group>
     </form>
   );
 }

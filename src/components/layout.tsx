@@ -1,40 +1,13 @@
 'use client'
 
-import { AppShell, Burger, Group } from "@mantine/core";
+import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import Image from 'next/image'
 import { redirect } from "next/navigation";
 import Sidebar from "./navigation/sidebar";
 import NavBreadcrumbs from "./navigation/breadcrumbs";
-import {
-    IconDownload,
-    IconReport,
-    IconSettings,
-    IconHome,
-    Icon,
-  } from '@tabler/icons-react';
-import { brandNav } from "@/lib/branding/constants";
 import NavFooter from "./navigation/footer";
-import DarkModeToggle from "./DarkModeToggle/DarkModeToggle";
 import NavHeader from "./navigation/header";
-
-export type WithNavLinkProps = {
-    navLinks: NavLinks;
-}
-
-export type NavLinks = {
-    href: string,
-    title: string,
-    icon: Icon,
-}[];  
-
-const navLinks: NavLinks = [
-    brandNav,
-    { href: 'start', title: 'Start', icon: IconHome },
-    { href: 'download', title: 'Download Site(s)', icon: IconDownload },
-    { href: 'local', title: 'Local Questionairre(s)', icon: IconReport },
-    { href: 'preferences', title: 'Preferences', icon: IconSettings },
-];
+import { navLinks } from "@/lib/constants/constants";
 
 export default function Layout({
     children,

@@ -1,9 +1,9 @@
 
+import { brandNav } from '@/lib/constants/constants';
+import { WithNavLinkProps } from '@/lib/types/nav';
 import { Breadcrumbs, Anchor, Text } from '@mantine/core';
 import { usePathname } from 'next/navigation';
-import { WithNavLinkProps } from '../layout';
 import { useEffect, useState } from 'react';
-import { brandNav } from '@/lib/branding/constants';
 
 export default function NavBreadcrumbs({navLinks}: WithNavLinkProps) {
     const pathname = usePathname();

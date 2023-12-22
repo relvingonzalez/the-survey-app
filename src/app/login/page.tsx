@@ -15,7 +15,6 @@ export default function Login() {
                 <LoginForm />
             </Stack>
         </Stack>
-
     </Flex>
   )
 }

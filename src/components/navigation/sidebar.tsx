@@ -1,9 +1,9 @@
+import { WithNavLinkProps } from '@/lib/types/nav';
 import classes from './sidebar.module.css';
 import { Anchor } from '@mantine/core';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation'
-import { WithNavLinkProps } from '../layout';
-import { brandNav } from '@/lib/branding/constants';
+import { brandNav } from '@/lib/constants/constants';
 
 
 export default function Sidebar({navLinks}: WithNavLinkProps) {

@@ -1,5 +1,7 @@
+import PreferencesForm from "@/components/PreferencesForm";
+
 export default function Preferences() {
     return (
-        <div>Preferences</div>
+        <PreferencesForm />
       );
 }

@@ -1,5 +1,8 @@
-export default function Local() {
+import { LocalSites } from "@/components/Sites/Sites";
+import { dummySites } from "@/lib/data/sites";
+
+export default function DownloadPage() {
     return (
-        <div>local</div>
+        <LocalSites sites={dummySites}/>
       );
 }
