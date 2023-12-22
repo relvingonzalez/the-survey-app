@@ -13,8 +13,8 @@ import {
     IconHome,
     Icon,
   } from '@tabler/icons-react';
-import { useState } from "react";
 import { brandNav } from "@/lib/branding/constants";
+import NavFooter from "./navigation/footer";
 
 export type WithNavLinkProps = {
     navLinks: NavLinks;
@@ -69,7 +69,7 @@ export default function Layout({
                 <NavBreadcrumbs navLinks={navLinks} />
                 {children}
             </AppShell.Main>
-            <AppShell.Footer p="md">Footer</AppShell.Footer>
+            <AppShell.Footer p="md"><NavFooter /></AppShell.Footer>
         </AppShell>
     )
   }

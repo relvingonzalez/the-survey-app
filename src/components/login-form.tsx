@@ -1,6 +1,6 @@
 'use client'
 
-import { TextInput, Button, Group, Box, PasswordInput } from '@mantine/core';
+import { TextInput, Button, Group, PasswordInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { redirect } from 'next/navigation';
 
