@@ -15,6 +15,8 @@ import {
   } from '@tabler/icons-react';
 import { brandNav } from "@/lib/branding/constants";
 import NavFooter from "./navigation/footer";
+import DarkModeToggle from "./DarkModeToggle/DarkModeToggle";
+import NavHeader from "./navigation/header";
 
 export type WithNavLinkProps = {
     navLinks: NavLinks;
@@ -56,11 +58,7 @@ export default function Layout({
         padding="md"
         >
             <AppShell.Header>
-                <Group h="100%" px="md">
-                    <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="sm" size="sm" />
-                    <Burger opened={desktopOpened} onClick={toggleDesktop} visibleFrom="sm" size="sm" />
-                    <Image src="/logo_otsan.png" alt="OtsanLLC"  width={30} height={30}/>
-                </Group>
+                <NavHeader mobileOpened={mobileOpened} desktopOpened={desktopOpened} toggleMobile={toggleMobile} toggleDesktop={toggleDesktop}/>
             </AppShell.Header>
             <AppShell.Navbar p="md">
                 <Sidebar navLinks={navLinks} />
