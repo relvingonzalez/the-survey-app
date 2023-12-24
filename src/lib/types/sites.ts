@@ -1,5 +1,7 @@
+export type SiteCode = string;
+
 export type Site = {
-    siteCode: string;
+    siteCode: SiteCode;
     location: string;
     questionnaire: string;
     answers: string;

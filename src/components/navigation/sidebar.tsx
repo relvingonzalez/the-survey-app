@@ -3,16 +3,14 @@ import classes from './sidebar.module.css';
 import { Anchor } from '@mantine/core';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation'
-import { brandNav } from '@/lib/constants/constants';
+import { brandNav } from '@/lib/navigation/routes';
 
 
 export default function Sidebar({navLinks}: WithNavLinkProps) {
   const pathname = usePathname();
   const pathNameArray = pathname.split('/');
   // Remove Top Level from links
-  const sideBarLinks = [...navLinks];
-  sideBarLinks.splice(sideBarLinks.findIndex(n => n.href === brandNav.href), 1);
-
+  const sideBarLinks = Object.values(navLinks).filter(n => !n.hideOnSidebar);
   const links = sideBarLinks.map((item) => (
     <Anchor component={Link}
       className={classes.link}
@@ -20,7 +18,7 @@ export default function Sidebar({navLinks}: WithNavLinkProps) {
       href={item.href}
       key={item.title}
     >
-      <item.icon className={classes.linkIcon} stroke={1.5} />
+      {item.icon && <item.icon className={classes.linkIcon} stroke={1.5} />}
       <span>{item.title}</span>
     </Anchor>
   ));

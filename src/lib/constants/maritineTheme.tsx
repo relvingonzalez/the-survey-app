@@ -51,8 +51,8 @@ import {
     // Add new variants support
     if (input.variant === 'warning') {
         return {
-            background: 'var(--mantine-color-orange-9)',
-            hover: 'var(--mantine-color-orange-8)',
+            background: 'var(--mantine-color-yellow-5)',
+            hover: 'var(--mantine-color-yellow-4)',
             color: 'var(--mantine-color-white)',
             border: 'none',
         };

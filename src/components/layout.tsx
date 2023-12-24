@@ -7,7 +7,7 @@ import Sidebar from "./navigation/sidebar";
 import NavBreadcrumbs from "./navigation/breadcrumbs";
 import NavFooter from "./navigation/footer";
 import NavHeader from "./navigation/header";
-import { navLinks } from "@/lib/constants/constants";
+import { navLinks } from "@/lib/navigation/routes";
 
 export default function Layout({
     children,

@@ -1,27 +1,27 @@
 'use client'
 
-import { Card, Group, Text, Anchor } from '@mantine/core';
-import { IconClockHour9 } from '@tabler/icons-react';
-import Link from 'next/link';
+import { Site } from '@/lib/types/sites';
+import { Card, Group, Text, Button } from '@mantine/core';
+import { IconInfoCircleFilled, IconAddressBook } from '@tabler/icons-react';
 
-export default function SiteOverview() {
+type SiteOverviewProps = {
+  site: Site;
+}
+
+export default function SiteOverview({site}: SiteOverviewProps) {
   return (
     <>
     <Card withBorder shadow="sm" radius="md">
       <Card.Section withBorder inheritPadding py="xs">
         <Group justify="start">
-          <IconClockHour9 />
+          <IconAddressBook />
           <Text size="xl" fw={500}>Site Overview</Text>
         </Group>
       </Card.Section>
       <Text mt="10" inherit>
-        You are logged in as <Text span fw={700}>rs@orga.zone</Text>.
+        {site.location}
       </Text>
-      <Text mt="10">Your last login was: 3rd of May, 2017.</Text>
-      <Text my="10">Last server contact: 2nd of May, 2017.</Text>
-      <Anchor component={Link} href="local">
-        <Text span fw={700}>4</Text> local sites available
-      </Anchor>
+     <Button mt="4" w="fit-content" leftSection={<IconInfoCircleFilled />} >Details</Button>
     </Card>
 
     <Card withBorder mt="10" shadow="sm" radius="md">
@@ -30,7 +30,12 @@ export default function SiteOverview() {
           <Text size="xl" fw={500}>Questions</Text>
         </Group>
       </Card.Section>
+
       <Text mt="10">Total: 32, Answered: 3</Text>
+      <Group justify="space-between">
+        <Button mt="8" w="fit-content" variant="warning">List</Button>
+        <Button mt="8" w="fit-content">Go</Button>
+      </Group>
     </Card>
 
     <Card withBorder mt="10" shadow="sm" radius="md">
@@ -40,6 +45,10 @@ export default function SiteOverview() {
         </Group>
       </Card.Section>
       <Text mt="10">Drawings: 2</Text>
+      <Group justify="space-between">
+        <Button mt="8" w="fit-content" variant="warning">List</Button>
+        <Button mt="8" w="fit-content">New</Button>
+      </Group>
     </Card>
 
     <Card withBorder mt="10" shadow="sm" radius="md">
@@ -49,6 +58,10 @@ export default function SiteOverview() {
         </Group>
       </Card.Section>
       <Text mt="10">Total: 32, Answered: 3</Text>
+      <Group justify="space-between">
+        <Button mt="8" w="fit-content" variant="warning">List</Button>
+        <Button mt="8" w="fit-content">Go</Button>
+      </Group>
     </Card>
     </>
 

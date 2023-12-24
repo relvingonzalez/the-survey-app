@@ -44,8 +44,8 @@ const siteProgress = (site: Site) => {
 }
 
 function Sites({ sites, download }: SitesProps) {
-  const rows = sites.map((site) => (
-    <Table.Tr key={site.siteCode}>
+  const rows = sites.map((site, index) => (
+    <Table.Tr key={`${site.siteCode}-${index}`}>
       <Table.Td>{site.siteCode}</Table.Td>
       <Table.Td>
             <Text>{site.location}</Text>
@@ -62,7 +62,7 @@ function Sites({ sites, download }: SitesProps) {
                 <IconDownload />
             </Group> : 
             <Group>
-                <Link href={`site-overview/${site.siteCode}`}><IconSettingsFilled /></Link>
+                <Link href={`local/${site.siteCode}/site-overview`}><IconSettingsFilled /></Link>
             </Group>}
       </Table.Td>
     </Table.Tr>
