@@ -22,8 +22,8 @@ export default function NavBreadcrumbs({navLinks}: WithNavLinkProps) {
             return pathSection === currentHref ? (
                 <Text key={index}>{navLink ? navLink.title : pathSection}</Text>
             ) : (
-                <Anchor component={Link} href={navLink?.href ===  brandNav.href ? '/' : cummulativeHref } key={index}>
-                    {navLink?.title}
+                <Anchor component={Link} href={navLink?.href ===  brandNav.href ? '/' : cummulativeHref} key={index}>
+                    {navLink?.title || pathSection}
                 </Anchor>
             )
         }));

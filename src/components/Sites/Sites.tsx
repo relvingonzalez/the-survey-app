@@ -62,7 +62,7 @@ function Sites({ sites, download }: SitesProps) {
                 <IconDownload />
             </Group> : 
             <Group>
-                <Link href={`local/${site.siteCode}/site-overview`}><IconSettingsFilled /></Link>
+                <Link href={`local/${site.siteCode}`}><IconSettingsFilled /></Link>
             </Group>}
       </Table.Td>
     </Table.Tr>

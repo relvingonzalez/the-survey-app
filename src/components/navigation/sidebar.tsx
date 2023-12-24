@@ -15,7 +15,7 @@ export default function Sidebar({navLinks}: WithNavLinkProps) {
     <Anchor component={Link}
       className={classes.link}
       data-active={pathNameArray.includes(item.href) || undefined}
-      href={item.href}
+      href={'/the-survey-app/' + item.href}
       key={item.title}
     >
       {item.icon && <item.icon className={classes.linkIcon} stroke={1.5} />}
