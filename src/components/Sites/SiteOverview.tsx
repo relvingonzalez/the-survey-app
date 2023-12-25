@@ -3,6 +3,7 @@
 import { Site } from '@/lib/types/sites';
 import { Card, Group, Text, Button } from '@mantine/core';
 import { IconInfoCircleFilled, IconAddressBook } from '@tabler/icons-react';
+import Link from 'next/link';
 
 type SiteOverviewProps = {
   site: Site;
@@ -33,7 +34,7 @@ export default function SiteOverview({site}: SiteOverviewProps) {
 
       <Text mt="10">Total: 32, Answered: 3</Text>
       <Group justify="space-between">
-        <Button mt="8" w="fit-content" variant="warning">List</Button>
+        <Link href={`${site.siteCode}/list`}><Button mt="8" w="fit-content" variant="warning">List</Button></Link>
         <Button mt="8" w="fit-content">Go</Button>
       </Group>
     </Card>
@@ -46,7 +47,7 @@ export default function SiteOverview({site}: SiteOverviewProps) {
       </Card.Section>
       <Text mt="10">Drawings: 2</Text>
       <Group justify="space-between">
-        <Button mt="8" w="fit-content" variant="warning">List</Button>
+      <Link href={`${site.siteCode}/rooms`}><Button mt="8" w="fit-content" variant="warning">List</Button></Link>
         <Button mt="8" w="fit-content">New</Button>
       </Group>
     </Card>
@@ -59,7 +60,7 @@ export default function SiteOverview({site}: SiteOverviewProps) {
       </Card.Section>
       <Text mt="10">Total: 32, Answered: 3</Text>
       <Group justify="space-between">
-        <Button mt="8" w="fit-content" variant="warning">List</Button>
+      <Link href={`${site.siteCode}/processes`}><Button mt="8" w="fit-content" variant="warning">List</Button></Link>
         <Button mt="8" w="fit-content">Go</Button>
       </Group>
     </Card>
