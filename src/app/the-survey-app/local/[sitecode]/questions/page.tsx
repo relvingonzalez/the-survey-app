@@ -12,5 +12,5 @@ export default async function ListPage({
   console.log(siteCode);
 
   const questions = dummyQuestions;
-  return <QuestionList items={questions} />;
+  return <QuestionList isQuestion items={questions} />;
 }

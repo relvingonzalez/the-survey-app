@@ -11,8 +11,8 @@ const registerHandlerA = (app: Express) => {
     const mockApiResponse = dummySite;
     return res.status(200).json(mockApiResponse);
   });
-}
+};
 
-export const registerHandlers = (app: Express)  => {
+export const registerHandlers = (app: Express) => {
   registerHandlerA(app);
-}
+};

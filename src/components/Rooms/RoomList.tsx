@@ -1,12 +1,12 @@
-'use client'
+"use client";
 
-import { Rooms } from '@/lib/types/rooms';
-import { Button, Table, Text } from '@mantine/core';
-import { IconSettings } from '@tabler/icons-react';
-import Link from 'next/link';
+import { Rooms } from "@/lib/types/rooms";
+import { Button, Table, Text } from "@mantine/core";
+import { IconSettings } from "@tabler/icons-react";
+import Link from "next/link";
 
 type RoomListProps = {
-    items: Rooms;
+  items: Rooms;
 };
 
 export default function RoomList({ items }: RoomListProps) {
@@ -19,7 +19,11 @@ export default function RoomList({ items }: RoomListProps) {
         <Text size="sm">Additional Info: {item.moreInfo.length || 0}</Text>
       </Table.Td>
       <Table.Td>
-        <Link href={item.id}><Button><IconSettings /></Button></Link>
+        <Link href={item.id}>
+          <Button>
+            <IconSettings />
+          </Button>
+        </Link>
       </Table.Td>
     </Table.Tr>
   ));

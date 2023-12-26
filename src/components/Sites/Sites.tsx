@@ -1,69 +1,62 @@
-'use client'
+"use client";
 
-import { Site } from '@/lib/types/sites';
-import { Group, Table, Text } from '@mantine/core';
-import { IconInfoCircleFilled, IconDownload, IconSettingsFilled } from '@tabler/icons-react';
-import Link from 'next/link';
+import { Site } from "@/lib/types/sites";
+import { Group, Table, Text } from "@mantine/core";
+import {
+  IconInfoCircleFilled,
+  IconDownload,
+  IconSettingsFilled,
+} from "@tabler/icons-react";
+import Link from "next/link";
 
 type SitesProps = {
-    sites: Site[];
-    download?: boolean
+  sites: Site[];
+  download?: boolean;
 };
 
 const siteProgress = (site: Site) => {
-    return (
-        <Table withColumnBorders>
-            <Table.Tbody>
-                <Table.Tr>
-                    <Table.Td>
-                        Questions:
-                    </Table.Td>
-                    <Table.Td>
-                        1/{site.questionnaire.length}
-                    </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                    <Table.Td>
-                        Sketches:
-                    </Table.Td>
-                    <Table.Td>
-                        3
-                    </Table.Td>
-                </Table.Tr>
-                <Table.Tr>
-                    <Table.Td>
-                        Processes:
-                    </Table.Td>
-                    <Table.Td>
-                        5/{site.process.length}
-                    </Table.Td>
-                </Table.Tr>
-            </Table.Tbody>
-        </Table>
-    )
-}
+  return (
+    <Table withColumnBorders>
+      <Table.Tbody>
+        <Table.Tr>
+          <Table.Td>Questions:</Table.Td>
+          <Table.Td>1/{site.questionnaire.length}</Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td>Sketches:</Table.Td>
+          <Table.Td>3</Table.Td>
+        </Table.Tr>
+        <Table.Tr>
+          <Table.Td>Processes:</Table.Td>
+          <Table.Td>5/{site.process.length}</Table.Td>
+        </Table.Tr>
+      </Table.Tbody>
+    </Table>
+  );
+};
 
 function Sites({ sites, download }: SitesProps) {
   const rows = sites.map((site, index) => (
     <Table.Tr key={`${site.siteCode}-${index}`}>
       <Table.Td>{site.siteCode}</Table.Td>
       <Table.Td>
-            <Text>{site.location}</Text>
-            {download && <Text>{site.questionnaire ? 'Yes' : 'No'}</Text>}
+        <Text>{site.location}</Text>
+        {download && <Text>{site.questionnaire ? "Yes" : "No"}</Text>}
       </Table.Td>
-      {!download && 
-        <Table.Td>
-            {siteProgress(site)}
-        </Table.Td>}
+      {!download && <Table.Td>{siteProgress(site)}</Table.Td>}
       <Table.Td>
-        {download ? 
-            <Group>
-                <IconInfoCircleFilled className="text-red" />
-                <IconDownload />
-            </Group> : 
-            <Group>
-                <Link href={`local/${site.siteCode}`}><IconSettingsFilled /></Link>
-            </Group>}
+        {download ? (
+          <Group>
+            <IconInfoCircleFilled className="text-red" />
+            <IconDownload />
+          </Group>
+        ) : (
+          <Group>
+            <Link href={`local/${site.siteCode}`}>
+              <IconSettingsFilled />
+            </Link>
+          </Group>
+        )}
       </Table.Td>
     </Table.Tr>
   ));
@@ -86,10 +79,10 @@ function Sites({ sites, download }: SitesProps) {
   );
 }
 
-export function DownloadSites({sites}: SitesProps ) {
-    return <Sites sites={sites} download/>
+export function DownloadSites({ sites }: SitesProps) {
+  return <Sites sites={sites} download />;
 }
 
-export function LocalSites({sites}: SitesProps) {
-    return <Sites sites={sites} />
+export function LocalSites({ sites }: SitesProps) {
+  return <Sites sites={sites} />;
 }

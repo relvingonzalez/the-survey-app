@@ -1,25 +1,35 @@
-'use client'
+"use client";
 
-import { Processes, Questions } from '@/lib/types/question';
-import { Button, Table, Text } from '@mantine/core';
-import { IconSettings } from '@tabler/icons-react';
-import Link from 'next/link';
+import { Processes, Questions } from "@/lib/types/question";
+import { Button, Table, Text } from "@mantine/core";
+import { IconSettings } from "@tabler/icons-react";
+import Link from "next/link";
 
 type QuestionsProps = {
-    items: Questions | Processes;
+  items: Questions | Processes;
+  isQuestion?: boolean;
 };
 
-export default function QuestionList({ items }: QuestionsProps) {
+export default function QuestionList({ items, isQuestion }: QuestionsProps) {
   const rows = items.map((item, index) => (
     <Table.Tr key={`${item.id}-${index}`}>
       <Table.Td>{item.id}</Table.Td>
       <Table.Td>{item.sub1}</Table.Td>
       <Table.Td>
-        <Text size="sm" fs="italic"> {item.question}</Text>
-        <Text size="sm" fw="700">{item.displayValue}</Text>
+        <Text size="sm" fs="italic">
+          {" "}
+          {item.question}
+        </Text>
+        <Text size="sm" fw="700">
+          {item.displayValue}
+        </Text>
       </Table.Td>
       <Table.Td>
-        <Link href={item.id}><Button variant={item.answer.value? 'light': 'default'}><IconSettings /></Button></Link>
+        <Link href={`${isQuestion ? "questions" : "processes"}/${item.id}`}>
+          <Button variant={item.answer.value ? "light" : "default"}>
+            <IconSettings />
+          </Button>
+        </Link>
       </Table.Td>
     </Table.Tr>
   ));
