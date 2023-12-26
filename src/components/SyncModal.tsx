@@ -1,3 +1,5 @@
+"use client";
+
 import { ModalProps } from "@mantine/core";
 import ProgressModal from "./ProgressModal";
 import { useEffect, useState } from "react";

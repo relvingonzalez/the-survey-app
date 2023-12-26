@@ -18,7 +18,7 @@ export default function LoginForm() {
 
   return (
     <form
-      onSubmit={form.onSubmit((values) => redirect("the-survey-app/start"))}
+      onSubmit={form.onSubmit(() => redirect("the-survey-app/start"))}
       className="w-100"
     >
       <TextInput

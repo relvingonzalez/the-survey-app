@@ -1,6 +1,12 @@
 "use client";
 
-import { AppShell } from "@mantine/core";
+import {
+  AppShell,
+  AppShellNavbar,
+  AppShellHeader,
+  AppShellFooter,
+  AppShellMain,
+} from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { redirect } from "next/navigation";
 import Sidebar from "./navigation/Sidebar";
@@ -28,24 +34,24 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       }}
       padding="md"
     >
-      <AppShell.Header>
+      <AppShellHeader>
         <NavHeader
           mobileOpened={mobileOpened}
           desktopOpened={desktopOpened}
           toggleMobile={toggleMobile}
           toggleDesktop={toggleDesktop}
         />
-      </AppShell.Header>
-      <AppShell.Navbar p="md">
+      </AppShellHeader>
+      <AppShellNavbar p="md">
         <Sidebar navLinks={navLinks} />
-      </AppShell.Navbar>
-      <AppShell.Main>
+      </AppShellNavbar>
+      <AppShellMain>
         <NavBreadcrumbs navLinks={navLinks} />
         {children}
-      </AppShell.Main>
-      <AppShell.Footer p="md">
+      </AppShellMain>
+      <AppShellFooter p="md">
         <NavFooter />
-      </AppShell.Footer>
+      </AppShellFooter>
     </AppShell>
   );
 }

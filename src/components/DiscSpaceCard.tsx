@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, Group, Text, RingProgress } from "@mantine/core";
+import { Card, CardSection, Group, Text, RingProgress } from "@mantine/core";
 import { IconClockHour9 } from "@tabler/icons-react";
 import { useState } from "react";
 
@@ -16,14 +16,14 @@ export default function DiscSpaceCard() {
 
   return (
     <Card withBorder shadow="sm" radius="md">
-      <Card.Section withBorder inheritPadding py="xs">
+      <CardSection withBorder inheritPadding py="xs">
         <Group justify="start">
           <IconClockHour9 />
           <Text size="xl" fw={500}>
             Storage
           </Text>
         </Group>
-      </Card.Section>
+      </CardSection>
       <RingProgress
         sections={[{ value: percentFilled, color: "blue" }]}
         label={

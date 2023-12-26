@@ -1,3 +1,5 @@
+"use client";
+
 import { brandNav } from "@/lib/navigation/routes";
 import { WithNavLinkProps } from "@/lib/types/nav";
 import { Breadcrumbs, Anchor, Text } from "@mantine/core";

@@ -1,9 +1,6 @@
 "use client";
 
 import {
-  Button,
-  Group,
-  MantineProvider,
   defaultVariantColorsResolver,
   VariantColorsResolver,
   parseThemeColor,

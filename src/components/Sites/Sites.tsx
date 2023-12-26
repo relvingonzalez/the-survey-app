@@ -1,7 +1,15 @@
-"use client";
-
 import { Site } from "@/lib/types/sites";
-import { Group, Table, Text } from "@mantine/core";
+import {
+  Group,
+  Table,
+  TableTbody,
+  TableTr,
+  TableTd,
+  TableTh,
+  TableThead,
+  TableTfoot,
+  Text,
+} from "@mantine/core";
 import {
   IconInfoCircleFilled,
   IconDownload,
@@ -17,34 +25,34 @@ type SitesProps = {
 const siteProgress = (site: Site) => {
   return (
     <Table withColumnBorders>
-      <Table.Tbody>
-        <Table.Tr>
-          <Table.Td>Questions:</Table.Td>
-          <Table.Td>1/{site.questionnaire.length}</Table.Td>
-        </Table.Tr>
-        <Table.Tr>
-          <Table.Td>Sketches:</Table.Td>
-          <Table.Td>3</Table.Td>
-        </Table.Tr>
-        <Table.Tr>
-          <Table.Td>Processes:</Table.Td>
-          <Table.Td>5/{site.process.length}</Table.Td>
-        </Table.Tr>
-      </Table.Tbody>
+      <TableTbody>
+        <TableTr>
+          <TableTd>Questions:</TableTd>
+          <TableTd>1/{site.questionnaire.length}</TableTd>
+        </TableTr>
+        <TableTr>
+          <TableTd>Sketches:</TableTd>
+          <TableTd>3</TableTd>
+        </TableTr>
+        <TableTr>
+          <TableTd>Processes:</TableTd>
+          <TableTd>5/{site.process.length}</TableTd>
+        </TableTr>
+      </TableTbody>
     </Table>
   );
 };
 
 function Sites({ sites, download }: SitesProps) {
   const rows = sites.map((site, index) => (
-    <Table.Tr key={`${site.siteCode}-${index}`}>
-      <Table.Td>{site.siteCode}</Table.Td>
-      <Table.Td>
+    <TableTr key={`${site.siteCode}-${index}`}>
+      <TableTd>{site.siteCode}</TableTd>
+      <TableTd>
         <Text>{site.location}</Text>
         {download && <Text>{site.questionnaire ? "Yes" : "No"}</Text>}
-      </Table.Td>
-      {!download && <Table.Td>{siteProgress(site)}</Table.Td>}
-      <Table.Td>
+      </TableTd>
+      {!download && <TableTd>{siteProgress(site)}</TableTd>}
+      <TableTd>
         {download ? (
           <Group>
             <IconInfoCircleFilled className="text-red" />
@@ -57,24 +65,24 @@ function Sites({ sites, download }: SitesProps) {
             </Link>
           </Group>
         )}
-      </Table.Td>
-    </Table.Tr>
+      </TableTd>
+    </TableTr>
   ));
 
   const ths = (
-    <Table.Tr>
-      <Table.Th>Site Code</Table.Th>
-      <Table.Th>Location</Table.Th>
-      {!download && <Table.Th>Progress</Table.Th>}
-      <Table.Th>Action(s)</Table.Th>
-    </Table.Tr>
+    <TableTr>
+      <TableTh>Site Code</TableTh>
+      <TableTh>Location</TableTh>
+      {!download && <TableTh>Progress</TableTh>}
+      <TableTh>Action(s)</TableTh>
+    </TableTr>
   );
 
   return (
     <Table captionSide="bottom" withColumnBorders>
-      <Table.Thead bg="var(--mantine-color-gray-light)">{ths}</Table.Thead>
-      <Table.Tbody>{rows}</Table.Tbody>
-      <Table.Tfoot bg="var(--mantine-color-gray-light)">{ths}</Table.Tfoot>
+      <TableThead bg="var(--mantine-color-gray-light)">{ths}</TableThead>
+      <TableTbody>{rows}</TableTbody>
+      <TableTfoot bg="var(--mantine-color-gray-light)">{ths}</TableTfoot>
     </Table>
   );
 }

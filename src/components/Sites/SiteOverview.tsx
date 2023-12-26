@@ -1,7 +1,5 @@
-"use client";
-
 import { Site } from "@/lib/types/sites";
-import { Card, Group, Text, Button } from "@mantine/core";
+import { Card, CardSection, Group, Text, Button } from "@mantine/core";
 import { IconInfoCircleFilled, IconAddressBook } from "@tabler/icons-react";
 import Link from "next/link";
 
@@ -13,14 +11,14 @@ export default function SiteOverview({ site }: SiteOverviewProps) {
   return (
     <>
       <Card withBorder shadow="sm" radius="md">
-        <Card.Section withBorder inheritPadding py="xs">
+        <CardSection withBorder inheritPadding py="xs">
           <Group justify="start">
             <IconAddressBook />
             <Text size="xl" fw={500}>
               Site Overview
             </Text>
           </Group>
-        </Card.Section>
+        </CardSection>
         <Text mt="10" inherit>
           {site.location}
         </Text>
@@ -30,21 +28,25 @@ export default function SiteOverview({ site }: SiteOverviewProps) {
       </Card>
 
       <Card withBorder mt="10" shadow="sm" radius="md">
-        <Card.Section inheritPadding py="xs">
+        <CardSection inheritPadding py="xs">
           <Group justify="start">
             <Text size="xl" fw={500}>
               Questions
             </Text>
           </Group>
-        </Card.Section>
+        </CardSection>
 
         <Text mt="10">Total: 32, Answered: 3</Text>
         <Group justify="space-between">
-          <Link href={`${site.siteCode}/questions`}>
-            <Button mt="8" w="fit-content" variant="warning">
-              List
-            </Button>
-          </Link>
+          <Button
+            component={Link}
+            href={`${site.siteCode}/questions`}
+            mt="8"
+            w="fit-content"
+            variant="warning"
+          >
+            List
+          </Button>
           <Button mt="8" w="fit-content">
             Go
           </Button>
@@ -52,20 +54,24 @@ export default function SiteOverview({ site }: SiteOverviewProps) {
       </Card>
 
       <Card withBorder mt="10" shadow="sm" radius="md">
-        <Card.Section inheritPadding py="xs">
+        <CardSection inheritPadding py="xs">
           <Group justify="start">
             <Text size="xl" fw={500}>
               Rooms/Layouts
             </Text>
           </Group>
-        </Card.Section>
+        </CardSection>
         <Text mt="10">Drawings: 2</Text>
         <Group justify="space-between">
-          <Link href={`${site.siteCode}/rooms`}>
-            <Button mt="8" w="fit-content" variant="warning">
-              List
-            </Button>
-          </Link>
+          <Button
+            component={Link}
+            href={`${site.siteCode}/rooms`}
+            mt="8"
+            w="fit-content"
+            variant="warning"
+          >
+            List
+          </Button>
           <Button mt="8" w="fit-content">
             New
           </Button>
@@ -73,20 +79,24 @@ export default function SiteOverview({ site }: SiteOverviewProps) {
       </Card>
 
       <Card withBorder mt="10" shadow="sm" radius="md">
-        <Card.Section inheritPadding py="xs">
+        <CardSection inheritPadding py="xs">
           <Group justify="start">
             <Text size="xl" fw={500}>
               Processes
             </Text>
           </Group>
-        </Card.Section>
+        </CardSection>
         <Text mt="10">Total: 32, Answered: 3</Text>
         <Group justify="space-between">
-          <Link href={`${site.siteCode}/processes`}>
-            <Button mt="8" w="fit-content" variant="warning">
-              List
-            </Button>
-          </Link>
+          <Button
+            component={Link}
+            href={`${site.siteCode}/processes`}
+            mt="8"
+            w="fit-content"
+            variant="warning"
+          >
+            List
+          </Button>
           <Button mt="8" w="fit-content">
             Go
           </Button>

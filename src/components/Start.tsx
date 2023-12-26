@@ -1,20 +1,18 @@
-"use client";
-
-import { Card, Group, Text, Anchor } from "@mantine/core";
+import { Card, CardSection, Group, Text, Anchor } from "@mantine/core";
 import { IconClockHour9 } from "@tabler/icons-react";
 import Link from "next/link";
 
 export default function Start() {
   return (
     <Card withBorder shadow="sm" radius="md">
-      <Card.Section withBorder inheritPadding py="xs">
+      <CardSection withBorder inheritPadding py="xs">
         <Group justify="start">
           <IconClockHour9 />
           <Text size="xl" fw={500}>
             Welcome
           </Text>
         </Group>
-      </Card.Section>
+      </CardSection>
       <Text mt="10" inherit>
         You are logged in as{" "}
         <Text span fw={700}>
