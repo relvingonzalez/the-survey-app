@@ -1,4 +1,4 @@
-import { getSite } from "@/app/utils";
+//import { getSite } from "@/app/utils";
 import QuestionList from "@/components/Questions/QuestionList";
 import { dummyQuestions } from "@/lib/data/questions";
 import { SiteCode } from "@/lib/types/sites";
@@ -6,11 +6,11 @@ import { SiteCode } from "@/lib/types/sites";
 export default async function ProcessesPage({
   params: { siteCode },
 }: {
-  params: { siteCode: SiteCode }
+  params: { siteCode: SiteCode };
 }) {
+  console.log(siteCode);
+
   //const site = await getSite(siteCode);
   const questions = dummyQuestions;
-    return (
-        <QuestionList items={dummyQuestions} />
-      );
+  return <QuestionList items={questions} />;
 }

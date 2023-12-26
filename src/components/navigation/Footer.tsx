@@ -1,4 +1,4 @@
-import { Button, Center, UnstyledButton } from "@mantine/core";
+import { Button, Center } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { IconRefresh } from '@tabler/icons-react';
 import SyncModal from "../SyncModal";

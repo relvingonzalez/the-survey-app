@@ -16,8 +16,10 @@ export default function Layout({
   }) {
     const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
     const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
+    
+    const notLoggedIn = false; 
 
-    if(false) {
+    if(notLoggedIn) {
         redirect('login');
     }
     return (

@@ -1,23 +1,27 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import './globals.css'
-const inter = Inter({ subsets: ['latin'] })
-import '@mantine/core/styles.css';
-import { ColorSchemeScript, MantineProvider, Burger, Group, Skeleton  } from '@mantine/core';
-import { variantColorResolver } from '@/lib/constants/maritineTheme';
-
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
+import "./globals.css";
+const inter = Inter({ subsets: ["latin"] });
+import "@mantine/core/styles.css";
+import {
+  ColorSchemeScript,
+  MantineProvider,
+  Burger,
+  Group,
+  Skeleton,
+} from "@mantine/core";
+import { variantColorResolver } from "@/lib/constants/maritineTheme";
 
 export const metadata: Metadata = {
-  title: 'The Survey App',
-  description: 'The Original Survey App',
-}
+  title: "The Survey App",
+  description: "The Original Survey App",
+};
 
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
-
   return (
     <html lang="en">
       <head>
@@ -25,9 +29,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <MantineProvider theme={{ variantColorResolver }}>
-         {children}
+          {children}
         </MantineProvider>
       </body>
     </html>
-  )
+  );
 }

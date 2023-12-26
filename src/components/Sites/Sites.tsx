@@ -19,7 +19,7 @@ const siteProgress = (site: Site) => {
                         Questions:
                     </Table.Td>
                     <Table.Td>
-                        1/20
+                        1/{site.questionnaire.length}
                     </Table.Td>
                 </Table.Tr>
                 <Table.Tr>
@@ -35,7 +35,7 @@ const siteProgress = (site: Site) => {
                         Processes:
                     </Table.Td>
                     <Table.Td>
-                        5/10
+                        5/{site.process.length}
                     </Table.Td>
                 </Table.Tr>
             </Table.Tbody>
