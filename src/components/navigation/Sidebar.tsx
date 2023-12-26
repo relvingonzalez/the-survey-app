@@ -1,15 +1,13 @@
 import { WithNavLinkProps } from '@/lib/types/nav';
-import classes from './sidebar.module.css';
+import classes from './Sidebar.module.css';
 import { Anchor } from '@mantine/core';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation'
-import { brandNav } from '@/lib/navigation/routes';
 
 
 export default function Sidebar({navLinks}: WithNavLinkProps) {
   const pathname = usePathname();
   const pathNameArray = pathname.split('/');
-  // Remove Top Level from links
   const sideBarLinks = Object.values(navLinks).filter(n => !n.hideOnSidebar);
   const links = sideBarLinks.map((item) => (
     <Anchor component={Link}

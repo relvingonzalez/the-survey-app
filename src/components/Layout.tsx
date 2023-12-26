@@ -3,10 +3,10 @@
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { redirect } from "next/navigation";
-import Sidebar from "./navigation/sidebar";
-import NavBreadcrumbs from "./navigation/breadcrumbs";
-import NavFooter from "./navigation/footer";
-import NavHeader from "./navigation/header";
+import Sidebar from "./navigation/Sidebar";
+import NavBreadcrumbs from "./navigation/Breadcrumbs";
+import NavFooter from "./navigation/Footer";
+import NavHeader from "./navigation/Header";
 import { navLinks } from "@/lib/navigation/routes";
 
 export default function Layout({
