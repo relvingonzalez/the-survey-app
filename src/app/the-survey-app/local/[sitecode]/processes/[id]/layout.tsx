@@ -1,17 +1,27 @@
 //import { getSite } from "@/app/utils";
 
 import QuestionLayout from "@/components/Questions/QuestionLayout";
-import { dummyQuestion } from "@/lib/data/questions";
-import { dummySite } from "@/lib/data/sites";
+import { dummyQuestion, dummyQuestions } from "@/lib/data/questions";
 
 export default async function QuestionPage({
   children,
+  params: { id },
 }: {
   children: React.ReactNode;
+  params: { id: string };
 }) {
-  const question = dummyQuestion;
+  let currentIndex = 0;
+  const question =
+    dummyQuestions.find((q, i) => {
+      if (q.id === id) {
+        currentIndex = i;
+        return true;
+      }
+    }) || dummyQuestion;
+  const nextId = dummyQuestions[currentIndex + 1]?.id;
+  const prevId = dummyQuestions[currentIndex - 1]?.id;
   return (
-    <QuestionLayout question={question} site={dummySite}>
+    <QuestionLayout question={question} prevId={prevId} nextId={nextId}>
       {children}
     </QuestionLayout>
   );

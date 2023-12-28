@@ -1,6 +1,7 @@
 import { UUID } from "./util";
 
 type Answer = {
+  comment: string;
   value: string;
 };
 
@@ -22,10 +23,13 @@ export type QuestionType =
 
 type BaseQuestion = {
   id: UUID;
-  sub1: string;
-  question: string;
   answer: Answer;
+  hasComment: boolean;
   displayValue: string;
+  hasDrawing: boolean;
+  hasFile: boolean;
+  question: string;
+  sub1: string;
 };
 
 type QuestionEntry = {

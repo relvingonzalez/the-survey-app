@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function Start() {
   return (
     <Card withBorder shadow="sm" radius="md">
-      <CardSection withBorder inheritPadding py="xs">
+      <CardSection data-first-section="true" withBorder inheritPadding py="xs">
         <Group justify="start">
           <IconClockHour9 />
           <Text size="xl" fw={500}>

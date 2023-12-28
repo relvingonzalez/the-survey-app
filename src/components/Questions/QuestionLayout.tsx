@@ -1,30 +1,29 @@
 import { Process, Question } from "@/lib/types/question";
-import { Site } from "@/lib/types/sites";
-import { Button, Card, CardSection, Group, Text, Title } from "@mantine/core";
-import {
-  IconChevronLeft,
-  IconChevronRight,
-  IconList,
-} from "@tabler/icons-react";
-import Link from "next/link";
+import { UUID } from "@/lib/types/util";
+import { Card, CardSection, Group, Text, Title } from "@mantine/core";
 import { PropsWithChildren } from "react";
+import QuestionNavigation from "./QuetionNavigation";
 
 type QuestionLayoutProps = PropsWithChildren & {
-  site: Site;
+  prevId: UUID;
+  nextId: UUID;
   question: Question | Process;
   isQuestion?: boolean;
 };
 
 export default function QuestionLayout({
-  question,
-  site,
   children,
+  nextId,
   isQuestion,
+  prevId,
+  question,
 }: QuestionLayoutProps) {
+  const title = isQuestion ? "Questions" : "Processes";
+
   return (
     <>
       <Title order={2}>
-        {isQuestion ? "Questions" : "Processes"}: {question.sub1}
+        {title}: {question.sub1}
       </Title>
       <Card withBorder shadow="sm" radius="md">
         <CardSection inheritPadding py="xs">
@@ -36,36 +35,7 @@ export default function QuestionLayout({
         </CardSection>
         {children}
       </Card>
-      <Group justify="space-between">
-        <Button
-          component={Link}
-          href={`${site.siteCode}/processes`}
-          mt="8"
-          w="fit-content"
-          leftSection={<IconChevronLeft />}
-        >
-          Prev
-        </Button>
-        <Button
-          component={Link}
-          href="./"
-          mt="8"
-          leftSection={<IconList />}
-          w="fit-content"
-          variant="warning"
-        >
-          List
-        </Button>
-        <Button
-          component={Link}
-          href={`${site.siteCode}/processes`}
-          mt="8"
-          w="fit-content"
-          leftSection={<IconChevronRight />}
-        >
-          Next
-        </Button>
-      </Group>
+      <QuestionNavigation prevId={prevId} nextId={nextId} />
     </>
   );
 }
