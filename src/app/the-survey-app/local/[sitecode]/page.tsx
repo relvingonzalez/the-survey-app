@@ -1,4 +1,5 @@
 import SiteOverview from "@/components/Sites/SiteOverview";
+import { dummyQuestions } from "@/lib/data/questions";
 import { dummySite } from "@/lib/data/sites";
 import { SiteCode } from "@/lib/types/sites";
 
@@ -10,5 +11,11 @@ export default async function SiteOverviewPage({
   console.log(siteCode);
   //const site = await getSite(siteCode);
   const site = dummySite;
-  return <SiteOverview site={site} />;
+  return (
+    <SiteOverview
+      questions={dummyQuestions}
+      processes={dummyQuestions}
+      site={site}
+    />
+  );
 }

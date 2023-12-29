@@ -1,10 +1,13 @@
-import { Process, Question } from "@/lib/types/question";
-import { TextInput } from "@mantine/core";
+import { TextInput, TextInputProps } from "@mantine/core";
+import { BaseQuestionProps } from "../Question";
 
-type QuestionTextProps = {
-  question: Question | Process;
-};
+type QuestionTextProps = BaseQuestionProps & TextInputProps;
 
-export default function QuestionText({ question }: QuestionTextProps) {
-  return <TextInput placeholder="Text" value={question.answer.value} />;
+export default function QuestionText({
+  question,
+  ...props
+}: QuestionTextProps) {
+  return (
+    <TextInput placeholder="Text" value={question.answer.value} {...props} />
+  );
 }

@@ -6,20 +6,20 @@ type Answer = {
 };
 
 export type QuestionType =
-  | "CHECKBOX"
-  | "DATETIME"
-  | "DAYS"
-  | "EMAIL"
-  | "GEO"
-  | "LIST"
-  | "MULTIPLE"
-  | "NUMBER"
-  | "PERSON"
-  | "PHONE"
-  | "TEXT"
-  | "TIME"
-  | "YES/NO"
-  | "COLLECTION";
+  | "checkbox"
+  | "datetime"
+  | "days"
+  | "email"
+  | "geo"
+  | "list"
+  | "multiple"
+  | "number"
+  | "person"
+  | "phone"
+  | "text"
+  | "time"
+  | "yes/no"
+  | "collection";
 
 type BaseQuestion = {
   id: UUID;
@@ -39,12 +39,12 @@ type QuestionEntry = {
 };
 
 type CollectionQuestion = BaseQuestion & {
-  type: "COLLECTION";
+  type: "collection";
   entries: QuestionEntry[];
 };
 
 type DefaultQuestion = BaseQuestion & {
-  type: Omit<QuestionType, "COLLECTION">;
+  type: Omit<QuestionType, "collection">;
 };
 
 export type Question = CollectionQuestion | DefaultQuestion;

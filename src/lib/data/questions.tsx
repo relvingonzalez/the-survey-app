@@ -1,4 +1,5 @@
-import { Question, Questions } from "../types/question";
+import { Question, QuestionType, Questions } from "../types/question";
+import { UUID } from "../types/util";
 
 export const dummyQuestion: Question = {
   id: "1",
@@ -17,17 +18,29 @@ export const dummyQuestion: Question = {
 
 export const dummyQuestion2: Question = {
   id: "2",
-  question: "How blue is the ocean?",
+  question: "What is your phone?",
   sub1: "The most important question",
   answer: {
     value: "",
     comment: "",
   },
-  displayValue: "Very Hot",
-  type: "text",
+  displayValue: "1(333)444-5555",
+  type: "phone",
   hasDrawing: false,
   hasFile: false,
   hasComment: false,
 };
 
-export const dummyQuestions: Questions = [dummyQuestion, dummyQuestion2];
+function createQuestion(id: UUID, type: QuestionType, question: string) {
+  return Object.assign({}, dummyQuestion, {
+    id,
+    type,
+    question,
+  });
+}
+
+export const dummyQuestions: Questions = [
+  dummyQuestion,
+  dummyQuestion2,
+  createQuestion("3", "email", "Type your Email"),
+];

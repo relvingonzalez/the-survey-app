@@ -4,9 +4,12 @@ import { Process, Question } from "@/lib/types/question";
 import QuestionComment from "./QuestionComment";
 import QuestionType from "./QuestionType";
 
-type QuestionProps = {
-  hideFileButtons?: boolean;
+export type BaseQuestionProps = {
   question: Question | Process;
+};
+
+type QuestionProps = BaseQuestionProps & {
+  hideFileButtons?: boolean;
 };
 
 export default function Question({ question }: QuestionProps) {

@@ -1,3 +1,4 @@
+import { Processes, Questions } from "@/lib/types/question";
 import { Site } from "@/lib/types/sites";
 import { Card, CardSection, Group, Text, Button } from "@mantine/core";
 import { IconInfoCircleFilled, IconAddressBook } from "@tabler/icons-react";
@@ -5,9 +6,20 @@ import Link from "next/link";
 
 type SiteOverviewProps = {
   site: Site;
+  questions: Questions;
+  processes: Processes;
 };
 
-export default function SiteOverview({ site }: SiteOverviewProps) {
+export default function SiteOverview({
+  site,
+  questions,
+  processes,
+}: SiteOverviewProps) {
+  const nextQuestion =
+    questions.find((q) => !q.answer.value)?.id || questions[0].id;
+  const nextProcess =
+    processes.find((p) => !p.answer.value)?.id || processes[0].id;
+
   return (
     <>
       <Card withBorder shadow="sm" radius="md">
@@ -40,14 +52,19 @@ export default function SiteOverview({ site }: SiteOverviewProps) {
         <Group justify="space-between">
           <Button
             component={Link}
-            href={`${site.siteCode}/questions`}
+            href={"./questions"}
             mt="8"
             w="fit-content"
             variant="warning"
           >
             List
           </Button>
-          <Button mt="8" w="fit-content">
+          <Button
+            component={Link}
+            href={`${site.siteCode}/questions/${nextQuestion}`}
+            mt="8"
+            w="fit-content"
+          >
             Go
           </Button>
         </Group>
@@ -65,7 +82,7 @@ export default function SiteOverview({ site }: SiteOverviewProps) {
         <Group justify="space-between">
           <Button
             component={Link}
-            href={`${site.siteCode}/rooms`}
+            href={"./rooms"}
             mt="8"
             w="fit-content"
             variant="warning"
@@ -90,14 +107,19 @@ export default function SiteOverview({ site }: SiteOverviewProps) {
         <Group justify="space-between">
           <Button
             component={Link}
-            href={`${site.siteCode}/processes`}
+            href={"./processes"}
             mt="8"
             w="fit-content"
             variant="warning"
           >
             List
           </Button>
-          <Button mt="8" w="fit-content">
+          <Button
+            component={Link}
+            href={`${site.siteCode}/processes/${nextProcess}`}
+            mt="8"
+            w="fit-content"
+          >
             Go
           </Button>
         </Group>
