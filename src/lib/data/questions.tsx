@@ -31,11 +31,17 @@ export const dummyQuestion2: Question = {
   hasComment: false,
 };
 
-function createQuestion(id: UUID, type: QuestionType, question: string) {
+function createQuestion(
+  id: UUID,
+  type: QuestionType,
+  question?: string,
+  listOptions?: string[],
+) {
   return Object.assign({}, dummyQuestion, {
     id,
     type,
     question,
+    listOptions,
   });
 }
 
@@ -43,4 +49,21 @@ export const dummyQuestions: Questions = [
   dummyQuestion,
   dummyQuestion2,
   createQuestion("3", "email", "Type your Email"),
+  createQuestion("4", "list", "What is your favorite vacation spot?", [
+    "Brazil",
+    "Norway",
+    "USA",
+    "Denmark",
+  ]),
+  createQuestion("5", "checkbox", "Where have you looked?", [
+    "under the bed",
+    "Behind the counters",
+    "under the sink",
+  ]),
+  createQuestion("6", "multiple", "What countries have you visited?", [
+    "Brazil",
+    "Norway",
+    "USA",
+    "Denmark",
+  ]),
 ];

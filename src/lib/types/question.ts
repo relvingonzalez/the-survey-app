@@ -1,8 +1,14 @@
 import { UUID } from "./util";
 
-type Answer = {
+type AnswerValue = string;
+type BaseAnswer = {
   comment: string;
-  value: string;
+  value: AnswerValue;
+};
+type ListOptions = string[];
+type ListAnswer = {
+  comment: string;
+  [key: string]: AnswerValue;
 };
 
 export type QuestionType =
@@ -23,7 +29,6 @@ export type QuestionType =
 
 type BaseQuestion = {
   id: UUID;
-  answer: Answer;
   hasComment: boolean;
   displayValue: string;
   hasDrawing: boolean;
@@ -35,19 +40,29 @@ type BaseQuestion = {
 type QuestionEntry = {
   question: string;
   type: QuestionType;
-  answer: Answer;
+  answer: BaseAnswer;
 };
+
+type ListQuestionTypes = "list" | "checkbox" | "multiple";
 
 type CollectionQuestion = BaseQuestion & {
   type: "collection";
   entries: QuestionEntry[];
+  answer: ListAnswer;
+};
+
+type ListQuestion = BaseQuestion & {
+  type: ListQuestionTypes;
+  listOptions: ListOptions;
+  answer: ListAnswer;
 };
 
 type DefaultQuestion = BaseQuestion & {
-  type: Omit<QuestionType, "collection">;
+  type: Exclude<QuestionType, "collection" | ListQuestionTypes>;
+  answer: BaseAnswer;
 };
 
-export type Question = CollectionQuestion | DefaultQuestion;
+export type Question = CollectionQuestion | ListQuestion | DefaultQuestion;
 
 export type Process = Question;
 

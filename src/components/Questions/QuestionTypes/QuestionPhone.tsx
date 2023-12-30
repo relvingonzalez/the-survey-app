@@ -1,10 +1,10 @@
-import { BaseQuestionProps } from "../Question";
+import { QuestionTypeProps } from "../QuestionType";
 import QuestionText from "./QuestionText";
 
-export default function QuestionPhone({ question }: BaseQuestionProps) {
+export default function QuestionPhone(props: QuestionTypeProps) {
   return (
     <QuestionText
-      question={question}
+      {...props}
       type="tel"
       label="Telephone"
       placeholder="+9-(999)999-9999"
