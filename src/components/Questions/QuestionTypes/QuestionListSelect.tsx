@@ -1,18 +1,21 @@
-import { Select } from "@mantine/core";
-import { QuestionTypeProps } from "../QuestionType";
+import { Select, SelectProps } from "@mantine/core";
+import { ListQuestion } from "@/lib/types/question";
 
-export default function QuestionListSelect({ question }: QuestionTypeProps) {
-  //question.answer[option]
+export type QuestionListSelectProps = {
+  question: ListQuestion;
+} & SelectProps;
+
+export default function QuestionListSelect({
+  question,
+  ...props
+}: QuestionListSelectProps) {
   return (
-    <>
-      {question.type === "list" && (
-        <Select
-          name="list"
-          label="Select"
-          placeholder="--Select One--"
-          data={question.listOptions}
-        />
-      )}
-    </>
+    <Select
+      {...props}
+      name="list"
+      label="Select"
+      placeholder="--Select One--"
+      data={question.listOptions}
+    />
   );
 }

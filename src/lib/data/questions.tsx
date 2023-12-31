@@ -1,7 +1,12 @@
-import { Question, QuestionType, Questions } from "../types/question";
+import {
+  Question,
+  QuestionType,
+  Questions,
+  TextQuestion,
+} from "../types/question";
 import { UUID } from "../types/util";
 
-export const dummyQuestion: Question = {
+export const dummyQuestion: TextQuestion = {
   id: "1",
   question: "How hot is the Sun?",
   sub1: "The most important question",

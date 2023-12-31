@@ -35,7 +35,7 @@ export default function Question({ question }: QuestionProps) {
   const showComment =
     question.hasComment ||
     (question.type === "multiple" &&
-      ["Other", "Others"].includes(question.answer.value));
+      question.answer.value.some((v) => ["Other", "Others"].includes(v)));
 
   return (
     <>

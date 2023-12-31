@@ -14,19 +14,17 @@ export type QuestionTypeProps = {
   onChange: ChangeEventHandler;
 };
 
-export default function QuestionType(props: QuestionTypeProps) {
-  const type = props.question.type;
-
+export default function QuestionType({ question }: QuestionTypeProps) {
   return (
     <>
-      {type === "text" && <QuestionText {...props} />}
-      {type === "phone" && <QuestionPhone {...props} />}
-      {type === "email" && <QuestionEmail {...props} />}
-      {type === "number" && <QuestionNumber {...props} />}
-      {type === "checkbox" && <QuestionCheckbox {...props} />}
-      {type === "yes/no" && <QuestionYesNo {...props} />}
-      {type === "list" && <QuestionListSelect {...props} />}
-      {type === "multiple" && <QuestionMultiple {...props} />}
+      {question.type === "text" && <QuestionText question={question} />}
+      {question.type === "phone" && <QuestionPhone question={question} />}
+      {question.type === "email" && <QuestionEmail question={question} />}
+      {question.type === "number" && <QuestionNumber question={question} />}
+      {question.type === "checkbox" && <QuestionCheckbox question={question} />}
+      {question.type === "yes/no" && <QuestionYesNo question={question} />}
+      {question.type === "list" && <QuestionListSelect question={question} />}
+      {question.type === "multiple" && <QuestionMultiple question={question} />}
     </>
   );
 }

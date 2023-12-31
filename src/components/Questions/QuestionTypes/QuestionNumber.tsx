@@ -1,13 +1,18 @@
-import { QuestionTypeProps } from "../QuestionType";
-import QuestionText from "./QuestionText";
+import { NumberQuestion } from "@/lib/types/question";
+import { TextInput, TextInputProps } from "@mantine/core";
+
+export type QuestionNumberProps = {
+  question: NumberQuestion;
+} & TextInputProps;
 
 export default function QuestionNumber({
   question,
-  onChange,
-}: QuestionTypeProps) {
+  ...props
+}: QuestionNumberProps) {
   return (
-    <QuestionText
-      question={question}
+    <TextInput
+      {...props}
+      value={question.answer.value}
       type="number"
       label="Number"
       min="0"
@@ -16,7 +21,6 @@ export default function QuestionNumber({
           event.preventDefault();
         }
       }}
-      onChange={onChange}
     />
   );
 }

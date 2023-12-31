@@ -1,7 +1,9 @@
 import { TextInput, TextInputProps } from "@mantine/core";
-import { BaseQuestionProps } from "../Question";
+import { TextQuestion } from "@/lib/types/question";
 
-type QuestionTextProps = BaseQuestionProps & TextInputProps;
+export type QuestionTextProps = {
+  question: TextQuestion;
+} & TextInputProps;
 
 export default function QuestionText({
   question,
