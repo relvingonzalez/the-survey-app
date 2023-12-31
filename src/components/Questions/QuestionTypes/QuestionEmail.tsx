@@ -1,12 +1,20 @@
-import { BaseQuestionProps } from "../Question";
-import QuestionText from "./QuestionText";
+import { EmailQuestion } from "@/lib/types/question";
+import { TextInput, TextInputProps } from "@mantine/core";
 
-export default function QuestionEmail(props: BaseQuestionProps) {
+export type QuestionEmailProps = {
+  question: EmailQuestion;
+} & TextInputProps;
+
+export default function QuestionEmail({
+  question,
+  ...props
+}: QuestionEmailProps) {
   const pattern =
-    '[a-z0-9!#$%&"*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&"*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?';
+    '[a-z0-9!#$%&"*+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&"*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?';
   return (
-    <QuestionText
+    <TextInput
       {...props}
+      value={question.answer.value}
       label="Email"
       type="email"
       placeholder="email@example.com"

@@ -8,6 +8,7 @@ import QuestionYesNo from "./QuestionTypes/QuestionYesNo";
 import QuestionListSelect from "./QuestionTypes/QuestionListSelect";
 import QuestionMultiple from "./QuestionTypes/QuestionMultiple";
 import { ChangeEventHandler } from "react";
+import QuestionGeo from "./QuestionTypes/QuestionGeo";
 
 export type QuestionTypeProps = {
   question: Question | Process;
@@ -25,6 +26,7 @@ export default function QuestionType({ question }: QuestionTypeProps) {
       {question.type === "yes/no" && <QuestionYesNo question={question} />}
       {question.type === "list" && <QuestionListSelect question={question} />}
       {question.type === "multiple" && <QuestionMultiple question={question} />}
+      {question.type === "geo" && <QuestionGeo question={question} />}
     </>
   );
 }

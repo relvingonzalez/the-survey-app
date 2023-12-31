@@ -71,4 +71,5 @@ export const dummyQuestions: Questions = [
     "USA",
     "Denmark",
   ]),
+  createQuestion("7", "geo", "Get your coordinates"),
 ];
