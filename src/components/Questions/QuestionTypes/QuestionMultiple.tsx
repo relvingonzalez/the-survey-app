@@ -9,7 +9,6 @@ export default function QuestionListSelect({
   question,
   ...props
 }: QuestionMultipleProps) {
-  //question.answer[option]
   return (
     <MultiSelect
       {...props}

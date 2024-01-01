@@ -52,7 +52,7 @@ export default function SiteOverview({
         <Group justify="space-between">
           <Button
             component={Link}
-            href={"./questions"}
+            href={`${site.siteCode}/questions`}
             mt="8"
             w="fit-content"
             variant="warning"
@@ -82,7 +82,7 @@ export default function SiteOverview({
         <Group justify="space-between">
           <Button
             component={Link}
-            href={"./rooms"}
+            href={`${site.siteCode}/rooms`}
             mt="8"
             w="fit-content"
             variant="warning"
@@ -107,7 +107,7 @@ export default function SiteOverview({
         <Group justify="space-between">
           <Button
             component={Link}
-            href={"./processes"}
+            href={`${site.siteCode}/processes`}
             mt="8"
             w="fit-content"
             variant="warning"

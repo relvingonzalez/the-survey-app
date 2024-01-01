@@ -83,14 +83,14 @@ export default function QuestionGeo({ question, ...props }: QuestionGeoProps) {
           pattern={pattern}
           {...props}
         />
+        {coords.length && (
+          <Anchor
+            href={`https://maps.google.com/maps?q=${coords[0]},${coords[1]}`}
+          >
+            Go to maps
+          </Anchor>
+        )}
       </Group>
-      {coords.length && (
-        <Anchor
-          href={`https://maps.google.com/maps?q=${coords[0]},${coords[1]}`}
-        >
-          Go to maps
-        </Anchor>
-      )}
     </>
   );
 }

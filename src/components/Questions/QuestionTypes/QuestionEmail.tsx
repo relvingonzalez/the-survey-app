@@ -5,12 +5,13 @@ export type QuestionEmailProps = {
   question: EmailQuestion;
 } & TextInputProps;
 
+export const emailPattern =
+  '[a-z0-9!#$%&"*+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&"*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?';
+
 export default function QuestionEmail({
   question,
   ...props
 }: QuestionEmailProps) {
-  const pattern =
-    '[a-z0-9!#$%&"*+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&"*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?';
   return (
     <TextInput
       {...props}
@@ -18,7 +19,7 @@ export default function QuestionEmail({
       label="Email"
       type="email"
       placeholder="email@example.com"
-      pattern={pattern}
+      pattern={emailPattern}
     />
   );
 }

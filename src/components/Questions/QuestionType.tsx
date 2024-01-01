@@ -9,6 +9,9 @@ import QuestionListSelect from "./QuestionTypes/QuestionListSelect";
 import QuestionMultiple from "./QuestionTypes/QuestionMultiple";
 import { ChangeEventHandler } from "react";
 import QuestionGeo from "./QuestionTypes/QuestionGeo";
+import QuestionDateTime from "./QuestionTypes/QuestionDateTime";
+import QuestionTime from "./QuestionTypes/QuestionTime";
+import QuestionPerson from "./QuestionTypes/QuestionPerson";
 
 export type QuestionTypeProps = {
   question: Question | Process;
@@ -27,6 +30,9 @@ export default function QuestionType({ question }: QuestionTypeProps) {
       {question.type === "list" && <QuestionListSelect question={question} />}
       {question.type === "multiple" && <QuestionMultiple question={question} />}
       {question.type === "geo" && <QuestionGeo question={question} />}
+      {question.type === "datetime" && <QuestionDateTime question={question} />}
+      {question.type === "time" && <QuestionTime question={question} />}
+      {question.type === "person" && <QuestionPerson question={question} />}
     </>
   );
 }

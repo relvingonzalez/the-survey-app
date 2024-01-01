@@ -1,10 +1,6 @@
-import {
-  Question,
-  QuestionType,
-  Questions,
-  TextQuestion,
-} from "../types/question";
+import { Question, Questions, TextQuestion } from "../types/question";
 import { UUID } from "../types/util";
+import { createPerson } from "../utils/functions";
 
 export const dummyQuestion: TextQuestion = {
   id: "1",
@@ -36,17 +32,17 @@ export const dummyQuestion2: Question = {
   hasComment: false,
 };
 
-function createQuestion(
+function createQuestion<QuestionType>(
   id: UUID,
   type: QuestionType,
   question?: string,
-  listOptions?: string[],
+  others?: Partial<Extract<Question, { type: QuestionType }>>,
 ) {
   return Object.assign({}, dummyQuestion, {
     id,
     type,
     question,
-    listOptions,
+    ...others,
   });
 }
 
@@ -54,22 +50,27 @@ export const dummyQuestions: Questions = [
   dummyQuestion,
   dummyQuestion2,
   createQuestion("3", "email", "Type your Email"),
-  createQuestion("4", "list", "What is your favorite vacation spot?", [
-    "Brazil",
-    "Norway",
-    "USA",
-    "Denmark",
-  ]),
-  createQuestion("5", "checkbox", "Where have you looked?", [
-    "under the bed",
-    "Behind the counters",
-    "under the sink",
-  ]),
-  createQuestion("6", "multiple", "What countries have you visited?", [
-    "Brazil",
-    "Norway",
-    "USA",
-    "Denmark",
-  ]),
+  createQuestion("4", "list", "What is your favorite vacation spot?", {
+    listOptions: ["Brazil", "Norway", "USA", "Denmark"],
+  }),
+  createQuestion("5", "checkbox", "Where have you looked?", {
+    listOptions: ["under the bed", "Behind the counters", "under the sink"],
+  }),
+  createQuestion("6", "multiple", "What countries have you visited?", {
+    listOptions: ["Brazil", "Norway", "USA", "Denmark"],
+    answer: {
+      comment: "",
+      value: [],
+    },
+  }),
   createQuestion("7", "geo", "Get your coordinates"),
+  createQuestion("8", "person", "Add contacts", {
+    answer: {
+      comment: "",
+      value: [
+        createPerson("Mr", "Johnny", "Smith", "e@mail.com", "444-555-6666"),
+        createPerson("Ms", "Pat", "Smith", "p@mail.com", "444-555-6666"),
+      ],
+    },
+  }),
 ];

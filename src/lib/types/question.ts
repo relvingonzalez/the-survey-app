@@ -1,17 +1,18 @@
 import { UUID } from "./util";
 
 // Value option types
-type Day = "Mon" | "Tue" | "Wed" | "Thur" | "Fri" | "Sat" | "Sun";
-type Person = {
-  salut: string;
+export type Day = "Mon" | "Tue" | "Wed" | "Thur" | "Fri" | "Sat" | "Sun";
+export type Salutation = "Mr" | "Ms" | undefined;
+export type Person = {
+  salut: Salutation;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
 };
 type Time = {
-  fromTime: Date;
-  toTime: Date;
+  fromTime: string;
+  toTime: string;
 };
 type YesNo = "Yes" | "No" | "Unknown";
 type EntryValue = {
@@ -32,6 +33,17 @@ type PersonValue = { value: Person[] };
 type TimeValue = { value: Time };
 type YesNoValue = { value: YesNo };
 type CollectionValue = { value: EntryValue[] };
+
+export type QuestionValue =
+  | StringValue
+  | CheckboxValue
+  | DateTimeValue
+  | DaysValue
+  | MultipleValue
+  | PersonValue
+  | TimeValue
+  | YesNoValue
+  | CollectionValue;
 
 // Answer by Question Type
 type DefaultAnswer = {

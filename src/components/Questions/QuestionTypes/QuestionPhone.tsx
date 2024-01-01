@@ -5,6 +5,8 @@ export type QuestionPhoneProps = {
   question: PhoneQuestion;
 } & TextInputProps;
 
+export const phonePattern = "^[0-9+()-]*$";
+
 export default function QuestionPhone({
   question,
   ...props
@@ -16,7 +18,7 @@ export default function QuestionPhone({
       type="tel"
       label="Telephone"
       placeholder="+9-(999)999-9999"
-      pattern="^[0-9+()-]*$"
+      pattern={phonePattern}
     />
   );
 }
