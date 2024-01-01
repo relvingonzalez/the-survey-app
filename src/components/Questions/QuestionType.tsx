@@ -12,6 +12,7 @@ import QuestionGeo from "./QuestionTypes/QuestionGeo";
 import QuestionDateTime from "./QuestionTypes/QuestionDateTime";
 import QuestionTime from "./QuestionTypes/QuestionTime";
 import QuestionPerson from "./QuestionTypes/QuestionPerson";
+import QuestionDays from "./QuestionTypes/QuestionDays";
 
 export type QuestionTypeProps = {
   question: Question | Process;
@@ -32,6 +33,7 @@ export default function QuestionType({ question }: QuestionTypeProps) {
       {question.type === "geo" && <QuestionGeo question={question} />}
       {question.type === "datetime" && <QuestionDateTime question={question} />}
       {question.type === "time" && <QuestionTime question={question} />}
+      {question.type === "days" && <QuestionDays question={question} />}
       {question.type === "person" && <QuestionPerson question={question} />}
     </>
   );

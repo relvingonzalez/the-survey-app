@@ -1,7 +1,7 @@
 "use client";
 
 import { TimeQuestion } from "@/lib/types/question";
-import { ActionIcon, rem } from "@mantine/core";
+import { ActionIcon, Group, rem } from "@mantine/core";
 import { TimeInput, TimeInputProps } from "@mantine/dates";
 import { IconClock } from "@tabler/icons-react";
 import { useRef } from "react";
@@ -10,7 +10,7 @@ export type QuestionTimeProps = {
   question: TimeQuestion;
 } & TimeInputProps;
 
-export default function QuestionDateTime({
+export default function QuestionTime({
   question,
   ...props
 }: QuestionTimeProps) {
@@ -38,7 +38,7 @@ export default function QuestionDateTime({
   );
 
   return (
-    <>
+    <Group>
       <TimeInput
         {...props}
         label="From"
@@ -53,6 +53,6 @@ export default function QuestionDateTime({
         rightSection={pickerControlTo}
         defaultValue={question.answer.value.toTime}
       />
-    </>
+    </Group>
   );
 }

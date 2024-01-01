@@ -1,5 +1,5 @@
 import { Day, DaysQuestion } from "@/lib/types/question";
-import { Checkbox, CheckboxProps, Text } from "@mantine/core";
+import { Checkbox, CheckboxProps, Group, Text } from "@mantine/core";
 
 export type QuestionDaysProps = {
   question: DaysQuestion;
@@ -13,18 +13,20 @@ export default function QuestionDays({
 }: QuestionDaysProps) {
   return (
     <>
-      {daysOptions.map((option, i) => {
-        return (
-          <Checkbox
-            {...props}
-            label={option}
-            key={i}
-            mt="10"
-            checked={question.answer.value.includes(option)}
-          />
-        );
-      })}
-      <Text>{question.answer.value.toString()}</Text>
+      <Group>
+        {daysOptions.map((option, i) => {
+          return (
+            <Checkbox
+              {...props}
+              label={option}
+              key={i}
+              mt="10"
+              checked={question.answer.value.includes(option)}
+            />
+          );
+        })}
+      </Group>
+      <Text mt="10">{question.answer.value.toString()}</Text>
       <Text size="sm" c="dimmed">
         List of days of the week (the site is open)
       </Text>

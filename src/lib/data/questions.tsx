@@ -73,4 +73,25 @@ export const dummyQuestions: Questions = [
       ],
     },
   }),
+  createQuestion("9", "time", "When is this site open", {
+    answer: {
+      comment: "",
+      value: {
+        fromTime: "",
+        toTime: "",
+      },
+    },
+  }),
+  createQuestion("10", "days", "What days is it open", {
+    answer: {
+      comment: "",
+      value: [],
+    },
+  }),
+  createQuestion("11", "datetime", "When is this site open", {
+    answer: {
+      comment: "",
+      value: new Date(),
+    },
+  }),
 ];
