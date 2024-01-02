@@ -6,6 +6,7 @@ export type QuestionPhoneProps = {
 } & TextInputProps;
 
 export const phonePattern = "^[0-9+()-]*$";
+export const phonePatternRegex = new RegExp(phonePattern);
 
 export default function QuestionPhone({
   question,

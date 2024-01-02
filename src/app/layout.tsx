@@ -3,13 +3,12 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 import "@mantine/core/styles.css";
-import {
-  ColorSchemeScript,
-  MantineProvider,
-  Burger,
-  Group,
-  Skeleton,
-} from "@mantine/core";
+import "@mantine/dates/styles.css";
+import "@mantine/notifications/styles.css";
+import "@mantine/dropzone/styles.css";
+import "@mantine/spotlight/styles.css";
+import "@mantine/nprogress/styles.css";
+import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { variantColorResolver } from "@/lib/constants/maritineTheme";
 
 export const metadata: Metadata = {
