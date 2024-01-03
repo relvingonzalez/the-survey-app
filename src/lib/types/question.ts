@@ -15,13 +15,17 @@ type Time = {
   toTime: string;
 };
 type YesNo = "Yes" | "No" | "Unknown";
-type EntryValue = {
-  question: string;
-  type: QuestionType;
-  answer: string; //should be of any kind;
-}[];
+// type QuestionCollectionAnswer<T> = Extract<Extract<Question, { type: T }>,  'answer'>;
+// export type EntryAnswer<T> = {
+//   question: string;
+//   type: T;
+//   answer: QuestionCollectionAnswer<T>
+// };
+// export type EntryAnswers = EntryAnswer<QuestionType>[];
 
-type Entries = Question[];
+type EntryAnswers = Question[];
+
+export type Entries = Exclude<Question, "CollectionQuestion">[];
 
 // Question Answer Value types
 type StringValue = { value: string };
@@ -32,7 +36,7 @@ type MultipleValue = { value: string[] };
 type PersonValue = { value: Person[] };
 type TimeValue = { value: Time };
 type YesNoValue = { value: YesNo };
-type CollectionValue = { value: EntryValue[] };
+type CollectionValue = { value: EntryAnswers[] };
 
 export type QuestionValue =
   | StringValue
@@ -166,13 +170,13 @@ export type QuestionType =
   | "collection";
 
 type BaseQuestion = {
-  id: UUID;
-  hasComment: boolean;
-  displayValue: string;
-  hasDrawing: boolean;
-  hasFile: boolean;
+  id?: UUID;
+  hasComment?: boolean;
+  displayValue?: string;
+  hasDrawing?: boolean;
+  hasFile?: boolean;
   question: string;
-  sub1: string;
+  sub1?: string;
   type: QuestionType;
 };
 

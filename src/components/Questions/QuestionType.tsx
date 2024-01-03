@@ -13,6 +13,7 @@ import QuestionDateTime from "./QuestionTypes/QuestionDateTime";
 import QuestionTime from "./QuestionTypes/QuestionTime";
 import QuestionPerson from "./QuestionTypes/QuestionPerson";
 import QuestionDays from "./QuestionTypes/QuestionDays";
+import QuestionCollection from "./QuestionTypes/QuestionCollection";
 
 export type QuestionTypeProps = {
   question: Question | Process;
@@ -35,6 +36,9 @@ export default function QuestionType({ question }: QuestionTypeProps) {
       {question.type === "time" && <QuestionTime question={question} />}
       {question.type === "days" && <QuestionDays question={question} />}
       {question.type === "person" && <QuestionPerson question={question} />}
+      {question.type === "collection" && (
+        <QuestionCollection question={question} />
+      )}
     </>
   );
 }

@@ -94,4 +94,41 @@ export const dummyQuestions: Questions = [
       value: new Date(),
     },
   }),
+  createQuestion("12", "collection", "What Collection?", {
+    entries: [
+      createQuestion("3", "email", "Type your Email"),
+      createQuestion("4", "list", "What is your favorite vacation spot?", {
+        listOptions: ["Brazil", "Norway", "USA", "Denmark"],
+      }),
+    ],
+    answer: {
+      comment: "",
+      value: [
+        [
+          createQuestion("3", "email", "Type your Email", {
+            answer: { comment: "", value: "mail23@mail.com" },
+          }),
+          createQuestion("4", "list", "What is your favorite vacation spot?", {
+            listOptions: ["Brazil", "Norway", "USA", "Denmark"],
+            answer: {
+              comment: "Nada",
+              value: "Brazil",
+            },
+          }),
+        ],
+        [
+          createQuestion("3", "email", "Type your Email", {
+            answer: { comment: "", value: "mail@mail.com" },
+          }),
+          createQuestion("4", "list", "What is your favorite vacation spot?", {
+            listOptions: ["Brazil", "Norway", "USA", "Denmark"],
+            answer: {
+              comment: "Nada",
+              value: "Norway",
+            },
+          }),
+        ],
+      ],
+    },
+  }),
 ];

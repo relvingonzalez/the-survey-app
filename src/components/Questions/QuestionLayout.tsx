@@ -1,6 +1,6 @@
 import { Process, Question } from "@/lib/types/question";
 import { UUID } from "@/lib/types/util";
-import { Card, CardSection, Group, Text, Title } from "@mantine/core";
+import { Card, CardSection, Group, Stack, Text, Title } from "@mantine/core";
 import { PropsWithChildren } from "react";
 import QuestionNavigation from "./QuetionNavigation";
 
@@ -21,7 +21,7 @@ export default function QuestionLayout({
   const title = isQuestion ? "Questions" : "Processes";
 
   return (
-    <>
+    <Stack mb="80">
       <Title order={2}>
         {title}: {question.sub1}
       </Title>
@@ -36,6 +36,6 @@ export default function QuestionLayout({
         {children}
       </Card>
       <QuestionNavigation prevId={prevId} nextId={nextId} />
-    </>
+    </Stack>
   );
 }
