@@ -1,19 +1,30 @@
 "use client";
 
-import { Process, Question } from "@/lib/types/question";
+import {
+  ProcessByType,
+  Question,
+  QuestionByType,
+  QuestionValueByType,
+} from "@/lib/types/question";
 import QuestionComment from "./QuestionComment";
 import QuestionType from "./QuestionType";
 import { useState, ChangeEventHandler } from "react";
 
-export type BaseQuestionProps = {
-  question: Question | Process;
+export type BaseQuestionProps<T> = {
+  question: QuestionByType<T> | ProcessByType<T>;
 };
 
-type QuestionProps = BaseQuestionProps & {
+type QuestionProps<T> = BaseQuestionProps<T> & {
   hideFileButtons?: boolean;
 };
 
-export default function Question({ question }: QuestionProps) {
+type OnAnsweredCallback<T> = (value: QuestionValueByType<T>) => void;
+
+export type WithQuestionCallback<T> = {
+  onAnswered: OnAnsweredCallback<T>;
+};
+
+export default function Question<T>({ question }: QuestionProps<T>) {
   const [currentQuestion, setQuestion] = useState(question);
   const handleCommentChange: ChangeEventHandler<HTMLTextAreaElement> &
     ((value: string) => void) = (value) => {
@@ -25,21 +36,21 @@ export default function Question({ question }: QuestionProps) {
       });
     }
   };
-  const handleAnswerChange: ChangeEventHandler<HTMLInputElement> = (e) => {
+  const handleAnswered: OnAnsweredCallback<T> = (value) => {
     setQuestion((prevState) => {
       const newQuestion = Object.assign({}, prevState);
-      newQuestion.answer.value = e.target.value;
+      newQuestion.answer.value = value;
       return newQuestion;
     });
   };
-  const showComment =
-    question.hasComment ||
+  const showComment = true;
+  question.hasComment ||
     (question.type === "multiple" &&
       question.answer.value.some((v) => ["Other", "Others"].includes(v)));
 
   return (
     <>
-      <QuestionType question={question} onChange={handleAnswerChange} />
+      <QuestionType question={question} onAnswered={handleAnswered} />
       {showComment && (
         <QuestionComment
           mt="10"

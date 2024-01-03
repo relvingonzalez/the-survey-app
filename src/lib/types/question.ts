@@ -185,3 +185,7 @@ export type Process = Question;
 export type Questions = Question[];
 
 export type Processes = Questions;
+
+export type QuestionByType<T> = Extract<Question, T>;
+export type QuestionValueByType<T> = QuestionByType<T>["answer"]["value"];
+export type ProcessByType<T> = QuestionByType<T>;

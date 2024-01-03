@@ -1,5 +1,5 @@
-import { Process, Question } from "@/lib/types/question";
-import QuestionText from "./QuestionTypes/QuestionText";
+import { ProcessByType, QuestionByType } from "@/lib/types/question";
+import QuestionText, { isTextQuestion } from "./QuestionTypes/QuestionText";
 import QuestionPhone from "./QuestionTypes/QuestionPhone";
 import QuestionEmail from "./QuestionTypes/QuestionEmail";
 import QuestionNumber from "./QuestionTypes/QuestionNumber";
@@ -7,23 +7,27 @@ import QuestionCheckbox from "./QuestionTypes/QuestionCheckbox";
 import QuestionYesNo from "./QuestionTypes/QuestionYesNo";
 import QuestionListSelect from "./QuestionTypes/QuestionListSelect";
 import QuestionMultiple from "./QuestionTypes/QuestionMultiple";
-import { ChangeEventHandler } from "react";
 import QuestionGeo from "./QuestionTypes/QuestionGeo";
 import QuestionDateTime from "./QuestionTypes/QuestionDateTime";
 import QuestionTime from "./QuestionTypes/QuestionTime";
 import QuestionPerson from "./QuestionTypes/QuestionPerson";
 import QuestionDays from "./QuestionTypes/QuestionDays";
 import QuestionCollection from "./QuestionTypes/QuestionCollection";
+import { WithQuestionCallback } from "./Question";
 
-export type QuestionTypeProps = {
-  question: Question | Process;
-  onChange: ChangeEventHandler;
-};
+export type QuestionTypeProps<T> = {
+  question: QuestionByType<T> | ProcessByType<T>;
+} & WithQuestionCallback<T>;
 
-export default function QuestionType({ question }: QuestionTypeProps) {
+export default function QuestionType<T>({
+  question,
+  onAnswered,
+}: QuestionTypeProps<T>) {
   return (
     <>
-      {question.type === "text" && <QuestionText question={question} />}
+      {question.type === "text" && (
+        <QuestionText question={question} onAnswered={onAnswered} />
+      )}
       {question.type === "phone" && <QuestionPhone question={question} />}
       {question.type === "email" && <QuestionEmail question={question} />}
       {question.type === "number" && <QuestionNumber question={question} />}
