@@ -28,18 +28,42 @@ export default function QuestionType<Q extends Question>({
       {question.type === "text" && (
         <QuestionText question={question} onAnswered={onAnswered} />
       )}
-      {question.type === "phone" && <QuestionPhone question={question} />}
-      {question.type === "email" && <QuestionEmail question={question} />}
-      {question.type === "number" && <QuestionNumber question={question} />}
-      {question.type === "checkbox" && <QuestionCheckbox question={question} />}
-      {question.type === "yes/no" && <QuestionYesNo question={question} />}
-      {question.type === "list" && <QuestionListSelect question={question} />}
-      {question.type === "multiple" && <QuestionMultiple question={question} />}
-      {question.type === "geo" && <QuestionGeo question={question} />}
-      {question.type === "datetime" && <QuestionDateTime question={question} />}
-      {question.type === "time" && <QuestionTime question={question} />}
-      {question.type === "days" && <QuestionDays question={question} />}
-      {question.type === "person" && <QuestionPerson question={question} />}
+      {question.type === "phone" && (
+        <QuestionPhone question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "email" && (
+        <QuestionEmail question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "number" && (
+        <QuestionNumber question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "checkbox" && (
+        <QuestionCheckbox question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "yes/no" && (
+        <QuestionYesNo question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "list" && (
+        <QuestionListSelect question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "multiple" && (
+        <QuestionMultiple question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "geo" && (
+        <QuestionGeo question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "datetime" && (
+        <QuestionDateTime question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "time" && (
+        <QuestionTime question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "days" && (
+        <QuestionDays question={question} onAnswered={onAnswered} />
+      )}
+      {question.type === "person" && (
+        <QuestionPerson question={question} onAnswered={onAnswered} />
+      )}
       {question.type === "collection" && (
         <QuestionCollection question={question} />
       )}

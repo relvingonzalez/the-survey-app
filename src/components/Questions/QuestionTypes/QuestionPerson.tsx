@@ -24,10 +24,11 @@ import {
 } from "@tabler/icons-react";
 import { createPerson } from "@/lib/utils/functions";
 import { UseFormReturnType, useForm } from "@mantine/form";
+import { WithQuestionCallback } from "../Question";
 
 export type QuestionPersonProps = {
   question: PersonQuestion;
-};
+} & WithQuestionCallback<PersonQuestion["answer"]["value"]>;
 
 export const salutationOptions = ["Mr", "Ms"];
 
@@ -129,7 +130,10 @@ function ExistingPerson({
   );
 }
 
-export default function QuestionText({ question }: QuestionPersonProps) {
+export default function QuestionText({
+  question,
+  onAnswered,
+}: QuestionPersonProps) {
   const [addNew, setAddNew] = useState(
     !question.answer.value.length ? true : false,
   );
@@ -143,13 +147,17 @@ export default function QuestionText({ question }: QuestionPersonProps) {
   };
 
   const onSaveNewPerson = (person: Person) => {
-    // send new question answer upstairs
-    console.log(person);
+    const newPersons = [...question.answer.value];
+    newPersons.push(person);
+    onAnswered(newPersons);
     resetNewPerson();
   };
 
   const onDeletePerson = (i: number) => {
     console.log("delete " + i);
+    const newPersons = [...question.answer.value];
+    newPersons.splice(i, 1);
+    onAnswered(newPersons);
   };
 
   const form = useForm({

@@ -1,12 +1,15 @@
 import { NumberQuestion } from "@/lib/types/question";
 import { TextInput, TextInputProps } from "@mantine/core";
+import { WithQuestionCallback } from "../Question";
 
 export type QuestionNumberProps = {
   question: NumberQuestion;
-} & TextInputProps;
+} & WithQuestionCallback<NumberQuestion["answer"]["value"]> &
+  TextInputProps;
 
 export default function QuestionNumber({
   question,
+  onAnswered,
   ...props
 }: QuestionNumberProps) {
   return (
@@ -20,6 +23,9 @@ export default function QuestionNumber({
         if (!/[0-9]/.test(event.key)) {
           event.preventDefault();
         }
+      }}
+      onChange={(e) => {
+        onAnswered(e.target.value);
       }}
     />
   );

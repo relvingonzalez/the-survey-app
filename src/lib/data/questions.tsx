@@ -131,4 +131,7 @@ export const dummyQuestions: Questions = [
       ],
     },
   }),
+  createQuestion("13", "yes/no", "Yes or no?", {
+    answer: { value: "No", comment: "" },
+  }),
 ];

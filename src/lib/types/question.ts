@@ -15,7 +15,7 @@ type Time = {
   fromTime: string;
   toTime: string;
 };
-type YesNo = "Yes" | "No" | "Unknown";
+export type YesNo = "Yes" | "No" | "Unknown";
 // type QuestionCollectionAnswer<T> = Extract<Extract<Question, { type: T }>,  'answer'>;
 // export type EntryAnswer<T> = {
 //   question: string;
@@ -30,6 +30,7 @@ export type Entries = Exclude<Question, "CollectionQuestion">[];
 
 // Question Answer Value types
 type StringValue = { value: string };
+type StringOrNullValue = { value: string | null };
 type CheckboxValue = { value: Record<string, boolean> };
 type DateTimeValue = { value: Date };
 type DaysValue = { value: Day[] };
@@ -55,6 +56,7 @@ type DefaultAnswer = {
   comment: string;
 };
 type StringAnswer = { answer: DefaultAnswer & StringValue };
+type StringOrNullAnswer = { answer: DefaultAnswer & StringOrNullValue };
 type CheckboxAnswer = { answer: DefaultAnswer & CheckboxValue };
 type DateTimeAnswer = { answer: DefaultAnswer & DateTimeValue };
 type DaysAnswer = { answer: DefaultAnswer & DaysValue };
@@ -66,6 +68,7 @@ type CollectionAnswer = { answer: DefaultAnswer & CollectionValue };
 
 // Question by Type
 export type StringValueQuestion = BaseQuestion & StringAnswer;
+export type StringOrNullValueQuestion = BaseQuestion & StringOrNullAnswer;
 
 export type CheckboxQuestion = StringValueQuestion &
   CheckboxAnswer & {
@@ -93,7 +96,7 @@ export type TextQuestion = StringValueQuestion & {
   type: "text";
 };
 
-export type ListQuestion = StringValueQuestion & {
+export type ListQuestion = StringOrNullValueQuestion & {
   type: "list";
   listOptions: ListOptions;
 };

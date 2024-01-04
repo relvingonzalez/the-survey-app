@@ -9,10 +9,12 @@ import {
 } from "@mantine/core";
 import { GeoQuestion } from "@/lib/types/question";
 import { MouseEventHandler, useEffect, useState } from "react";
+import { WithQuestionCallback } from "../Question";
 
 export type QuestionGeoProps = {
   question: GeoQuestion;
-} & TextInputProps;
+} & WithQuestionCallback<GeoQuestion["answer"]["value"]> &
+  TextInputProps;
 
 const options: PositionOptions = {
   enableHighAccuracy: true,
@@ -24,10 +26,12 @@ const errors: PositionErrorCallback = (err) => {
   console.warn(`ERROR(${err.code}): ${err.message}`);
 };
 
-export default function QuestionGeo({ question, ...props }: QuestionGeoProps) {
+export default function QuestionGeo({
+  question,
+  onAnswered,
+  ...props
+}: QuestionGeoProps) {
   const [coords, setCoords] = useState(question.answer.value.split(","));
-  //
-  const [currentQuestion, setCurrentQuestion] = useState(question);
   const pattern =
     "^[-+]?([1-8]?d(.d+)?|90(.0+)?),s*[-+]?(180(.0+)?|((1[0-7]d)|([1-9]?d))(.d+)?)$";
   const getLocation: MouseEventHandler<HTMLButtonElement> = () => {
@@ -57,18 +61,7 @@ export default function QuestionGeo({ question, ...props }: QuestionGeoProps) {
   };
 
   useEffect(() => {
-    // send question value change up the pipeline
-    // IDEA TODO : onChange any question send new answer (comment and value) up the pipeline and in main component just reset the questions answer.
-    // Also update the indexedDB
-    setCurrentQuestion((oldQuestion) => {
-      return {
-        ...oldQuestion,
-        answer: {
-          value: coords.join(","),
-          comment: oldQuestion.answer.comment,
-        },
-      };
-    });
+    onAnswered(coords.join(","));
   }, [coords]);
 
   return (
@@ -79,7 +72,7 @@ export default function QuestionGeo({ question, ...props }: QuestionGeoProps) {
           name="geo"
           placeholder="49.4550734,11.0794632"
           id="oGPS"
-          value={currentQuestion.answer.value}
+          value={question.answer.value}
           pattern={pattern}
           {...props}
         />

@@ -1,16 +1,32 @@
 import { Day, DaysQuestion } from "@/lib/types/question";
 import { Checkbox, CheckboxProps, Group, Text } from "@mantine/core";
+import { WithQuestionCallback } from "../Question";
 
 export type QuestionDaysProps = {
   question: DaysQuestion;
-} & CheckboxProps;
+} & WithQuestionCallback<DaysQuestion["answer"]["value"]> &
+  CheckboxProps;
 
 const daysOptions: Day[] = ["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"];
 
 export default function QuestionDays({
   question,
+  onAnswered,
   ...props
 }: QuestionDaysProps) {
+  const checkedOption = (option: Day, checked: boolean) => {
+    const newDays = [...question.answer.value];
+    if (checked) {
+      newDays.push(option);
+    } else {
+      newDays.splice(
+        newDays.findIndex((day) => day === option),
+        1,
+      );
+    }
+    onAnswered(newDays);
+  };
+
   return (
     <>
       <Group>
@@ -22,6 +38,9 @@ export default function QuestionDays({
               key={i}
               mt="10"
               checked={question.answer.value.includes(option)}
+              onChange={(e) => {
+                checkedOption(option, e.currentTarget.checked);
+              }}
             />
           );
         })}

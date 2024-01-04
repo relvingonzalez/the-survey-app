@@ -1,29 +1,31 @@
-import { TextInput, TextInputProps } from "@mantine/core";
-import { YesNoQuestion } from "@/lib/types/question";
+import { Radio, RadioProps } from "@mantine/core";
+import { YesNo, YesNoQuestion } from "@/lib/types/question";
+import { WithQuestionCallback } from "../Question";
 
 export type QuestionYesNoProps = {
   question: YesNoQuestion;
-} & TextInputProps;
+} & WithQuestionCallback<YesNoQuestion["answer"]["value"]> &
+  RadioProps;
 
 export default function QuestionYesNo({
   question,
+  onAnswered,
   ...props
 }: QuestionYesNoProps) {
-  //question.answer[option]
-  const options = ["Yes", "No", "Unknown"];
+  const options: YesNo[] = ["Yes", "No", "Unknown"];
   return (
     <>
       {options.map((option, i) => {
         return (
-          <TextInput
+          <Radio
             {...props}
-            value={question.answer.value}
-            type="radio"
-            label={option}
-            min="0"
+            mt="sm"
             key={i}
-            name="radio"
+            label={option}
             checked={option === question.answer.value}
+            onChange={(event) =>
+              event.currentTarget.checked ? onAnswered(option) : null
+            }
           />
         );
       })}

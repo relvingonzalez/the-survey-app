@@ -1,12 +1,15 @@
 import { Select, SelectProps } from "@mantine/core";
 import { ListQuestion } from "@/lib/types/question";
+import { WithQuestionCallback } from "../Question";
 
 export type QuestionListSelectProps = {
   question: ListQuestion;
-} & SelectProps;
+} & WithQuestionCallback<ListQuestion["answer"]["value"]> &
+  SelectProps;
 
 export default function QuestionListSelect({
   question,
+  onAnswered,
   ...props
 }: QuestionListSelectProps) {
   return (
@@ -16,6 +19,7 @@ export default function QuestionListSelect({
       label="Select"
       placeholder="--Select One--"
       data={question.listOptions}
+      onChange={onAnswered}
     />
   );
 }

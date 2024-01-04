@@ -61,7 +61,7 @@ function NewEntriesAnswer({
               <Text fw={500}>{e.question}</Text>
               <QuestionType
                 question={e}
-                onChange={() => console.log("changed")}
+                onAnswered={() => console.log("changed")}
               />
             </Stack>
           ))}
@@ -81,7 +81,7 @@ function Entries({ question, onDelete }: EntriesProps) {
   const rows = question.answer.value.map((entryAnswers, index) => (
     <TableTr key={`${index}`}>
       {entryAnswers.map((entryAnswer, j) => (
-        <TableTd key={j}>{entryAnswer.answer.value.toString()}</TableTd>
+        <TableTd key={j}>{entryAnswer.answer.value?.toString()}</TableTd>
       ))}
       <TableTd>
         <ActionIcon
