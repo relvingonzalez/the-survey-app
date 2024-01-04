@@ -1,11 +1,6 @@
 "use client";
 
-import {
-  ProcessByType,
-  Question,
-  QuestionByType,
-  QuestionValueByType,
-} from "@/lib/types/question";
+import { ProcessByType, Question, QuestionByType } from "@/lib/types/question";
 import QuestionComment from "./QuestionComment";
 import QuestionType from "./QuestionType";
 import { useState, ChangeEventHandler } from "react";
@@ -18,13 +13,15 @@ type QuestionProps<T> = BaseQuestionProps<T> & {
   hideFileButtons?: boolean;
 };
 
-type OnAnsweredCallback<T> = (value: QuestionValueByType<T>) => void;
+type OnAnsweredCallback<V> = (value: V) => void;
 
-export type WithQuestionCallback<T> = {
-  onAnswered: OnAnsweredCallback<T>;
+export type WithQuestionCallback<V> = {
+  onAnswered: OnAnsweredCallback<V>;
 };
 
-export default function Question<T>({ question }: QuestionProps<T>) {
+export default function Question<T extends Question>({
+  question,
+}: QuestionProps<T>) {
   const [currentQuestion, setQuestion] = useState(question);
   const handleCommentChange: ChangeEventHandler<HTMLTextAreaElement> &
     ((value: string) => void) = (value) => {
@@ -36,7 +33,7 @@ export default function Question<T>({ question }: QuestionProps<T>) {
       });
     }
   };
-  const handleAnswered: OnAnsweredCallback<T> = (value) => {
+  const handleAnswered: OnAnsweredCallback<T["answer"]["value"]> = (value) => {
     setQuestion((prevState) => {
       const newQuestion = Object.assign({}, prevState);
       newQuestion.answer.value = value;

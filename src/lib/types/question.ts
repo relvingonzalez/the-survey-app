@@ -1,3 +1,4 @@
+import QuestionType from "@/components/Questions/QuestionType";
 import { UUID } from "./util";
 
 // Value option types
@@ -188,4 +189,5 @@ export type Processes = Questions;
 
 export type QuestionByType<T> = Extract<Question, T>;
 export type QuestionValueByType<T> = QuestionByType<T>["answer"]["value"];
+
 export type ProcessByType<T> = QuestionByType<T>;

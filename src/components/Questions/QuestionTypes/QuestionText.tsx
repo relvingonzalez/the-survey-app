@@ -4,7 +4,7 @@ import { WithQuestionCallback } from "../Question";
 
 export type QuestionTextProps = {
   question: TextQuestion;
-} & WithQuestionCallback<TextQuestion> &
+} & WithQuestionCallback<TextQuestion["answer"]["value"]> &
   TextInputProps;
 
 export declare function isTextQuestion(
