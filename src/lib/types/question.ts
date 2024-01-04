@@ -24,7 +24,7 @@ export type YesNo = "Yes" | "No" | "Unknown";
 // };
 // export type EntryAnswers = EntryAnswer<QuestionType>[];
 
-type EntryAnswers = Question[];
+export type EntryAnswers = Question[];
 
 export type Entries = Exclude<Question, "CollectionQuestion">[];
 
@@ -50,6 +50,8 @@ export type QuestionValue =
   | TimeValue
   | YesNoValue
   | CollectionValue;
+
+export type ValueByQuestionType<T extends Question> = T["answer"]["value"];
 
 // Answer by Question Type
 type DefaultAnswer = {

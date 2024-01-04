@@ -1,6 +1,11 @@
 "use client";
 
-import { ProcessByType, Question, QuestionByType } from "@/lib/types/question";
+import {
+  ProcessByType,
+  Question,
+  QuestionByType,
+  ValueByQuestionType,
+} from "@/lib/types/question";
 import QuestionComment from "./QuestionComment";
 import QuestionType from "./QuestionType";
 import { useState, ChangeEventHandler } from "react";
@@ -33,7 +38,9 @@ export default function Question<T extends Question>({
       });
     }
   };
-  const handleAnswered: OnAnsweredCallback<T["answer"]["value"]> = (value) => {
+  const handleAnswered: OnAnsweredCallback<ValueByQuestionType<T>> = (
+    value,
+  ) => {
     console.log("newValue", value);
     setQuestion((prevState) => {
       const newQuestion = Object.assign({}, prevState);

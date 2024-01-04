@@ -1,10 +1,10 @@
-import { Day, DaysQuestion } from "@/lib/types/question";
+import { Day, DaysQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { Checkbox, CheckboxProps, Group, Text } from "@mantine/core";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionDaysProps = {
   question: DaysQuestion;
-} & WithQuestionCallback<DaysQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<DaysQuestion>> &
   CheckboxProps;
 
 const daysOptions: Day[] = ["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"];

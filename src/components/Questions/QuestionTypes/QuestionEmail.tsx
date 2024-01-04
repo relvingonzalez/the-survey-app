@@ -1,10 +1,10 @@
-import { EmailQuestion } from "@/lib/types/question";
+import { EmailQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { TextInput, TextInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionEmailProps = {
   question: EmailQuestion;
-} & WithQuestionCallback<EmailQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<EmailQuestion>> &
   TextInputProps;
 
 export const emailPattern =

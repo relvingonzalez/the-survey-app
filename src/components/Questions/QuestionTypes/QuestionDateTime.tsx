@@ -1,10 +1,10 @@
-import { DateTimeQuestion } from "@/lib/types/question";
+import { DateTimeQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { DateTimePicker, DateTimePickerProps } from "@mantine/dates";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionDateTimeProps = {
   question: DateTimeQuestion;
-} & WithQuestionCallback<DateTimeQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<DateTimeQuestion>> &
   DateTimePickerProps;
 
 export default function QuestionDateTime({

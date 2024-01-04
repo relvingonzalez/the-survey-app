@@ -1,10 +1,10 @@
-import { NumberQuestion } from "@/lib/types/question";
+import { NumberQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { TextInput, TextInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionNumberProps = {
   question: NumberQuestion;
-} & WithQuestionCallback<NumberQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<NumberQuestion>> &
   TextInputProps;
 
 export default function QuestionNumber({

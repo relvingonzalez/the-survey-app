@@ -1,4 +1,8 @@
-import { Question, QuestionType } from "@/lib/types/question";
+import {
+  Question,
+  QuestionType,
+  ValueByQuestionType,
+} from "@/lib/types/question";
 import QuestionText from "./QuestionTypes/QuestionText";
 import QuestionPhone from "./QuestionTypes/QuestionPhone";
 import QuestionEmail from "./QuestionTypes/QuestionEmail";
@@ -17,7 +21,7 @@ import { WithQuestionCallback } from "./Question";
 
 export type QuestionTypeProps<T extends Question> = {
   question: T;
-} & WithQuestionCallback<T["answer"]["value"]>;
+} & WithQuestionCallback<ValueByQuestionType<T>>;
 
 export default function QuestionType<Q extends Question>({
   question,
@@ -65,7 +69,7 @@ export default function QuestionType<Q extends Question>({
         <QuestionPerson question={question} onAnswered={onAnswered} />
       )}
       {question.type === "collection" && (
-        <QuestionCollection question={question} />
+        <QuestionCollection question={question} onAnswered={onAnswered} />
       )}
     </>
   );

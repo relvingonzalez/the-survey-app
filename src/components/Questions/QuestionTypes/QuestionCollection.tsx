@@ -16,32 +16,41 @@ import {
   TableTfoot,
   Stack,
 } from "@mantine/core";
-import { CollectionQuestion, Entries } from "@/lib/types/question";
+import {
+  CollectionQuestion,
+  EntryAnswers,
+  ValueByQuestionType,
+} from "@/lib/types/question";
 import { useState } from "react";
 import { IconLayoutGridAdd, IconTrash, IconX } from "@tabler/icons-react";
 import QuestionType from "../QuestionType";
+import { WithQuestionCallback } from "../Question";
 
 export type QuestionCollectionProps = {
   question: CollectionQuestion;
-};
+} & WithQuestionCallback<ValueByQuestionType<CollectionQuestion>>;
 
-// const createNewEntry  = (entries: Entries): EntryAnswers => {
-//     return entries.map(function(e) {
-//             return { question: e.question, type: e.type, answer: undefined };
-//         });
-// }
-
-type NewEntriesAnswerProps = {
-  entries: Entries;
+type NewEntriesAnswerProps<E extends EntryAnswers> = {
+  entries: E;
   onSave: () => void;
   onCancel: () => void;
+  onAnsweredNewEntries: (entries: EntryAnswers) => void;
 };
 
-function NewEntriesAnswer({
+function NewEntriesAnswer<E extends EntryAnswers>({
   entries,
+  onAnsweredNewEntries,
   onSave,
   onCancel,
-}: NewEntriesAnswerProps) {
+}: NewEntriesAnswerProps<E>) {
+  const onAnsweredQuestionInEntry = (
+    i: number,
+    value: ValueByQuestionType<E[number]>,
+  ) => {
+    const newEntries: EntryAnswers = entries.map((q) => structuredClone(q));
+    newEntries[i].answer.value = value;
+    onAnsweredNewEntries(newEntries);
+  };
   return (
     <Card mt="10" withBorder shadow="sm" radius="md">
       <CardSection withBorder inheritPadding py="xs">
@@ -61,7 +70,7 @@ function NewEntriesAnswer({
               <Text fw={500}>{e.question}</Text>
               <QuestionType
                 question={e}
-                onAnswered={() => console.log("changed")}
+                onAnswered={(v) => onAnsweredQuestionInEntry(i, v)}
               />
             </Stack>
           ))}
@@ -74,7 +83,7 @@ function NewEntriesAnswer({
   );
 }
 
-type EntriesProps = QuestionCollectionProps & {
+type EntriesProps = Omit<QuestionCollectionProps, "onAnswered"> & {
   onDelete: (i: number) => void;
 };
 function Entries({ question, onDelete }: EntriesProps) {
@@ -115,11 +124,17 @@ function Entries({ question, onDelete }: EntriesProps) {
 
 export default function QuestionCollection({
   question,
+  onAnswered,
 }: QuestionCollectionProps) {
   const [addNew, setAddNew] = useState(
     !question.answer.value.length ? true : false,
   );
+  const [newEntriesAnswer, setNewEntriesAnswer] = useState<EntryAnswers>([]);
   const onAddNewClick = () => {
+    const newEntriesCopy: EntryAnswers = question.entries.map((q) =>
+      structuredClone(q),
+    );
+    setNewEntriesAnswer(newEntriesCopy);
     setAddNew(true);
   };
 
@@ -128,11 +143,16 @@ export default function QuestionCollection({
   };
 
   const onSaveNewQuestion = () => {
+    const newEntriesAnswers = [...question.answer.value];
+    newEntriesAnswers.push(newEntriesAnswer);
+    onAnswered(newEntriesAnswers);
     resetNewQuestion();
   };
 
   const onDeleteEntriesAnswer = (i: number) => {
-    console.log("delete " + i);
+    const newEntriesAnswers = [...question.answer.value];
+    newEntriesAnswers.splice(i, 1);
+    onAnswered(newEntriesAnswers);
   };
 
   return (
@@ -141,7 +161,8 @@ export default function QuestionCollection({
 
       {addNew ? (
         <NewEntriesAnswer
-          entries={question.entries}
+          entries={newEntriesAnswer}
+          onAnsweredNewEntries={setNewEntriesAnswer}
           onSave={onSaveNewQuestion}
           onCancel={resetNewQuestion}
         />

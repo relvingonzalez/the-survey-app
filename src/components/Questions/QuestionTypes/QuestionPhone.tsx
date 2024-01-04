@@ -1,10 +1,10 @@
-import { PhoneQuestion } from "@/lib/types/question";
+import { PhoneQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { TextInput, TextInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionPhoneProps = {
   question: PhoneQuestion;
-} & WithQuestionCallback<PhoneQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<PhoneQuestion>> &
   TextInputProps;
 
 export const phonePattern = "^[0-9+()-]*$";

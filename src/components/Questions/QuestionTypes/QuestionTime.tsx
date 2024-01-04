@@ -1,6 +1,6 @@
 "use client";
 
-import { TimeQuestion } from "@/lib/types/question";
+import { TimeQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { ActionIcon, Group, rem } from "@mantine/core";
 import { TimeInput, TimeInputProps } from "@mantine/dates";
 import { IconClock } from "@tabler/icons-react";
@@ -9,7 +9,7 @@ import { WithQuestionCallback } from "../Question";
 
 export type QuestionTimeProps = {
   question: TimeQuestion;
-} & WithQuestionCallback<TimeQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<TimeQuestion>> &
   TimeInputProps;
 
 export default function QuestionTime({

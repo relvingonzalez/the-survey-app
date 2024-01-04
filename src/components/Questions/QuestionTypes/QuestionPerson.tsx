@@ -12,7 +12,11 @@ import {
   Button,
   ActionIcon,
 } from "@mantine/core";
-import { Person, PersonQuestion } from "@/lib/types/question";
+import {
+  Person,
+  PersonQuestion,
+  ValueByQuestionType,
+} from "@/lib/types/question";
 import { emailPatternRegex } from "./QuestionEmail";
 import { phonePatternRegex } from "./QuestionPhone";
 import { useState } from "react";
@@ -28,7 +32,7 @@ import { WithQuestionCallback } from "../Question";
 
 export type QuestionPersonProps = {
   question: PersonQuestion;
-} & WithQuestionCallback<PersonQuestion["answer"]["value"]>;
+} & WithQuestionCallback<ValueByQuestionType<PersonQuestion>>;
 
 export const salutationOptions = ["Mr", "Ms"];
 
@@ -154,7 +158,6 @@ export default function QuestionText({
   };
 
   const onDeletePerson = (i: number) => {
-    console.log("delete " + i);
     const newPersons = [...question.answer.value];
     newPersons.splice(i, 1);
     onAnswered(newPersons);

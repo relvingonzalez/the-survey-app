@@ -1,10 +1,10 @@
 import { TextInput, TextInputProps } from "@mantine/core";
-import { TextQuestion } from "@/lib/types/question";
+import { TextQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionTextProps = {
   question: TextQuestion;
-} & WithQuestionCallback<TextQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<TextQuestion>> &
   TextInputProps;
 
 export declare function isTextQuestion(

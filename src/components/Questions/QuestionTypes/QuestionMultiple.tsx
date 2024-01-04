@@ -1,10 +1,10 @@
-import { MultipleQuestion } from "@/lib/types/question";
+import { MultipleQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionMultipleProps = {
   question: MultipleQuestion;
-} & WithQuestionCallback<MultipleQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<MultipleQuestion>> &
   MultiSelectProps;
 
 export default function QuestionListSelect({

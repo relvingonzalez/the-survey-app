@@ -7,13 +7,13 @@ import {
   TextInput,
   TextInputProps,
 } from "@mantine/core";
-import { GeoQuestion } from "@/lib/types/question";
+import { GeoQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { MouseEventHandler, useEffect, useState } from "react";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionGeoProps = {
   question: GeoQuestion;
-} & WithQuestionCallback<GeoQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<GeoQuestion>> &
   TextInputProps;
 
 const options: PositionOptions = {

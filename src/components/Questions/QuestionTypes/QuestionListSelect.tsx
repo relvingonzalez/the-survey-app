@@ -1,10 +1,10 @@
 import { Select, SelectProps } from "@mantine/core";
-import { ListQuestion } from "@/lib/types/question";
+import { ListQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionListSelectProps = {
   question: ListQuestion;
-} & WithQuestionCallback<ListQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<ListQuestion>> &
   SelectProps;
 
 export default function QuestionListSelect({

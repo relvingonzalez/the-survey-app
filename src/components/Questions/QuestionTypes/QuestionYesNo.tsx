@@ -1,10 +1,14 @@
 import { Radio, RadioProps } from "@mantine/core";
-import { YesNo, YesNoQuestion } from "@/lib/types/question";
+import {
+  ValueByQuestionType,
+  YesNo,
+  YesNoQuestion,
+} from "@/lib/types/question";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionYesNoProps = {
   question: YesNoQuestion;
-} & WithQuestionCallback<YesNoQuestion["answer"]["value"]> &
+} & WithQuestionCallback<ValueByQuestionType<YesNoQuestion>> &
   RadioProps;
 
 export default function QuestionYesNo({
