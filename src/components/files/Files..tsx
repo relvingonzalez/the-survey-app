@@ -1,7 +1,7 @@
 import useGalleryFiles, { GalleryFile } from "@/lib/hooks/useGaleryFiles";
 import { SimpleGrid, Image, Box, BoxProps, ActionIcon } from "@mantine/core";
 import { FileButton, Group, Text } from "@mantine/core";
-import { IconPencil, IconPhoto } from "@tabler/icons-react";
+import { IconPhoto, IconWriting } from "@tabler/icons-react";
 
 const acceptTypes =
   ".doc,.docx,.zip,.pdf,.xls,.xlsx,.ppt,.pptx,.mp3,.wav,.tgz,image/*";
@@ -71,7 +71,7 @@ export default function Files({
             aria-label="Drawing Board"
             px="4"
           >
-            <IconPencil />
+            <IconWriting />
           </ActionIcon>
         )}
       </Group>
