@@ -10,8 +10,8 @@ import {
 import Link from "next/link";
 
 type QuestionNavigationProps = {
-  prevId: UUID;
-  nextId: UUID;
+  prevId?: UUID;
+  nextId?: UUID;
 };
 
 export default function QuestionNavigation({

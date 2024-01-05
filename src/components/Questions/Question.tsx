@@ -9,6 +9,7 @@ import {
 import QuestionComment from "./QuestionComment";
 import QuestionType from "./QuestionType";
 import { useState, ChangeEventHandler } from "react";
+import Files from "../files/Files.";
 
 export type BaseQuestionProps<T> = {
   question: QuestionByType<T> | ProcessByType<T>;
@@ -28,6 +29,7 @@ export default function Question<T extends Question>({
   question,
 }: QuestionProps<T>) {
   const [currentQuestion, setQuestion] = useState(question);
+  const [files, setFiles] = useState<File[]>([]);
   const handleCommentChange: ChangeEventHandler<HTMLTextAreaElement> &
     ((value: string) => void) = (value) => {
     if (typeof value === "string") {
@@ -48,6 +50,13 @@ export default function Question<T extends Question>({
       return newQuestion;
     });
   };
+  const handleFileDelete = (file: File) => {
+    console.log(file);
+  };
+  const handleSelectedFiles = (newFiles: File[]) => {
+    console.log(files);
+    setFiles([...files, ...newFiles]);
+  };
   const showComment = true;
   question.hasComment ||
     (question.type === "multiple" &&
@@ -63,7 +72,12 @@ export default function Question<T extends Question>({
           onChange={handleCommentChange}
         />
       )}
-      filebuttonsHere
+      <Files
+        mt="10"
+        files={files}
+        onDelete={handleFileDelete}
+        onSelectFiles={handleSelectedFiles}
+      />
     </>
   );
 }

@@ -5,8 +5,8 @@ import { PropsWithChildren } from "react";
 import QuestionNavigation from "./QuetionNavigation";
 
 type QuestionLayoutProps = PropsWithChildren & {
-  prevId: UUID;
-  nextId: UUID;
+  prevId?: UUID;
+  nextId?: UUID;
   question: Question | Process;
   isQuestion?: boolean;
 };
