@@ -1,3 +1,4 @@
+import useGalleryFiles, { GalleryFile } from "@/lib/hooks/useGaleryFiles";
 import { SimpleGrid, Image, Box, BoxProps, ActionIcon } from "@mantine/core";
 import { FileButton, Group, Text } from "@mantine/core";
 import { IconPencil, IconPhoto } from "@tabler/icons-react";
@@ -5,27 +6,37 @@ import { IconPencil, IconPhoto } from "@tabler/icons-react";
 const acceptTypes =
   ".doc,.docx,.zip,.pdf,.xls,.xlsx,.ppt,.pptx,.mp3,.wav,.tgz,image/*";
 
-type GalleryProps = {
-  files: File[];
-  onDelete: (file: File) => void;
+export type GalleryProps = {
+  files: GalleryFile[];
+  onDelete: (i: number) => void;
 };
-
 export function Gallery({ files }: GalleryProps) {
   return (
-    <SimpleGrid cols={4}>
-      {files.map((f, i) => (
-        <Image key={i} src={f} radius="md" h="auto" w={200} fit="contain" />
-      ))}
+    <SimpleGrid cols={6}>
+      {files.map((f, i) => {
+        return (
+          <Image
+            key={i}
+            src={f.url}
+            radius="md"
+            h={150}
+            w="auto"
+            fit="contain"
+            onLoad={f.url ? () => URL.revokeObjectURL(f.url) : () => {}}
+          />
+        );
+      })}
     </SimpleGrid>
   );
 }
 
-export type FilesProps = GalleryProps &
-  BoxProps & {
-    onSelectFiles: (files: File[]) => void;
-    hideFileButton?: boolean;
-    hideDrawingButton?: boolean;
-  };
+export type FilesProps = BoxProps & {
+  files: File[];
+  onDelete: (i: number) => void;
+  onSelectFiles: (files: File[]) => void;
+  hideFileButton?: boolean;
+  hideDrawingButton?: boolean;
+};
 export default function Files({
   files,
   hideFileButton,
@@ -34,8 +45,8 @@ export default function Files({
   onSelectFiles,
   ...boxProps
 }: FilesProps) {
+  const galleryFiles = useGalleryFiles(files);
   return (
-    // add hook const galleryFiles = useGalleryFiles(files);
     <Box {...boxProps}>
       <Group justify="center">
         {!hideFileButton && (
@@ -66,12 +77,12 @@ export default function Files({
       </Group>
 
       {files.length > 0 && (
-        <Text size="sm" mt="sm">
-          Selected files:
+        <Text size="sm" my="sm">
+          Attachments:
         </Text>
       )}
 
-      <Gallery files={files} onDelete={onDelete} />
+      <Gallery files={galleryFiles} onDelete={onDelete} />
     </Box>
   );
 }

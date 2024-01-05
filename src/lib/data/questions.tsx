@@ -55,6 +55,7 @@ export const dummyQuestions: Questions = [
   }),
   createQuestion("5", "checkbox", "Where have you looked?", {
     listOptions: ["under the bed", "Behind the counters", "under the sink"],
+    answer: { comment: "", value: {} },
   }),
   createQuestion("6", "multiple", "What countries have you visited?", {
     listOptions: ["Brazil", "Norway", "USA", "Denmark"],

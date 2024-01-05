@@ -72,7 +72,7 @@ type CollectionAnswer = { answer: DefaultAnswer & CollectionValue };
 export type StringValueQuestion = BaseQuestion & StringAnswer;
 export type StringOrNullValueQuestion = BaseQuestion & StringOrNullAnswer;
 
-export type CheckboxQuestion = StringValueQuestion &
+export type CheckboxQuestion = BaseQuestion &
   CheckboxAnswer & {
     type: "checkbox";
     listOptions: ListOptions;
