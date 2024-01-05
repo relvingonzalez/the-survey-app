@@ -1,4 +1,4 @@
-import LoginForm from "@/components/login-form";
+import LoginForm from "@/components/LoginForm";
 import { Flex, Stack } from "@mantine/core";
 import Image from "next/image";
 

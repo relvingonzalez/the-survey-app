@@ -4,7 +4,7 @@ import { TextInput, Button, Group, PasswordInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { redirect } from "next/navigation";
 
-export default function LoginForm() {
+export default function PreferencesForm() {
   const form = useForm({
     initialValues: {
       email: "rs@orga.zone",
@@ -19,7 +19,7 @@ export default function LoginForm() {
   return (
     <>
       <form
-        onSubmit={form.onSubmit((values) => redirect("the-survey-app/start"))}
+        onSubmit={form.onSubmit(() => redirect("the-survey-app/start"))}
         className="w-100"
       >
         <TextInput
