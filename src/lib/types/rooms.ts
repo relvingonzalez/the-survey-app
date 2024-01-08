@@ -25,8 +25,11 @@ export type Rack = {
 export type Room = {
   id: UUID;
   name: string;
+  comment: string;
   racks: Rack[];
   moreInfo: MoreInfo[];
 };
+
+export type NewRoom = Omit<Room, "id">;
 
 export type Rooms = Room[];

@@ -89,7 +89,12 @@ export default function SiteOverview({
           >
             List
           </Button>
-          <Button mt="8" w="fit-content">
+          <Button
+            mt="8"
+            w="fit-content"
+            component={Link}
+            href={`${site.siteCode}/rooms/new`}
+          >
             New
           </Button>
         </Group>

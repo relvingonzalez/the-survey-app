@@ -6,9 +6,13 @@ import { IconPhoto, IconWriting } from "@tabler/icons-react";
 const acceptTypes =
   ".doc,.docx,.zip,.pdf,.xls,.xlsx,.ppt,.pptx,.mp3,.wav,.tgz,image/*";
 
-export type GalleryProps = {
+export type FileCallbacks = {
+  onDeleteFile: (i: number) => void;
+  onSelectFiles: (files: File[]) => void;
+};
+
+export type GalleryProps = Pick<FileCallbacks, "onDeleteFile"> & {
   files: GalleryFile[];
-  onDelete: (i: number) => void;
 };
 export function Gallery({ files }: GalleryProps) {
   return (
@@ -30,18 +34,17 @@ export function Gallery({ files }: GalleryProps) {
   );
 }
 
-export type FilesProps = BoxProps & {
-  files: File[];
-  onDelete: (i: number) => void;
-  onSelectFiles: (files: File[]) => void;
-  hideFileButton?: boolean;
-  hideDrawingButton?: boolean;
-};
+export type FilesProps = BoxProps &
+  FileCallbacks & {
+    files: File[];
+    hideFileButton?: boolean;
+    hideDrawingButton?: boolean;
+  };
 export default function Files({
   files,
   hideFileButton,
   hideDrawingButton,
-  onDelete,
+  onDeleteFile,
   onSelectFiles,
   ...boxProps
 }: FilesProps) {
@@ -82,7 +85,7 @@ export default function Files({
         </Text>
       )}
 
-      <Gallery files={galleryFiles} onDelete={onDelete} />
+      <Gallery files={galleryFiles} onDeleteFile={onDeleteFile} />
     </Box>
   );
 }

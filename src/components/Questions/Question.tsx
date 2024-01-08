@@ -6,7 +6,7 @@ import {
   QuestionByType,
   ValueByQuestionType,
 } from "@/lib/types/question";
-import QuestionComment from "./QuestionComment";
+import QuestionComment from "../Comment";
 import QuestionType from "./QuestionType";
 import { useState, ChangeEventHandler } from "react";
 import Files from "../files/Files.";
@@ -50,8 +50,8 @@ export default function Question<T extends Question>({
       return newQuestion;
     });
   };
-  const handleFileDelete = (file: File) => {
-    console.log(file);
+  const handleFileDelete = (i: number) => {
+    console.log(i);
   };
   const handleSelectedFiles = (newFiles: File[]) => {
     console.log(files);
@@ -75,7 +75,7 @@ export default function Question<T extends Question>({
       <Files
         mt="10"
         files={files}
-        onDelete={handleFileDelete}
+        onDeleteFile={handleFileDelete}
         onSelectFiles={handleSelectedFiles}
       />
     </>

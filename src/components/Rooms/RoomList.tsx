@@ -27,7 +27,7 @@ export default function RoomList({ items }: RoomListProps) {
         <Text size="sm">Additional Info: {item.moreInfo.length || 0}</Text>
       </TableTd>
       <TableTd>
-        <Button component={Link} href={item.id}>
+        <Button component={Link} href={`rooms/${item.id}`}>
           <IconSettings />
         </Button>
       </TableTd>

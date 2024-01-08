@@ -1,15 +1,13 @@
 import { useEffect, useState } from "react";
 
-export type GalleryFile = {
+export type GalleryFile = File & {
   url: string;
-  type: string;
+  extension: string;
 };
 
-export type UseFaleryFilesReturnType = GalleryFile[];
-
-const getImgUrl = (type: string, f: File) => {
+const getImgUrl = (extension: string, f: File) => {
   let imgUrl = "";
-  switch (type) {
+  switch (extension) {
     case "pdf":
       imgUrl = "/pdf_thumb.png";
       break;
@@ -42,12 +40,12 @@ const getImgUrl = (type: string, f: File) => {
 const getFileExtension = (f: File) => f.name.split(".").pop() || "png";
 
 const transformFileToGalleryFile = (f: File) => {
-  const type = getFileExtension(f);
-  const url = getImgUrl(type, f);
-  return { url, type };
+  const extension = getFileExtension(f);
+  const url = getImgUrl(extension, f);
+  return { ...f, url, extension };
 };
 
-const useGalleryFiles = (files: File[]): UseFaleryFilesReturnType => {
+const useGalleryFiles = (files: File[]): GalleryFile[] => {
   const [galleryFiles, setGalleryFiles] = useState<GalleryFile[]>([]);
 
   useEffect(() => {

@@ -1,15 +1,11 @@
 import { Textarea, TextareaProps } from "@mantine/core";
 
-type QuestionCommentProps = TextareaProps & {
+type CommentProps = TextareaProps & {
   value: string;
   onChange: (value: string) => void;
 };
 
-export default function QuestionComment({
-  value,
-  onChange,
-  ...props
-}: QuestionCommentProps) {
+export default function Comment({ value, onChange, ...props }: CommentProps) {
   return (
     <Textarea
       {...props}

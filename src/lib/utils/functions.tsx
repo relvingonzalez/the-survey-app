@@ -1,4 +1,5 @@
 import { Person, Salutation } from "../types/question";
+import { NewRoom } from "../types/rooms";
 
 export const createPerson = (
   salut: Salutation = undefined,
@@ -15,3 +16,15 @@ export const createPerson = (
     phone,
   };
 };
+
+export const createRoom = (
+  name = "",
+  comment = "",
+  racks = [],
+  moreInfo = [],
+): NewRoom => ({
+  name,
+  comment,
+  racks,
+  moreInfo,
+});

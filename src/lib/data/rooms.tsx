@@ -23,6 +23,7 @@ export const dummyMoreInfo: MoreInfo = {
 export const dummyRoom: Room = {
   id: "1",
   name: "Dummy Room",
+  comment: "",
   racks: [dummyRack, dummyRack],
   moreInfo: [dummyMoreInfo],
 };
