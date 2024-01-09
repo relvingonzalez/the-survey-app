@@ -62,7 +62,7 @@ export default function QuestionGeo({
 
   useEffect(() => {
     onAnswered(coords.join(","));
-  }, [coords]);
+  }, [coords, onAnswered]);
 
   return (
     <>

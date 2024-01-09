@@ -20,6 +20,7 @@ export function Gallery({ files }: GalleryProps) {
       {files.map((f, i) => {
         return (
           <Image
+            alt={f.name}
             key={i}
             src={f.url}
             radius="md"
