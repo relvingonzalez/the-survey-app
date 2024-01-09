@@ -6,8 +6,6 @@ import {
   AppShellHeader,
   AppShellFooter,
   AppShellMain,
-  useMantineTheme,
-  useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { redirect } from "next/navigation";
@@ -16,10 +14,10 @@ import NavBreadcrumbs from "./navigation/Breadcrumbs";
 import NavFooter from "./navigation/Footer";
 import NavHeader from "./navigation/Header";
 import { navLinks } from "@/lib/navigation/routes";
+import cx from "clsx";
+import classes from "./Layout.module.css";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
-  const theme = useMantineTheme();
-  const { colorScheme } = useMantineColorScheme();
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
@@ -36,18 +34,6 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         breakpoint: "sm",
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
-      styles={{
-        main: {
-          background:
-            colorScheme === "dark"
-              ? theme.colors.dark[8]
-              : theme.colors.gray[0],
-          color:
-            colorScheme === "dark"
-              ? theme.colors.gray[0]
-              : theme.colors.dark[8],
-        },
-      }}
       padding="md"
     >
       <AppShellHeader>
@@ -61,7 +47,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       <AppShellNavbar p="md">
         <Sidebar navLinks={navLinks} />
       </AppShellNavbar>
-      <AppShellMain>
+      <AppShellMain className={cx(classes.main)}>
         <NavBreadcrumbs navLinks={navLinks} />
         {children}
       </AppShellMain>
