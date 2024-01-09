@@ -41,5 +41,9 @@ export default function NavBreadcrumbs({ navLinks }: WithNavLinkProps) {
     return null;
   }
 
-  return <Breadcrumbs mb="20">{breadcrumbs}</Breadcrumbs>;
+  return (
+    <Breadcrumbs px="md" pt="md" mb="20">
+      {breadcrumbs}
+    </Breadcrumbs>
+  );
 }

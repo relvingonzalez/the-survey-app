@@ -6,6 +6,7 @@ import {
   AppShellHeader,
   AppShellFooter,
   AppShellMain,
+  ScrollArea,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { redirect } from "next/navigation";
@@ -34,7 +35,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         breakpoint: "sm",
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
       }}
-      padding="md"
+      padding={0}
     >
       <AppShellHeader>
         <NavHeader
@@ -49,7 +50,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
       </AppShellNavbar>
       <AppShellMain className={cx(classes.main)}>
         <NavBreadcrumbs navLinks={navLinks} />
-        {children}
+        <ScrollArea
+          p="md"
+          h="calc(100vh - var(--app-shell-header-height, 0px) - var(--app-shell-footer-height, 0px))"
+        >
+          {children}
+        </ScrollArea>
       </AppShellMain>
       <AppShellFooter p="md">
         <NavFooter />
