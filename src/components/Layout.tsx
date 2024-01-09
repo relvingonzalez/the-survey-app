@@ -6,6 +6,8 @@ import {
   AppShellHeader,
   AppShellFooter,
   AppShellMain,
+  useMantineTheme,
+  useMantineColorScheme,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { redirect } from "next/navigation";
@@ -16,6 +18,8 @@ import NavHeader from "./navigation/Header";
 import { navLinks } from "@/lib/navigation/routes";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
+  const theme = useMantineTheme();
+  const { colorScheme } = useMantineColorScheme();
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
 
@@ -31,6 +35,14 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         width: 300,
         breakpoint: "sm",
         collapsed: { mobile: !mobileOpened, desktop: !desktopOpened },
+      }}
+      styles={{
+        main: {
+          background:
+            colorScheme === "dark"
+              ? theme.colors.dark[8]
+              : theme.colors.gray[0],
+        },
       }}
       padding="md"
     >
