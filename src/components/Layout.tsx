@@ -42,6 +42,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             colorScheme === "dark"
               ? theme.colors.dark[8]
               : theme.colors.gray[0],
+          color:
+            colorScheme === "dark"
+              ? theme.colors.gray[0]
+              : theme.colors.dark[8],
         },
       }}
       padding="md"
