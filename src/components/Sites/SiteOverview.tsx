@@ -23,7 +23,12 @@ export default function SiteOverview({
   return (
     <>
       <Card withBorder shadow="sm" radius="md">
-        <CardSection withBorder inheritPadding py="xs">
+        <CardSection
+          data-first-section="true"
+          withBorder
+          inheritPadding
+          py="xs"
+        >
           <Group justify="start">
             <IconAddressBook />
             <Text size="xl" fw={500}>
