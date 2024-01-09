@@ -16,23 +16,23 @@ export default function NavHeader({
   toggleDesktop,
 }: NavHeaderProps) {
   return (
-    <Group h="100%" px="md">
-      <Burger
-        opened={mobileOpened}
-        onClick={toggleMobile}
-        hiddenFrom="sm"
-        size="sm"
-      />
-      <Burger
-        opened={desktopOpened}
-        onClick={toggleDesktop}
-        visibleFrom="sm"
-        size="sm"
-      />
-      <Image src="/logo_otsan.png" alt="OtsanLLC" w={30} h="auto" />
-      <Flex className="flex-1" justify="right">
-        <DarkModeToggle />
-      </Flex>
-    </Group>
+    <Flex w="100%" px="md" h="100%" align="center" justify="space-between">
+      <Group>
+        <Burger
+          opened={mobileOpened}
+          onClick={toggleMobile}
+          hiddenFrom="sm"
+          size="sm"
+        />
+        <Burger
+          opened={desktopOpened}
+          onClick={toggleDesktop}
+          visibleFrom="sm"
+          size="sm"
+        />
+        <Image src="/logo_otsan.png" alt="OtsanLLC" w={30} h="auto" />
+      </Group>
+      <DarkModeToggle />
+    </Flex>
   );
 }
