@@ -8,7 +8,7 @@ import {
   TextInputProps,
 } from "@mantine/core";
 import { GeoQuestion, ValueByQuestionType } from "@/lib/types/question";
-import { MouseEventHandler, useEffect, useState } from "react";
+import { MouseEventHandler } from "react";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionGeoProps = {
@@ -31,7 +31,7 @@ export default function QuestionGeo({
   onAnswered,
   ...props
 }: QuestionGeoProps) {
-  const [coords, setCoords] = useState(question.answer.value.split(","));
+  const coords = question.answer.value.split(",");
   const pattern =
     "^[-+]?([1-8]?d(.d+)?|90(.0+)?),s*[-+]?(180(.0+)?|((1[0-7]d)|([1-9]?d))(.d+)?)$";
   const getLocation: MouseEventHandler<HTMLButtonElement> = () => {
@@ -57,12 +57,12 @@ export default function QuestionGeo({
 
   const success: PositionCallback = (pos) => {
     const crd = pos.coords;
-    setCoords([`${crd.latitude}`, `${crd.longitude}`]);
+    onAnswered(`${crd.latitude}, ${crd.longitude}`);
   };
 
-  useEffect(() => {
-    onAnswered(coords.join(","));
-  }, [coords, onAnswered]);
+  const onChange = (value: string) => {
+    onAnswered(value);
+  };
 
   return (
     <>
@@ -74,6 +74,7 @@ export default function QuestionGeo({
           id="oGPS"
           value={question.answer.value}
           pattern={pattern}
+          onChange={(e) => onChange(e.target.value)}
           {...props}
         />
         {coords.length && (
