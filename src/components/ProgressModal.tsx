@@ -20,6 +20,7 @@ export default function ProgressModal({
   showButtons,
   onClose,
   onContinue,
+  title = <Text>Download</Text>,
   ...props
 }: ProgressModalProps) {
   return (
@@ -30,7 +31,7 @@ export default function ProgressModal({
         blur: 3,
       }}
       size="xl"
-      title={<Text>Download</Text>}
+      title={title}
       onClose={onClose}
     >
       <Text>{statusText}</Text>
