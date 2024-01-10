@@ -15,8 +15,8 @@ import NavBreadcrumbs from "./navigation/Breadcrumbs";
 import NavFooter from "./navigation/Footer";
 import NavHeader from "./navigation/Header";
 import { navLinks } from "@/lib/navigation/routes";
-import cx from "clsx";
-import classes from "./Layout.module.css";
+// import cx from "clsx";
+// import classes from "./Layout.module.css";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
