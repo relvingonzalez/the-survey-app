@@ -23,13 +23,13 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
 
   return (
     <ProgressModal
-    statusText={statusText}
-    progressValue={progressValue}
-    onContinue={handleOnContinue}
-    opened={opened}
-    showButtons
-    title={<Text>Syncing</Text>}
-    {...props}
-    ></ProgressModal>
+      statusText={statusText}
+      progressValue={progressValue}
+      onContinue={handleOnContinue}
+      opened={opened}
+      showButtons
+      title={<Text>Syncing</Text>}
+      {...props}
+    />
   );
 }
