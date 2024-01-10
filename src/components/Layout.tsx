@@ -19,7 +19,6 @@ import { navLinks } from "@/lib/navigation/routes";
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
   const [desktopOpened, { toggle: toggleDesktop }] = useDisclosure(true);
-
   const notLoggedIn = false;
 
   if (notLoggedIn) {
