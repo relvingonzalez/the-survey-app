@@ -1,6 +1,6 @@
 "use client";
 
-import { ModalProps } from "@mantine/core";
+import { ModalProps, Text } from "@mantine/core";
 import ProgressModal from "./ProgressModal";
 import { useEffect, useState } from "react";
 
@@ -28,6 +28,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       onContinue={handleOnContinue}
       opened={opened}
       showButtons
+      title={<Text>Syncing</Text>}
       {...props}
     ></ProgressModal>
   );

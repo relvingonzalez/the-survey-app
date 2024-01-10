@@ -1,4 +1,11 @@
-import { Button, Group, Modal, ModalProps, Progress } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Modal,
+  ModalProps,
+  Progress,
+  Text,
+} from "@mantine/core";
 
 export type ProgressModalProps = ModalProps & {
   progressValue: number;
@@ -23,10 +30,10 @@ export default function ProgressModal({
         blur: 3,
       }}
       size="xl"
-      title="Syncing"
+      title={<Text>Download</Text>}
       onClose={onClose}
     >
-      {statusText}
+      <Text>{statusText}</Text>
       <Progress value={progressValue} />
 
       {showButtons && (
