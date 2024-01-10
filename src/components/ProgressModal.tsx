@@ -20,7 +20,7 @@ export default function ProgressModal({
   showButtons,
   onClose,
   onContinue,
-  title = <Text>Download</Text>,
+  title = "Download",
   ...props
 }: ProgressModalProps) {
   return (
