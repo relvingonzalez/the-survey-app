@@ -2,6 +2,8 @@ import useGalleryFiles, { GalleryFile } from "@/lib/hooks/useGaleryFiles";
 import { SimpleGrid, Image, Box, BoxProps, ActionIcon } from "@mantine/core";
 import { FileButton, Group, Text } from "@mantine/core";
 import { IconPhoto, IconWriting } from "@tabler/icons-react";
+import DrawingModal from "../DrawingModal";
+import { useDisclosure } from "@mantine/hooks";
 
 const acceptTypes =
   ".doc,.docx,.zip,.pdf,.xls,.xlsx,.ppt,.pptx,.mp3,.wav,.tgz,image/*";
@@ -50,8 +52,11 @@ export default function Files({
   ...boxProps
 }: FilesProps) {
   const galleryFiles = useGalleryFiles(files);
+  const [opened, { open, close }] = useDisclosure(false);
+
   return (
     <Box {...boxProps}>
+      {!hideDrawingButton && <DrawingModal opened={opened} onClose={close} />}
       <Group justify="center">
         {!hideFileButton && (
           <FileButton onChange={onSelectFiles} accept={acceptTypes} multiple>
@@ -70,6 +75,7 @@ export default function Files({
         )}
         {!hideDrawingButton && (
           <ActionIcon
+            onClick={open}
             size={42}
             variant="default"
             aria-label="Drawing Board"
