@@ -25,7 +25,7 @@ export default function DiscSpaceCard() {
         <Group justify="start">
           <IconDatabase />
           <Text size="xl" fw={500}>
-            Storage
+            Local Storage
           </Text>
         </Group>
       </CardSection>
