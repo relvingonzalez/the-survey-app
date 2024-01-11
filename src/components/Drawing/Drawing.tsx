@@ -11,12 +11,5 @@ export type DrawingProps = CanvasHTMLAttributes<HTMLCanvasElement>;
 export default function Drawing({ ...props }: DrawingProps) {
   const { ref, x, y } = useMouse();
   console.log(x, y);
-  return (
-    <canvas
-      ref={ref}
-      className={classes.drawing}
-      width={window.innerWidth}
-      {...props}
-    />
-  );
+  return <canvas ref={ref} className={classes.drawing} {...props} />;
 }

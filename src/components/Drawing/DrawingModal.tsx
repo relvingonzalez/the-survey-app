@@ -1,19 +1,20 @@
-import { Button, Group, Modal, ModalProps } from "@mantine/core";
-import Drawing from "./Drawing/Drawing";
+import { Modal, ModalProps, Stack } from "@mantine/core";
+import Drawing from "./Drawing";
 import { useRef } from "react";
+import DrawingToolBox from "./DrawingToolBox";
 
 export type DrawingModalProps = ModalProps & {
   file?: File;
-  onContinue?: () => void;
+  onSave?: () => void;
 };
 
 export default function DrawingModal({
   onClose,
-  onContinue,
-  title = "Drawing",
+  onSave,
   ...props
 }: DrawingModalProps) {
   const ref = useRef<HTMLDivElement>(null);
+
   return (
     <Modal
       {...props}
@@ -21,17 +22,15 @@ export default function DrawingModal({
         backgroundOpacity: 0.55,
         blur: 3,
       }}
-      title={title}
       onClose={onClose}
       fullScreen
       ref={ref}
+      withCloseButton={false}
     >
-      <Drawing width={"100%"} height={"100%"} />
-
-      <Group mt="xl">
-        <Button onClick={onClose}>Close</Button>
-        <Button onClick={onContinue}>Save</Button>
-      </Group>
+      <Stack align="center">
+        <DrawingToolBox onClose={onClose} onSave={onSave} />
+        <Drawing />
+      </Stack>
     </Modal>
   );
 }

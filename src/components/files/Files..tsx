@@ -2,7 +2,7 @@ import useGalleryFiles, { GalleryFile } from "@/lib/hooks/useGaleryFiles";
 import { SimpleGrid, Image, Box, BoxProps, ActionIcon } from "@mantine/core";
 import { FileButton, Group, Text } from "@mantine/core";
 import { IconPhoto, IconWriting } from "@tabler/icons-react";
-import DrawingModal from "../DrawingModal";
+import DrawingModal from "../Drawing/DrawingModal";
 import { useDisclosure } from "@mantine/hooks";
 
 const acceptTypes =

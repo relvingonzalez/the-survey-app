@@ -86,7 +86,7 @@ export const dummyQuestions: Questions = [
   createQuestion("10", "days", "What days is it open", {
     answer: {
       comment: "",
-      value: [],
+      value: ["Tue", "Sat"],
     },
   }),
   createQuestion("11", "datetime", "When is this site open", {
