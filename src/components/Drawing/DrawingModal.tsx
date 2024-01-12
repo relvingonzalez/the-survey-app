@@ -23,10 +23,8 @@ export default function DrawingModal({
 }: DrawingModalProps) {
   const [selectedColor, setSelectedColor] = useState("#2e2e2e");
   const [activeTool, setActiveTool] = useState("line");
-  const { ref, height } = useElementSize();
+  const { ref, height } = useElementSize(); // elementSize doe snot have top and bottom padding, so I had to add 32
   const { width, height: viewportHeight } = useViewportSize();
-  console.log(width, height, viewportHeight);
-
   return (
     <ModalRoot {...props} onClose={onClose} fullScreen>
       <ModalOverlay backgroundOpacity={0.55} blur={3} />
@@ -42,7 +40,12 @@ export default function DrawingModal({
           />
         </ModalHeader>
         <ModalBody p="0">
-          <Drawing width={width} height={viewportHeight - height} />
+          <Drawing
+            width={width}
+            height={viewportHeight - height - 32}
+            activeTool={activeTool}
+            selectedColor={selectedColor}
+          />
         </ModalBody>
       </ModalContent>
     </ModalRoot>

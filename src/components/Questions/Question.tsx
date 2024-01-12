@@ -43,7 +43,6 @@ export default function Question<T extends Question>({
   const handleAnswered: OnAnsweredCallback<ValueByQuestionType<T>> = (
     value,
   ) => {
-    console.log("newValue", value);
     setQuestion((prevState) => {
       const newQuestion = Object.assign({}, prevState);
       newQuestion.answer.value = value;

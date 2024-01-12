@@ -19,12 +19,13 @@ import {
   IconRectangle,
   IconServer2,
 } from "@tabler/icons-react";
+import { DrawingStateProps } from "./Drawing";
 
 const tools = [
   { label: "Line", value: "line", icon: IconLine },
   { label: "Circle", value: "circle", icon: IconCircle },
   { label: "Rectangle", value: "rectangle", icon: IconRectangle },
-  { label: "Freehand", value: "freehand", icon: IconEaseInOut },
+  { label: "Freehand", value: "freeHand", icon: IconEaseInOut },
   { label: "More Info", value: "moreInfo", icon: IconInfoCircleFilled },
   { label: "Rack", value: "rack", icon: IconServer2 },
 ];
@@ -53,10 +54,7 @@ export type DrawingToolBoxCallbacks = {
   onSelectTool: (tool: string) => void;
 };
 
-export type DrawingToolBoxProps = DrawingToolBoxCallbacks & {
-  selectedColor: string;
-  activeTool: string;
-};
+export type DrawingToolBoxProps = DrawingToolBoxCallbacks & DrawingStateProps;
 
 export default function DrawingToolBox({
   selectedColor = "#2e2e2e",
