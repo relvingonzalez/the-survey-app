@@ -5,8 +5,6 @@ import { useForm } from "@mantine/form";
 import { NewRoom, Room } from "@/lib/types/rooms";
 import Comment from "../Comment";
 import Files, { FileCallbacks } from "../files/Files.";
-import Drawing from "../Drawing/Drawing";
-
 export type RoomProps = FileCallbacks & {
   room: Room | NewRoom;
   files: File[];
@@ -49,7 +47,6 @@ export default function RoomComponent({
           />
           <Comment {...form.getInputProps("comment")} />
           <Files {...filesProps} hideDrawingButton />
-          <Drawing />
           <Group mb="10" justify="space-between">
             <Button mt="10" disabled={!form.isValid} type="submit">
               Save
