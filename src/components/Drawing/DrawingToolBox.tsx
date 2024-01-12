@@ -68,47 +68,56 @@ export default function DrawingToolBox({
 }: DrawingToolBoxProps) {
   // move this state to the modal
   return (
-    <Group>
-      <Popover width={300} position="bottom" withArrow shadow="md">
-        <PopoverTarget>
-          <Tooltip label="Select Color">
-            <ActionIcon variant="default" size="xl" aria-label="Gallery">
-              <ColorSwatch
-                color={selectedColor}
-                style={{ width: rem(20) }}
-                radius="xs"
-              />
-            </ActionIcon>
-          </Tooltip>
-        </PopoverTarget>
-        <PopoverDropdown p="sm">
-          <ColorPicker
-            value={selectedColor}
-            onChange={onSelectColor}
-            w="100%"
-            format="hex"
-            swatches={swatches}
-          />
-        </PopoverDropdown>
-      </Popover>
-      <ActionIconGroup>
-        {tools.map((t, i) => (
-          <Tooltip key={i} label={t.label}>
-            <ActionIcon
-              variant={activeTool === t.value ? "filled" : "default"}
-              size="xl"
-              aria-label={t.label}
-              onClick={() => onSelectTool(t.value)}
-            >
-              <t.icon style={{ width: rem(20) }} stroke={1.5} />
-            </ActionIcon>
-          </Tooltip>
-        ))}
-      </ActionIconGroup>
-      <Button ml="xl" onClick={onClose}>
-        Close
-      </Button>
-      <Button onClick={onSave}>Save</Button>
+    <Group w="100%" justify="space-around">
+      <Group>
+        <Popover width={300} position="bottom" withArrow shadow="md">
+          <PopoverTarget>
+            <Tooltip label="Select Color">
+              <ActionIcon
+                variant="outline"
+                color="white"
+                size="xl"
+                aria-label="Gallery"
+              >
+                <ColorSwatch
+                  color={selectedColor}
+                  style={{ width: rem(20) }}
+                  radius="xs"
+                />
+              </ActionIcon>
+            </Tooltip>
+          </PopoverTarget>
+          <PopoverDropdown p="sm">
+            <ColorPicker
+              value={selectedColor}
+              onChange={onSelectColor}
+              w="100%"
+              format="hex"
+              swatches={swatches}
+            />
+          </PopoverDropdown>
+        </Popover>
+        <ActionIconGroup>
+          {tools.map((t, i) => (
+            <Tooltip key={i} label={t.label}>
+              <ActionIcon
+                variant={activeTool === t.value ? "filled" : "default"}
+                size="xl"
+                aria-label={t.label}
+                onClick={() => onSelectTool(t.value)}
+              >
+                <t.icon style={{ width: rem(20) }} stroke={1.5} />
+              </ActionIcon>
+            </Tooltip>
+          ))}
+        </ActionIconGroup>
+      </Group>
+      <Group>
+        <Button ml="xl" onClick={onClose} variant="warning">
+          Close
+        </Button>
+        <Button onClick={onSave}>Save</Button>
+      </Group>
     </Group>
   );
 }
