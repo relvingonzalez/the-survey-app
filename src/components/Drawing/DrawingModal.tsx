@@ -9,7 +9,7 @@ import {
 import Drawing from "./Drawing";
 import { useState } from "react";
 import DrawingToolBox from "./DrawingToolBox";
-import { useElementSize } from "@mantine/hooks";
+import { useElementSize, useViewportSize } from "@mantine/hooks";
 
 export type DrawingModalProps = ModalProps & {
   file?: File;
@@ -23,13 +23,15 @@ export default function DrawingModal({
 }: DrawingModalProps) {
   const [selectedColor, setSelectedColor] = useState("#2e2e2e");
   const [activeTool, setActiveTool] = useState("line");
-  const { ref, width, height } = useElementSize();
+  const { ref, height } = useElementSize();
+  const { width, height: viewportHeight } = useViewportSize();
+  console.log(width, height, viewportHeight);
 
   return (
     <ModalRoot {...props} onClose={onClose} fullScreen>
       <ModalOverlay backgroundOpacity={0.55} blur={3} />
       <ModalContent>
-        <ModalHeader bg="gray.2">
+        <ModalHeader bg="gray.2" ref={ref}>
           <DrawingToolBox
             onClose={onClose}
             onSave={onSave}
@@ -39,8 +41,8 @@ export default function DrawingModal({
             selectedColor={selectedColor}
           />
         </ModalHeader>
-        <ModalBody ref={ref}>
-          <Drawing width={width} height={height} />
+        <ModalBody p="0">
+          <Drawing width={width} height={viewportHeight - height} />
         </ModalBody>
       </ModalContent>
     </ModalRoot>
