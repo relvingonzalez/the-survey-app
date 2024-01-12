@@ -1,6 +1,6 @@
 import { Modal, ModalProps, Stack } from "@mantine/core";
 import Drawing from "./Drawing";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import DrawingToolBox from "./DrawingToolBox";
 
 export type DrawingModalProps = ModalProps & {
@@ -14,6 +14,8 @@ export default function DrawingModal({
   ...props
 }: DrawingModalProps) {
   const ref = useRef<HTMLDivElement>(null);
+  const [selectedColor, setSelectedColor] = useState("");
+  const [activeTool, setActiveTool] = useState("line");
 
   return (
     <Modal
@@ -28,7 +30,14 @@ export default function DrawingModal({
       withCloseButton={false}
     >
       <Stack align="center">
-        <DrawingToolBox onClose={onClose} onSave={onSave} />
+        <DrawingToolBox
+          onClose={onClose}
+          onSave={onSave}
+          onSelectColor={setSelectedColor}
+          onSelectTool={setActiveTool}
+          activeTool={activeTool}
+          selectedColor={selectedColor}
+        />
         <Drawing />
       </Stack>
     </Modal>

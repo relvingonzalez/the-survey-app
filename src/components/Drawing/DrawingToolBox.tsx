@@ -9,10 +9,10 @@ import {
   PopoverDropdown,
   Button,
   Tooltip,
+  ColorSwatch,
 } from "@mantine/core";
 import {
   IconCircle,
-  IconColorPicker,
   IconEaseInOut,
   IconInfoCircleFilled,
   IconLine,
@@ -20,14 +20,51 @@ import {
   IconServer2,
 } from "@tabler/icons-react";
 
-export type DrawingToolBoxProps = {
+const tools = [
+  { label: "Line", value: "line", icon: IconLine },
+  { label: "Circle", value: "circle", icon: IconCircle },
+  { label: "Rectangle", value: "rectangle", icon: IconRectangle },
+  { label: "Freehand", value: "freehand", icon: IconEaseInOut },
+  { label: "More Info", value: "moreInfo", icon: IconInfoCircleFilled },
+  { label: "Rack", value: "rack", icon: IconServer2 },
+];
+
+const swatches = [
+  "#ffffff",
+  "#2e2e2e",
+  "#868e96",
+  "#fa5252",
+  "#e64980",
+  "#7950f2",
+  "#4c6ef5",
+  "#228be6",
+  "#15aabf",
+  "#12b886",
+  "#40c057",
+  "#82c91e",
+  "#fab005",
+  "#fd7e14",
+];
+
+export type DrawingToolBoxCallbacks = {
   onClose?: () => void;
   onSave?: () => void;
+  onSelectColor: (color: string) => void;
+  onSelectTool: (tool: string) => void;
+};
+
+export type DrawingToolBoxProps = DrawingToolBoxCallbacks & {
+  selectedColor: string;
+  activeTool: string;
 };
 
 export default function DrawingToolBox({
+  selectedColor = "#2e2e2e",
+  activeTool,
   onClose,
   onSave,
+  onSelectColor,
+  onSelectTool,
 }: DrawingToolBoxProps) {
   // move this state to the modal
   return (
@@ -36,69 +73,37 @@ export default function DrawingToolBox({
         <PopoverTarget>
           <Tooltip label="Select Color">
             <ActionIcon variant="default" size="xl" aria-label="Gallery">
-              <IconColorPicker style={{ width: rem(20) }} stroke={1.5} />
+              <ColorSwatch
+                color={selectedColor}
+                style={{ width: rem(20) }}
+                radius="xs"
+              />
             </ActionIcon>
           </Tooltip>
         </PopoverTarget>
         <PopoverDropdown p="sm">
           <ColorPicker
+            value={selectedColor}
+            onChange={onSelectColor}
             w="100%"
             format="hex"
-            swatches={[
-              "#ffffff",
-              "#2e2e2e",
-              "#868e96",
-              "#fa5252",
-              "#e64980",
-              "#7950f2",
-              "#4c6ef5",
-              "#228be6",
-              "#15aabf",
-              "#12b886",
-              "#40c057",
-              "#82c91e",
-              "#fab005",
-              "#fd7e14",
-            ]}
+            swatches={swatches}
           />
         </PopoverDropdown>
       </Popover>
       <ActionIconGroup>
-        <Tooltip label="Line">
-          <ActionIcon variant="default" size="xl" aria-label="Line">
-            <IconLine style={{ width: rem(20) }} stroke={1.5} />
-          </ActionIcon>
-        </Tooltip>
-
-        <Tooltip label="Circle">
-          <ActionIcon variant="default" size="xl" aria-label="Circle">
-            <IconCircle style={{ width: rem(20) }} stroke={1.5} />
-          </ActionIcon>
-        </Tooltip>
-
-        <Tooltip label="Rectangle">
-          <ActionIcon variant="default" size="xl" aria-label="Rectangle">
-            <IconRectangle style={{ width: rem(20) }} stroke={1.5} />
-          </ActionIcon>
-        </Tooltip>
-
-        <Tooltip label="Freehand">
-          <ActionIcon variant="default" size="xl" aria-label="Freehand">
-            <IconEaseInOut style={{ width: rem(20) }} stroke={1.5} />
-          </ActionIcon>
-        </Tooltip>
-
-        <Tooltip label="More Info">
-          <ActionIcon variant="default" size="xl" aria-label="More Info">
-            <IconInfoCircleFilled style={{ width: rem(20) }} stroke={1.5} />
-          </ActionIcon>
-        </Tooltip>
-
-        <Tooltip label="Rack">
-          <ActionIcon variant="default" size="xl" aria-label="Rack">
-            <IconServer2 style={{ width: rem(20) }} stroke={1.5} />
-          </ActionIcon>
-        </Tooltip>
+        {tools.map((t, i) => (
+          <Tooltip key={i} label={t.label}>
+            <ActionIcon
+              variant={activeTool === t.value ? "filled" : "default"}
+              size="xl"
+              aria-label={t.label}
+              onClick={() => onSelectTool(t.value)}
+            >
+              <t.icon style={{ width: rem(20) }} stroke={1.5} />
+            </ActionIcon>
+          </Tooltip>
+        ))}
       </ActionIconGroup>
       <Button ml="xl" onClick={onClose}>
         Close
