@@ -19,7 +19,9 @@ import {
   IconRectangle,
   IconServer2,
 } from "@tabler/icons-react";
-import { DrawingStateProps } from "./Drawing";
+import { DrawingCanvasRef, DrawingStateProps } from "./Drawing";
+import { clearCanvas } from "./DrawingFunctions";
+import { useState } from "react";
 
 const tools = [
   { label: "Line", value: "line", icon: IconLine },
@@ -49,26 +51,58 @@ const swatches = [
 
 export type DrawingToolBoxCallbacks = {
   onClose?: () => void;
-  onSave?: () => void;
+  onSave?: (files: File[]) => void;
   onSelectColor: (color: string) => void;
   onSelectTool: (tool: string) => void;
 };
 
-export type DrawingToolBoxProps = DrawingToolBoxCallbacks & DrawingStateProps;
+export type DrawingToolBoxProps = DrawingToolBoxCallbacks &
+  DrawingStateProps &
+  DrawingCanvasRef;
 
 export default function DrawingToolBox({
   selectedColor = "#2e2e2e",
   activeTool,
+  canvasRef,
   onClose,
   onSave,
   onSelectColor,
   onSelectTool,
 }: DrawingToolBoxProps) {
-  // move this state to the modal
+  const [colorPickerOpened, setColorPickerOpened] = useState(false);
+
+  const handleSave = () => {
+    canvasRef?.current?.getContext("2d")?.canvas.toBlob((blob) => {
+      blob &&
+        onSave?.([new File([blob], "NewDrawing.jpg", { type: "image/jpeg" })]);
+      onClose?.();
+    }, "image/jpeg");
+  };
+  const handleClear = () => {
+    const ctx = canvasRef?.current?.getContext("2d");
+    if (ctx) {
+      clearCanvas(
+        ctx,
+        canvasRef.current?.clientWidth || 0,
+        canvasRef.current?.clientHeight || 0,
+      );
+    }
+  };
+  const handleColorChanged = (newColor: string) => {
+    setColorPickerOpened(false);
+    onSelectColor(newColor);
+  };
+
   return (
     <Group w="100%" justify="space-around">
       <Group>
-        <Popover width={300} position="bottom" withArrow shadow="md">
+        <Popover
+          opened={colorPickerOpened}
+          width={300}
+          position="bottom"
+          withArrow
+          shadow="md"
+        >
           <PopoverTarget>
             <Tooltip label="Select Color">
               <ActionIcon
@@ -76,6 +110,7 @@ export default function DrawingToolBox({
                 color="white"
                 size="xl"
                 aria-label="Gallery"
+                onClick={() => setColorPickerOpened(true)}
               >
                 <ColorSwatch
                   color={selectedColor}
@@ -88,7 +123,7 @@ export default function DrawingToolBox({
           <PopoverDropdown p="sm">
             <ColorPicker
               value={selectedColor}
-              onChange={onSelectColor}
+              onChange={handleColorChanged}
               w="100%"
               format="hex"
               swatches={swatches}
@@ -110,11 +145,14 @@ export default function DrawingToolBox({
           ))}
         </ActionIconGroup>
       </Group>
+      <Button variant="danger" onClick={handleClear}>
+        Clear Canvas
+      </Button>
       <Group>
         <Button ml="xl" onClick={onClose} variant="warning">
           Close
         </Button>
-        <Button onClick={onSave}>Save</Button>
+        <Button onClick={handleSave}>Save</Button>
       </Group>
     </Group>
   );

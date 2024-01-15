@@ -6,13 +6,12 @@ export function drawRect(
   x: number,
   y: number,
 ) {
-  console.log(x, y);
   ctx.beginPath();
   ctx.moveTo(startX, startY);
   ctx.fillStyle = selectedColor;
   ctx.strokeStyle = selectedColor;
   ctx.clearRect(startX, startY, x - startX, y - startY);
-  ctx.strokeRect(startX, startY, x - startX, y - startY);
+  ctx.fillRect(startX, startY, x - startX, y - startY);
 }
 
 export function drawLine(
@@ -40,13 +39,13 @@ export function drawCircle(
   x: number,
   y: number,
 ) {
-  ctx.strokeStyle = selectedColor;
+  ctx.fillStyle = selectedColor;
   ctx.beginPath();
   ctx.moveTo(startX, startY + (y - startY) / 2);
   ctx.bezierCurveTo(startX, startY, x, startY, x, startY + (y - startY) / 2);
   ctx.bezierCurveTo(x, y, startX, y, startX, startY + (y - startY) / 2);
   ctx.closePath();
-  ctx.stroke();
+  ctx.fill();
 }
 
 export function clearCanvas(
@@ -66,4 +65,15 @@ export function drawCanvas(
 ) {
   ctx.drawImage(canvas, 0, 0);
   clearCanvas(ctxTemp, width, height);
+}
+
+export function prepareCanvas(
+  ctx: CanvasRenderingContext2D,
+  width: number,
+  height: number,
+) {
+  ctx.save();
+  ctx.fillStyle = "white";
+  ctx.fillRect(0, 0, width, height);
+  ctx.restore();
 }

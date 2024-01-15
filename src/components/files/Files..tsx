@@ -28,8 +28,10 @@ export function Gallery({ files }: GalleryProps) {
             radius="md"
             h={150}
             w="auto"
+            maw={200}
             fit="contain"
             onLoad={f.url ? () => URL.revokeObjectURL(f.url) : () => {}}
+            style={{ border: "1px black solid" }}
           />
         );
       })}
@@ -56,7 +58,9 @@ export default function Files({
 
   return (
     <Box {...boxProps}>
-      {!hideDrawingButton && <DrawingModal opened={opened} onClose={close} />}
+      {!hideDrawingButton && (
+        <DrawingModal opened={opened} onClose={close} onSave={onSelectFiles} />
+      )}
       <Group justify="center">
         {!hideFileButton && (
           <FileButton onChange={onSelectFiles} accept={acceptTypes} multiple>

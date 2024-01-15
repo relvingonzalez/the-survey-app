@@ -5,7 +5,13 @@ import {
   useWindowEvent,
 } from "@mantine/hooks";
 import classes from "./Drawing.module.css";
-import { CanvasHTMLAttributes, useCallback, useEffect, useState } from "react";
+import {
+  CanvasHTMLAttributes,
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { Box } from "@mantine/core";
 import {
   clearCanvas,
@@ -13,15 +19,27 @@ import {
   drawCircle,
   drawLine,
   drawRect,
+  prepareCanvas,
 } from "./DrawingFunctions";
+
+export type DrawingCanvasRef = {
+  canvasRef: MutableRefObject<HTMLCanvasElement | null>;
+};
 
 export type DrawingStateProps = {
   selectedColor: string;
   activeTool: string;
 };
 
+export type DrawingSizeProps = {
+  height: number;
+  width: number;
+};
+
 export type DrawingProps = CanvasHTMLAttributes<HTMLCanvasElement> &
-  DrawingStateProps;
+  DrawingStateProps &
+  DrawingCanvasRef &
+  DrawingSizeProps;
 
 const initialCoords = { x: 0, y: 0 };
 export default function Drawing({
@@ -29,9 +47,9 @@ export default function Drawing({
   height,
   activeTool,
   selectedColor,
+  canvasRef,
   ...props
 }: DrawingProps) {
-  const { ref: canvasRef } = useMouse();
   const { ref: tempRef, x: x, y: y } = useMouse();
   const [mouseCoords, setMouseCoords] = useState({ ...initialCoords });
   const [mouseDownFlag, setMouseDownFlag] = useState(false);
@@ -73,8 +91,12 @@ export default function Drawing({
   };
 
   const mouseUpHandler = () => {
-    const ctx = canvasRef.current.getContext("2d");
+    const ctx = canvasRef?.current?.getContext("2d");
     const ctxTemp = tempRef.current.getContext("2d");
+
+    if (!ctx) {
+      return;
+    }
 
     setMouseCoords({ ...initialCoords });
     setMouseDownFlag(false);
@@ -101,13 +123,18 @@ export default function Drawing({
 
   // Resize
   const handleResize = useCallback(() => {
-    const ctx = canvasRef.current.getContext("2d");
-    ctx.canvas.height = height;
-    ctx.canvas.width = width;
+    const ctx = canvasRef?.current?.getContext("2d");
+
+    if (ctx?.canvas) {
+      ctx.canvas.height = height;
+      ctx.canvas.width = width;
+      prepareCanvas(ctx, width, height);
+    }
 
     const ctxTemp = tempRef.current.getContext("2d");
     ctxTemp.canvas.height = height;
     ctxTemp.canvas.width = width;
+    prepareCanvas(ctxTemp, width, height);
   }, [canvasRef, height, tempRef, width]);
 
   useEffect(() => {

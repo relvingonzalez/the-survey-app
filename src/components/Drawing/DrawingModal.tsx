@@ -7,13 +7,13 @@ import {
   ModalRoot,
 } from "@mantine/core";
 import Drawing from "./Drawing";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import DrawingToolBox from "./DrawingToolBox";
 import { useElementSize, useViewportSize } from "@mantine/hooks";
 
 export type DrawingModalProps = ModalProps & {
   file?: File;
-  onSave?: () => void;
+  onSave?: (files: File[]) => void;
 };
 
 export default function DrawingModal({
@@ -25,12 +25,14 @@ export default function DrawingModal({
   const [activeTool, setActiveTool] = useState("line");
   const { ref, height } = useElementSize(); // elementSize doe snot have top and bottom padding, so I had to add 32
   const { width, height: viewportHeight } = useViewportSize();
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   return (
     <ModalRoot {...props} onClose={onClose} fullScreen>
       <ModalOverlay backgroundOpacity={0.55} blur={3} />
       <ModalContent>
         <ModalHeader bg="gray.2" ref={ref}>
           <DrawingToolBox
+            canvasRef={canvasRef}
             onClose={onClose}
             onSave={onSave}
             onSelectColor={setSelectedColor}
@@ -41,6 +43,7 @@ export default function DrawingModal({
         </ModalHeader>
         <ModalBody p="0">
           <Drawing
+            canvasRef={canvasRef}
             width={width}
             height={viewportHeight - height - 32}
             activeTool={activeTool}
