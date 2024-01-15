@@ -6,10 +6,14 @@ import {
 } from "@mantine/hooks";
 import classes from "./Drawing.module.css";
 import { CanvasHTMLAttributes, useCallback, useEffect, useState } from "react";
-
-// active button, on click check x and y start points and end points
-
-// Toolbar
+import { Box } from "@mantine/core";
+import {
+  clearCanvas,
+  drawCanvas,
+  drawCircle,
+  drawLine,
+  drawRect,
+} from "./DrawingFunctions";
 
 export type DrawingStateProps = {
   selectedColor: string;
@@ -19,71 +23,6 @@ export type DrawingStateProps = {
 export type DrawingProps = CanvasHTMLAttributes<HTMLCanvasElement> &
   DrawingStateProps;
 
-function drawRect(
-  selectedColor: string,
-  ctx: CanvasRenderingContext2D,
-  startX: number,
-  startY: number,
-  endX: number,
-  endY: number,
-) {
-  ctx.beginPath();
-  ctx.moveTo(startX, startY);
-  ctx.fillStyle = selectedColor;
-  ctx.clearRect(startX, startY, endX - startX, endY - startY);
-  ctx.strokeRect(startX, startY, endX - startX, endY - startY);
-}
-
-function finishRect(
-  selectedColor: string,
-  ctx: CanvasRenderingContext2D,
-  startX: number,
-  startY: number,
-  endX: number,
-  endY: number,
-) {
-  ctx.fillStyle = selectedColor;
-  ctx.closePath();
-  ctx.strokeRect(startX, startY, endX - startX, endY - startY);
-}
-
-function drawFreehand(
-  selectedColor: string,
-  ctx: CanvasRenderingContext2D,
-  startX: number,
-  startY: number,
-  x: number,
-  y: number,
-) {
-  ctx.beginPath(); // begin
-
-  ctx.lineWidth = 5;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = selectedColor;
-
-  ctx.moveTo(startX, startY); // from
-  ctx.lineTo(x, y); // to
-  ctx.stroke(); // draw it!
-}
-
-function drawLine(
-  selectedColor: string,
-  ctx: CanvasRenderingContext2D,
-  startX: number,
-  startY: number,
-  x: number,
-  y: number,
-) {
-  ctx.lineWidth = 5;
-  ctx.lineCap = "round";
-  ctx.strokeStyle = selectedColor;
-
-  ctx.moveTo(startX, startY); // from
-  ctx.lineTo(x, y); // t
-  //ctx.stroke();
-  ctx.closePath();
-}
-
 const initialCoords = { x: 0, y: 0 };
 export default function Drawing({
   width,
@@ -92,39 +31,60 @@ export default function Drawing({
   selectedColor,
   ...props
 }: DrawingProps) {
-  const { ref: canvasRef, x, y } = useMouse();
+  const { ref: canvasRef } = useMouse();
+  const { ref: tempRef, x: x, y: y } = useMouse();
   const [mouseCoords, setMouseCoords] = useState({ ...initialCoords });
   const [mouseDownFlag, setMouseDownFlag] = useState(false);
-  const ctx = canvasRef.current.getContext("2d");
 
   const mouseDownHandler = () => {
-    ctx.beginPath();
+    const ctxTemp = tempRef.current.getContext("2d");
     setMouseCoords({ x: x, y: y });
     setMouseDownFlag(true);
+    clearCanvas(
+      ctxTemp,
+      tempRef.current.clientWidth,
+      tempRef.current.clientHeight,
+    );
   };
 
   const mouseMoveHandler = () => {
-    setMouseCoords({ x: x, y: y });
+    const ctxTemp = tempRef.current.getContext("2d");
 
     if (mouseDownFlag) {
+      if (activeTool !== "freeHand") {
+        clearCanvas(
+          ctxTemp,
+          tempRef.current.clientWidth,
+          tempRef.current.clientHeight,
+        );
+      }
+
       if (activeTool === "rectangle") {
-        drawRect(selectedColor, ctx, mouseCoords.x, mouseCoords.y, x, y);
+        drawRect(selectedColor, ctxTemp, mouseCoords.x, mouseCoords.y, x, y);
       } else if (activeTool === "freeHand") {
-        drawFreehand(selectedColor, ctx, mouseCoords.x, mouseCoords.y, x, y);
+        setMouseCoords({ x: x, y: y });
+        drawLine(selectedColor, ctxTemp, mouseCoords.x, mouseCoords.y, x, y);
       } else if (activeTool === "line") {
-        drawLine(selectedColor, ctx, mouseCoords.x, mouseCoords.y, x, y);
+        drawLine(selectedColor, ctxTemp, mouseCoords.x, mouseCoords.y, x, y);
+      } else if (activeTool === "circle") {
+        drawCircle(selectedColor, ctxTemp, mouseCoords.x, mouseCoords.y, x, y);
       }
     }
   };
 
   const mouseUpHandler = () => {
-    if (activeTool === "rectangle") {
-      finishRect(selectedColor, ctx, mouseCoords.x, mouseCoords.y, x, y);
-    }
-    ctx.closePath(); // draw it!
+    const ctx = canvasRef.current.getContext("2d");
+    const ctxTemp = tempRef.current.getContext("2d");
 
     setMouseCoords({ ...initialCoords });
     setMouseDownFlag(false);
+    drawCanvas(
+      ctx,
+      tempRef.current,
+      ctxTemp,
+      tempRef.current.width,
+      tempRef.current.height,
+    );
   };
 
   const mouseDownRef = useEventListener("mousedown", mouseDownHandler);
@@ -133,7 +93,7 @@ export default function Drawing({
 
   // Merge refs
   const mergedRef = useMergedRef(
-    canvasRef,
+    tempRef,
     mouseDownRef,
     mouseMoveRef,
     mouseUpRef,
@@ -144,18 +104,26 @@ export default function Drawing({
     const ctx = canvasRef.current.getContext("2d");
     ctx.canvas.height = height;
     ctx.canvas.width = width;
-  }, [canvasRef, height, width]);
+
+    const ctxTemp = tempRef.current.getContext("2d");
+    ctxTemp.canvas.height = height;
+    ctxTemp.canvas.width = width;
+  }, [canvasRef, height, tempRef, width]);
 
   useEffect(() => {
     handleResize();
   }, [handleResize]);
 
-  //watch mouse click
-  // on click check which tool used, and decide which function to run
-  // First clicks sets off useMouseMove ?
-  // second click draws shape, saves it to history
-
   useWindowEvent("resize", handleResize);
-  //console.log(x, y);
-  return <canvas ref={mergedRef} className={classes.drawing} {...props} />;
+  return (
+    <Box pos="relative">
+      <canvas ref={canvasRef} className={classes.drawing} {...props} />
+      <canvas
+        id="tempCanvas"
+        ref={mergedRef}
+        className={classes.drawingTemp}
+        {...props}
+      />
+    </Box>
+  );
 }

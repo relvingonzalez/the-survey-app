@@ -1,4 +1,12 @@
 .drawing {
-  background-color: white;
   width: 100%;
+  background-color: white;
+}
+
+.drawingTemp {
+  position: absolute;
+  background: transparent;
+  width: 100%;
+  top: 0;
+  left: 0;
 }
