@@ -10,6 +10,7 @@ import QuestionComment from "../Comment";
 import QuestionType from "./QuestionType";
 import { useState, ChangeEventHandler } from "react";
 import Files from "../files/Files.";
+import { useListState } from "@mantine/hooks";
 
 export type BaseQuestionProps<T> = {
   question: QuestionByType<T> | ProcessByType<T>;
@@ -29,7 +30,7 @@ export default function Question<T extends Question>({
   question,
 }: QuestionProps<T>) {
   const [currentQuestion, setQuestion] = useState(question);
-  const [files, setFiles] = useState<File[]>([]);
+  const [files, handlers] = useListState<File>([]);
   const handleCommentChange: ChangeEventHandler<HTMLTextAreaElement> &
     ((value: string) => void) = (value) => {
     if (typeof value === "string") {
@@ -50,11 +51,10 @@ export default function Question<T extends Question>({
     });
   };
   const handleFileDelete = (i: number) => {
-    console.log(i);
+    handlers.remove(i);
   };
   const handleSelectedFiles = (newFiles: File[]) => {
-    console.log(files);
-    setFiles([...files, ...newFiles]);
+    handlers.append(...newFiles);
   };
   const showComment = true;
   question.hasComment ||

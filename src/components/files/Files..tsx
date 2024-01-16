@@ -1,7 +1,7 @@
 import useGalleryFiles, { GalleryFile } from "@/lib/hooks/useGaleryFiles";
 import { SimpleGrid, Image, Box, BoxProps, ActionIcon } from "@mantine/core";
 import { FileButton, Group, Text } from "@mantine/core";
-import { IconPhoto, IconWriting } from "@tabler/icons-react";
+import { IconPhoto, IconTrash, IconWriting } from "@tabler/icons-react";
 import DrawingModal from "../Drawing/DrawingModal";
 import { useDisclosure } from "@mantine/hooks";
 
@@ -16,23 +16,34 @@ export type FileCallbacks = {
 export type GalleryProps = Pick<FileCallbacks, "onDeleteFile"> & {
   files: GalleryFile[];
 };
-export function Gallery({ files }: GalleryProps) {
+export function Gallery({ files, onDeleteFile }: GalleryProps) {
   return (
     <SimpleGrid cols={6}>
       {files.map((f, i) => {
         return (
-          <Image
-            alt={f.name}
-            key={i}
-            src={f.url}
-            radius="md"
-            h={150}
-            w="auto"
-            maw={200}
-            fit="contain"
-            onLoad={f.url ? () => URL.revokeObjectURL(f.url) : () => {}}
-            style={{ border: "1px black solid" }}
-          />
+          <Box key={i} pos="relative">
+            <Image
+              alt={f.name}
+              src={f.url}
+              radius="md"
+              h={150}
+              w="auto"
+              maw={200}
+              fit="contain"
+              onLoad={f.url ? () => URL.revokeObjectURL(f.url) : () => {}}
+              style={{ border: "1px black solid" }}
+            />
+            <ActionIcon
+              pos="absolute"
+              top="-15px"
+              left="185px"
+              variant="filled"
+              color="red"
+              onClick={() => onDeleteFile(i)}
+            >
+              <IconTrash />
+            </ActionIcon>
+          </Box>
         );
       })}
     </SimpleGrid>

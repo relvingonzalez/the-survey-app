@@ -5,11 +5,13 @@
 import RoomComponent from "@/components/Rooms/Room";
 import { NewRoom, Room } from "@/lib/types/rooms";
 import { Card, Stack, Title } from "@mantine/core";
+import { useListState } from "@mantine/hooks";
 import { useState } from "react";
 
 export default function RoomPage({ room }: { room: Room | NewRoom }) {
   const [currentRoom, setCurrentRoom] = useState(room);
-  const [files, setFiles] = useState<File[]>([]);
+  //const [files, setFiles] = useState<File[]>([]);
+  const [files, handlers] = useListState<File>([]);
 
   const handleSave = (room: Partial<Room>) => {
     console.log("save", room);
@@ -23,11 +25,10 @@ export default function RoomPage({ room }: { room: Room | NewRoom }) {
     console.log("delete", room);
   };
   const handleSelectFiles = (newFiles: File[]) => {
-    console.log(files);
-    setFiles([...files, ...newFiles]);
+    handlers.append(...newFiles);
   };
   const handleDeleteFile = (i: number) => {
-    console.log("delete File", i);
+    handlers.remove(i);
   };
   return (
     <Stack mb="80">
