@@ -11,6 +11,7 @@ export const dummyRack: Rack = {
   x: 1.23,
   y: 34,
   rackName: "Dummy Rack",
+  rackComment: "Comment",
   rackList: [dummyHardware, dummyHardware],
 };
 

@@ -18,6 +18,7 @@ export type Hardware = {
 export type Rack = {
   x: Coordinate;
   y: Coordinate;
+  rackComment: string;
   rackName: string;
   rackList: Hardware[];
 };

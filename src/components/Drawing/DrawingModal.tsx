@@ -18,6 +18,7 @@ import {
 import { MoreInfo, Rack } from "@/lib/types/rooms";
 import MoreInfoModal from "./CustomTools/MoreInfo/MoreInfoModal";
 import { IconInfoCircleFilled, IconServer2 } from "@tabler/icons-react";
+import RackModal from "./CustomTools/Rack/RackModal";
 
 export type CustomTools = {
   racks?: Rack[];
@@ -43,6 +44,8 @@ export default function DrawingModal({
   const { width, height: viewportHeight } = useViewportSize();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [moreInfoModalOpened, { open: moreInfoOpen, close: moreInfoClose }] =
+    useDisclosure(false);
+  const [rackModalOpened, { open: rackOpen, close: rackClose }] =
     useDisclosure(false);
   const [localRacks, handlersRack] = useListState<Rack>(racks);
   const [localMoreInfo, handlersMoreInfo] = useListState<MoreInfo>(moreInfo);
@@ -75,6 +78,7 @@ export default function DrawingModal({
         handlersRack.append({
           rackName: "",
           rackList: [],
+          rackComment: "",
           x: x - 12,
           y: y - 12,
         }),
@@ -94,6 +98,15 @@ export default function DrawingModal({
           onSave={moreInfoClose}
           opened={moreInfoModalOpened}
           moreInfo={localMoreInfo[0]}
+          existingFiles={[]}
+        />
+      )}
+      {localRacks[0] && (
+        <RackModal
+          onClose={rackClose}
+          onSave={rackClose}
+          opened={rackModalOpened}
+          rack={localRacks[0]}
           existingFiles={[]}
         />
       )}
@@ -134,6 +147,7 @@ export default function DrawingModal({
                 <IconServer2
                   key={i}
                   style={{ position: "absolute", left: r.x, top: r.y }}
+                  onClick={rackOpen}
                 />
               ))}
             </Drawing>
