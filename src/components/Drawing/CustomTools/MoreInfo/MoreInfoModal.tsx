@@ -43,7 +43,7 @@ export default function MoreInfoModal({
   };
 
   return (
-    <Modal title="More Info" onClose={onClose} {...modalProps}>
+    <Modal title="More Info" onClose={onClose} size="xl" {...modalProps}>
       <form onSubmit={form.onSubmit(handleSubmit)} className="w-100">
         <Comment
           className="mb-4"

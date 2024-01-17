@@ -136,10 +136,6 @@ export default function DrawingToolBox({
       );
     }
   };
-  const handleColorChanged = (newColor: string) => {
-    setColorPickerOpened(false);
-    onSelectColor(newColor);
-  };
 
   return (
     <Group w="100%" justify="space-around">
@@ -158,7 +154,7 @@ export default function DrawingToolBox({
                 color="white"
                 size="xl"
                 aria-label="Gallery"
-                onClick={() => setColorPickerOpened(true)}
+                onClick={() => setColorPickerOpened(!colorPickerOpened)}
               >
                 <ColorSwatch
                   color={selectedColor}
@@ -171,10 +167,11 @@ export default function DrawingToolBox({
           <PopoverDropdown p="sm">
             <ColorPicker
               value={selectedColor}
-              onChange={handleColorChanged}
+              onChange={onSelectColor}
               w="100%"
               format="hex"
               swatches={swatches}
+              onColorSwatchClick={() => setColorPickerOpened(false)}
             />
           </PopoverDropdown>
         </Popover>

@@ -108,11 +108,11 @@ export default function Drawing({
 
     // TODO make this better
     if (tool.value === "moreInfo") {
-      handlersMoreInfo.append({ info: "", x, y });
+      handlersMoreInfo.append({ info: "", x: x - 12, y: y - 12 });
     }
 
     if (tool.value === "rack") {
-      handlersRack.append({ rackName: "", rackList: [], x, y });
+      handlersRack.append({ rackName: "", rackList: [], x: x - 12, y: y - 12 });
     }
 
     // if active tool has mouseUp, run mouse up.
