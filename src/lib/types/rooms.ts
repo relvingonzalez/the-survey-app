@@ -1,6 +1,6 @@
 import { UUID } from "./util";
 
-type Coordinate = string;
+type Coordinate = number;
 
 export type MoreInfo = {
   x: Coordinate;

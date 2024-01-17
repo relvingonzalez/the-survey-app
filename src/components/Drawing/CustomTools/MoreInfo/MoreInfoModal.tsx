@@ -10,7 +10,7 @@ export type MoreInfoProps = ModalProps & {
   existingFiles: File[];
   onSave: (info: string, files: File[]) => void;
 };
-export default function MoreInfo({
+export default function MoreInfoModal({
   moreInfo,
   existingFiles = [],
   onSave,

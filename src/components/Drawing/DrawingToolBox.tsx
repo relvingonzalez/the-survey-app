@@ -42,14 +42,14 @@ export type Tool = {
   label: string;
   value: string;
   icon: Icon;
+  skipClearOnMove?: boolean;
   setCoordsOnMove?: boolean;
-  skipCanvasClearOnMove?: boolean;
   onMouseDown?: ToolFn;
   onMouseUp?: ToolFn;
   onMouseMove?: ToolFn;
 };
 
-const tools: Tool[] = [
+export const tools: Tool[] = [
   { label: "Line", value: "line", icon: IconLine, onMouseMove: drawLine },
   {
     label: "Circle",
@@ -67,7 +67,7 @@ const tools: Tool[] = [
     label: "Freehand",
     value: "freeHand",
     icon: IconEaseInOut,
-    skipCanvasClearOnMove: true,
+    skipClearOnMove: true,
     setCoordsOnMove: true,
     onMouseMove: drawLine,
   },
@@ -75,7 +75,10 @@ const tools: Tool[] = [
   { label: "Rack", value: "rack", icon: IconServer2 },
 ];
 
-export const getTool = (value: string) => tools.find((t) => t.value === value);
+export const toolsObject: Record<string, Tool> = tools.reduce(
+  (a, v) => ({ ...a, [v.value]: v }),
+  {},
+);
 
 const swatches = [
   "#ffffff",
