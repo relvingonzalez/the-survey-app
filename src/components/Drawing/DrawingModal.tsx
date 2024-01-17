@@ -43,11 +43,13 @@ export default function DrawingModal({
         </ModalHeader>
         <ModalBody p="0">
           <Drawing
-            canvasRef={canvasRef}
-            width={width}
-            height={viewportHeight - height - 32}
             activeTool={activeTool}
+            canvasRef={canvasRef}
+            height={viewportHeight - height - 32}
+            racks={[]}
+            moreInfo={[]}
             selectedColor={selectedColor}
+            width={width}
           />
         </ModalBody>
       </ModalContent>

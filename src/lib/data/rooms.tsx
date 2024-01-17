@@ -8,15 +8,15 @@ export const dummyHardware = {
 };
 
 export const dummyRack: Rack = {
-  x: "1.23",
-  y: "34",
+  x: 1.23,
+  y: 34,
   rackName: "Dummy Rack",
   rackList: [dummyHardware, dummyHardware],
 };
 
 export const dummyMoreInfo: MoreInfo = {
-  x: "1.23",
-  y: "34",
+  x: 1.23,
+  y: 34,
   info: "Amazing Info",
 };
 
