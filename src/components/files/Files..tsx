@@ -21,11 +21,12 @@ export function Gallery({ files, onDeleteFile }: GalleryProps) {
     <Flex gap="lg" rowGap="lg" wrap="wrap">
       {files.map((f, i) => {
         return (
-          <Box
+          <Group
             key={i}
             pos="relative"
             style={{ border: "1px black solid" }}
             w={200}
+            justify="center"
           >
             <Image
               alt={f.name}
@@ -33,7 +34,7 @@ export function Gallery({ files, onDeleteFile }: GalleryProps) {
               radius="md"
               h={150}
               w="auto"
-              maw={200}
+              maw={190}
               fit="contain"
               onLoad={f.url ? () => URL.revokeObjectURL(f.url) : () => {}}
             />
@@ -47,7 +48,7 @@ export function Gallery({ files, onDeleteFile }: GalleryProps) {
             >
               <IconTrash />
             </ActionIcon>
-          </Box>
+          </Group>
         );
       })}
     </Flex>

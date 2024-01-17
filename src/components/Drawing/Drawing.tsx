@@ -1,7 +1,5 @@
 import {
-  useDisclosure,
   useEventListener,
-  useListState,
   useMergedRef,
   useMouse,
   useWindowEvent,
@@ -10,20 +8,19 @@ import classes from "./Drawing.module.css";
 import {
   CanvasHTMLAttributes,
   MutableRefObject,
+  PropsWithChildren,
   useCallback,
   useEffect,
   useState,
 } from "react";
 import { Box } from "@mantine/core";
 import { clearCanvas, drawCanvas, prepareCanvas } from "./DrawingFunctions";
-import { toolsObject } from "./DrawingToolBox";
-import { MoreInfo, Rack } from "@/lib/types/rooms";
-import MoreInfoModal from "./CustomTools/MoreInfo/MoreInfoModal";
-
-export type CustomTools = {
-  racks: Rack[];
-  moreInfo: MoreInfo[];
-};
+import {
+  DrawingToolBoxTools,
+  Tool,
+  createToolsObject,
+  defaultTools,
+} from "./DrawingToolBox";
 
 export type DrawingCanvasRef = {
   canvasRef: MutableRefObject<HTMLCanvasElement | null>;
@@ -39,11 +36,13 @@ export type DrawingSizeProps = {
   width: number;
 };
 
-export type DrawingProps = CanvasHTMLAttributes<HTMLCanvasElement> &
-  DrawingStateProps &
-  DrawingCanvasRef &
-  DrawingSizeProps &
-  CustomTools;
+export type DrawingProps = PropsWithChildren<
+  CanvasHTMLAttributes<HTMLCanvasElement> &
+    DrawingStateProps &
+    DrawingCanvasRef &
+    DrawingToolBoxTools &
+    DrawingSizeProps
+>;
 
 const initialCoords = { x: 0, y: 0 };
 export default function Drawing({
@@ -52,20 +51,23 @@ export default function Drawing({
   activeTool,
   selectedColor,
   canvasRef,
-  racks = [],
-  moreInfo = [],
+  tools = defaultTools,
+  children,
   ...props
 }: DrawingProps) {
   const { ref: tempRef, x: x, y: y } = useMouse();
   const [mouseCoords, setMouseCoords] = useState({ ...initialCoords });
   const [mouseDownFlag, setMouseDownFlag] = useState(false);
-  const tool = toolsObject[activeTool];
+  const [toolsObject, setToolsObject] = useState<Record<string, Tool>>();
+  const [tool, setTool] = useState<Tool>();
 
-  // this needs to get moved up
-  // Include modal, replace
-  const [opened, { open }] = useDisclosure(false);
-  const [localRacks, handlersRack] = useListState<Rack>(racks);
-  const [localMoreInfo, handlersMoreInfo] = useListState<MoreInfo>(moreInfo);
+  useEffect(() => {
+    setToolsObject(createToolsObject(tools));
+  }, [tools]);
+
+  useEffect(() => {
+    toolsObject && setTool(toolsObject[activeTool]);
+  }, [activeTool, toolsObject]);
 
   const mouseDownHandler = () => {
     const ctxTemp = tempRef.current.getContext("2d");
@@ -76,8 +78,14 @@ export default function Drawing({
       tempRef.current.clientWidth,
       tempRef.current.clientHeight,
     );
-
-    // run mouse down from tool
+    tool?.onMouseDown?.(
+      selectedColor,
+      ctxTemp,
+      mouseCoords.x,
+      mouseCoords.y,
+      x,
+      y,
+    );
   };
 
   const mouseMoveHandler = () => {
@@ -106,19 +114,14 @@ export default function Drawing({
     const ctx = canvasRef?.current?.getContext("2d");
     const ctxTemp = tempRef.current.getContext("2d");
 
-    // TODO make this better
-    if (tool.value === "moreInfo") {
-      handlersMoreInfo.append({ info: "", x: x - 12, y: y - 12 });
-    }
-
-    if (tool.value === "rack") {
-      handlersRack.append({ rackName: "", rackList: [], x: x - 12, y: y - 12 });
-    }
-
-    // if active tool has mouseUp, run mouse up.
-    // With custom tools, that means placing the image on screen and running the function
-    // We have x, y coordinates, and we have the function.
-    // For MoreInfo and Racks, we should place the tool image on where the mouse clicked and open the tool modal
+    tool?.onMouseUp?.(
+      selectedColor,
+      ctxTemp,
+      mouseCoords.x,
+      mouseCoords.y,
+      x,
+      y,
+    );
 
     if (!ctx) {
       return;
@@ -170,15 +173,6 @@ export default function Drawing({
   useWindowEvent("resize", handleResize);
   return (
     <Box pos="relative">
-      {localMoreInfo[0] && (
-        <MoreInfoModal
-          onClose={() => {}}
-          onSave={() => {}}
-          opened={opened}
-          moreInfo={localMoreInfo[0]}
-          existingFiles={[]}
-        />
-      )}
       <canvas ref={canvasRef} className={classes.drawing} {...props} />
       <canvas
         id="tempCanvas"
@@ -186,20 +180,7 @@ export default function Drawing({
         className={classes.drawingTemp}
         {...props}
       />
-      {localMoreInfo.map((mI, i) => (
-        <toolsObject.moreInfo.icon
-          key={i}
-          style={{ position: "absolute", left: mI.x, top: mI.y }}
-          onClick={open}
-        />
-      ))}
-
-      {localRacks.map((r, i) => (
-        <toolsObject.rack.icon
-          key={i}
-          style={{ position: "absolute", left: r.x, top: r.y }}
-        />
-      ))}
+      {children}
     </Box>
   );
 }

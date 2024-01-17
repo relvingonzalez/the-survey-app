@@ -15,14 +15,12 @@ import {
   Icon,
   IconCircle,
   IconEaseInOut,
-  IconInfoCircleFilled,
   IconLine,
   IconRectangle,
-  IconServer2,
 } from "@tabler/icons-react";
 import { DrawingCanvasRef, DrawingStateProps } from "./Drawing";
 import {
-  clearCanvas,
+  clearCanvasToOriginal,
   drawCircle,
   drawLine,
   drawRect,
@@ -49,7 +47,7 @@ export type Tool = {
   onMouseMove?: ToolFn;
 };
 
-export const tools: Tool[] = [
+export const defaultTools: Tool[] = [
   { label: "Line", value: "line", icon: IconLine, onMouseMove: drawLine },
   {
     label: "Circle",
@@ -71,14 +69,10 @@ export const tools: Tool[] = [
     setCoordsOnMove: true,
     onMouseMove: drawLine,
   },
-  { label: "More Info", value: "moreInfo", icon: IconInfoCircleFilled },
-  { label: "Rack", value: "rack", icon: IconServer2 },
 ];
 
-export const toolsObject: Record<string, Tool> = tools.reduce(
-  (a, v) => ({ ...a, [v.value]: v }),
-  {},
-);
+export const createToolsObject = (tools: Tool[]) =>
+  tools.reduce((a, v) => ({ ...a, [v.value]: v }), {});
 
 const swatches = [
   "#ffffff",
@@ -98,20 +92,28 @@ const swatches = [
 ];
 
 export type DrawingToolBoxCallbacks = {
+  onClear?: () => void;
   onClose?: () => void;
   onSave?: (files: File[]) => void;
   onSelectColor: (color: string) => void;
   onSelectTool: (tool: string) => void;
 };
 
+export type DrawingToolBoxTools = {
+  tools?: Tool[];
+};
+
 export type DrawingToolBoxProps = DrawingToolBoxCallbacks &
   DrawingStateProps &
-  DrawingCanvasRef;
+  DrawingCanvasRef &
+  DrawingToolBoxTools;
 
 export default function DrawingToolBox({
   selectedColor = "#2e2e2e",
   activeTool,
   canvasRef,
+  tools = defaultTools,
+  onClear,
   onClose,
   onSave,
   onSelectColor,
@@ -129,12 +131,13 @@ export default function DrawingToolBox({
   const handleClear = () => {
     const ctx = canvasRef?.current?.getContext("2d");
     if (ctx) {
-      clearCanvas(
+      clearCanvasToOriginal(
         ctx,
         canvasRef.current?.clientWidth || 0,
         canvasRef.current?.clientHeight || 0,
       );
     }
+    onClear?.();
   };
 
   return (
