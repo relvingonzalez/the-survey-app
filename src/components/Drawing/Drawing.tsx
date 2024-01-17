@@ -13,14 +13,8 @@ import {
   useState,
 } from "react";
 import { Box } from "@mantine/core";
-import {
-  clearCanvas,
-  drawCanvas,
-  drawCircle,
-  drawLine,
-  drawRect,
-  prepareCanvas,
-} from "./DrawingFunctions";
+import { clearCanvas, drawCanvas, prepareCanvas } from "./DrawingFunctions";
+import { getTool } from "./DrawingToolBox";
 
 export type DrawingCanvasRef = {
   canvasRef: MutableRefObject<HTMLCanvasElement | null>;
@@ -53,6 +47,7 @@ export default function Drawing({
   const { ref: tempRef, x: x, y: y } = useMouse();
   const [mouseCoords, setMouseCoords] = useState({ ...initialCoords });
   const [mouseDownFlag, setMouseDownFlag] = useState(false);
+  const tool = getTool(activeTool);
 
   const mouseDownHandler = () => {
     const ctxTemp = tempRef.current.getContext("2d");
@@ -63,36 +58,41 @@ export default function Drawing({
       tempRef.current.clientWidth,
       tempRef.current.clientHeight,
     );
+
+    // run mouse down from tool
   };
 
   const mouseMoveHandler = () => {
     const ctxTemp = tempRef.current.getContext("2d");
 
-    if (mouseDownFlag) {
-      if (activeTool !== "freeHand") {
+    if (tool && mouseDownFlag) {
+      !tool.skipCanvasClearOnMove &&
         clearCanvas(
           ctxTemp,
           tempRef.current.clientWidth,
           tempRef.current.clientHeight,
         );
-      }
 
-      if (activeTool === "rectangle") {
-        drawRect(selectedColor, ctxTemp, mouseCoords.x, mouseCoords.y, x, y);
-      } else if (activeTool === "freeHand") {
-        setMouseCoords({ x: x, y: y });
-        drawLine(selectedColor, ctxTemp, mouseCoords.x, mouseCoords.y, x, y);
-      } else if (activeTool === "line") {
-        drawLine(selectedColor, ctxTemp, mouseCoords.x, mouseCoords.y, x, y);
-      } else if (activeTool === "circle") {
-        drawCircle(selectedColor, ctxTemp, mouseCoords.x, mouseCoords.y, x, y);
-      }
+      tool.setCoordsOnMove && setMouseCoords({ x: x, y: y });
+      tool.onMouseMove?.(
+        selectedColor,
+        ctxTemp,
+        mouseCoords.x,
+        mouseCoords.y,
+        x,
+        y,
+      );
     }
   };
 
   const mouseUpHandler = () => {
     const ctx = canvasRef?.current?.getContext("2d");
     const ctxTemp = tempRef.current.getContext("2d");
+
+    // if active tool has mouseUp, run mouse up.
+    // With custom tools, that means placing the image on screen and running the function
+    // We have x, y coordinates, and we have the function.
+    // For MoreInfo and Racks, we should place the tool image on where the mouse clicked and open the tool modal
 
     if (!ctx) {
       return;

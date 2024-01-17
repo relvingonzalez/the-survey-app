@@ -12,6 +12,7 @@ import {
   ColorSwatch,
 } from "@mantine/core";
 import {
+  Icon,
   IconCircle,
   IconEaseInOut,
   IconInfoCircleFilled,
@@ -20,17 +21,61 @@ import {
   IconServer2,
 } from "@tabler/icons-react";
 import { DrawingCanvasRef, DrawingStateProps } from "./Drawing";
-import { clearCanvas } from "./DrawingFunctions";
+import {
+  clearCanvas,
+  drawCircle,
+  drawLine,
+  drawRect,
+} from "./DrawingFunctions";
 import { useState } from "react";
 
-const tools = [
-  { label: "Line", value: "line", icon: IconLine },
-  { label: "Circle", value: "circle", icon: IconCircle },
-  { label: "Rectangle", value: "rectangle", icon: IconRectangle },
-  { label: "Freehand", value: "freeHand", icon: IconEaseInOut },
+export type ToolFn = (
+  selectedColor: string,
+  ctx: CanvasRenderingContext2D,
+  startX: number,
+  startY: number,
+  x: number,
+  y: number,
+) => void;
+
+export type Tool = {
+  label: string;
+  value: string;
+  icon: Icon;
+  setCoordsOnMove?: boolean;
+  skipCanvasClearOnMove?: boolean;
+  onMouseDown?: ToolFn;
+  onMouseUp?: ToolFn;
+  onMouseMove?: ToolFn;
+};
+
+const tools: Tool[] = [
+  { label: "Line", value: "line", icon: IconLine, onMouseMove: drawLine },
+  {
+    label: "Circle",
+    value: "circle",
+    icon: IconCircle,
+    onMouseMove: drawCircle,
+  },
+  {
+    label: "Rectangle",
+    value: "rectangle",
+    icon: IconRectangle,
+    onMouseMove: drawRect,
+  },
+  {
+    label: "Freehand",
+    value: "freeHand",
+    icon: IconEaseInOut,
+    skipCanvasClearOnMove: true,
+    setCoordsOnMove: true,
+    onMouseMove: drawLine,
+  },
   { label: "More Info", value: "moreInfo", icon: IconInfoCircleFilled },
   { label: "Rack", value: "rack", icon: IconServer2 },
 ];
+
+export const getTool = (value: string) => tools.find((t) => t.value === value);
 
 const swatches = [
   "#ffffff",
