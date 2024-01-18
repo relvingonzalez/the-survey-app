@@ -17,7 +17,6 @@ import {
   PersonQuestion,
   ValueByQuestionType,
 } from "@/lib/types/question";
-import { emailPatternRegex } from "./QuestionEmail";
 import { phonePatternRegex } from "./QuestionPhone";
 import { useState } from "react";
 import {
@@ -27,7 +26,7 @@ import {
   IconUserPlus,
 } from "@tabler/icons-react";
 import { createPerson } from "@/lib/utils/functions";
-import { UseFormReturnType, useForm } from "@mantine/form";
+import { UseFormReturnType, isEmail, matches, useForm } from "@mantine/form";
 import { WithQuestionCallback } from "../Question";
 
 export type QuestionPersonProps = {
@@ -174,10 +173,8 @@ export default function QuestionText({
           : "Select a salutation",
       firstName: (value) => (value ? null : "First name is required"),
       lastName: (value) => (value ? null : "Last name is required"),
-      email: (value) =>
-        emailPatternRegex.test(value) ? null : "Invalid email",
-      phone: (value) =>
-        phonePatternRegex.test(value) ? null : "Invalid phone number",
+      email: isEmail("Invalid email"),
+      phone: matches(phonePatternRegex, "Invalid phone number"),
     },
   });
 

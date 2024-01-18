@@ -19,6 +19,7 @@ import { MoreInfo, Rack } from "@/lib/types/rooms";
 import MoreInfoModal from "./CustomTools/MoreInfo/MoreInfoModal";
 import { IconInfoCircleFilled, IconServer2 } from "@tabler/icons-react";
 import RackModal from "./CustomTools/Rack/RackModal";
+import { createHardware } from "@/lib/data/rooms";
 
 export type CustomTools = {
   racks?: Rack[];
@@ -77,7 +78,32 @@ export default function DrawingModal({
       ) =>
         handlersRack.append({
           rackName: "",
-          rackList: [],
+          hardwareList: [
+            createHardware({
+              name: "test functionality",
+              from: "1",
+              to: "3",
+              details: "details",
+            }),
+            createHardware({
+              name: "test functionality",
+              from: "1",
+              to: "3",
+              details: "details",
+            }),
+            createHardware({
+              name: "test functionality",
+              from: "1",
+              to: "3",
+              details: "details",
+            }),
+            createHardware({
+              name: "test functionality",
+              from: "1",
+              to: "3",
+              details: "details",
+            }),
+          ],
           rackComment: "",
           x: x - 12,
           y: y - 12,

@@ -20,7 +20,7 @@ export type Rack = {
   y: Coordinate;
   rackComment: string;
   rackName: string;
-  rackList: Hardware[];
+  hardwareList: Hardware[];
 };
 
 export type Room = {

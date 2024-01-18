@@ -10,7 +10,9 @@ export type QuestionEmailProps = {
 export const emailPattern =
   '[a-z0-9!#$%&"*+/=?^_`{|}~-]+(?:.[a-z0-9!#$%&"*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?';
 
-export const emailPatternRegex = new RegExp(emailPattern);
+export const emailPatternRegex = new RegExp(
+  /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/,
+);
 
 export default function QuestionEmail({
   question,

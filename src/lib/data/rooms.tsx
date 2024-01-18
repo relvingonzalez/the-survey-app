@@ -1,4 +1,4 @@
-import { MoreInfo, Rack, Room } from "../types/rooms";
+import { Hardware, MoreInfo, Rack, Room } from "../types/rooms";
 
 export const dummyHardware = {
   name: "Dummy Hardware",
@@ -12,7 +12,7 @@ export const dummyRack: Rack = {
   y: 34,
   rackName: "Dummy Rack",
   rackComment: "Comment",
-  rackList: [dummyHardware, dummyHardware],
+  hardwareList: [dummyHardware, dummyHardware],
 };
 
 export const dummyMoreInfo: MoreInfo = {
@@ -30,3 +30,11 @@ export const dummyRoom: Room = {
 };
 
 export const dummyRooms: Room[] = [dummyRoom, dummyRoom, dummyRoom, dummyRoom];
+
+export const createHardware = (args?: Partial<Hardware>): Hardware => ({
+  name: "",
+  from: "",
+  to: "",
+  details: "",
+  ...args,
+});

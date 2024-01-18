@@ -20,7 +20,6 @@ export default async function QuestionPage({
     }) || dummyQuestion;
   const nextId = dummyQuestions[currentIndex + 1]?.id;
   const prevId = dummyQuestions[currentIndex - 1]?.id;
-  console.log(question);
 
   return (
     <QuestionLayout
