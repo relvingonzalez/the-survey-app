@@ -14,17 +14,18 @@ export type FileCallbacks = {
 };
 
 export type GalleryProps = Pick<FileCallbacks, "onDeleteFile"> & {
-  files: GalleryFile[];
+  files?: GalleryFile[];
 };
 export function Gallery({ files, onDeleteFile }: GalleryProps) {
   return (
     <Flex gap="lg" rowGap="lg" wrap="wrap">
-      {files.map((f, i) => {
+      {files?.map((f, i) => {
         return (
           <Group
             key={i}
             pos="relative"
-            style={{ border: "1px black solid" }}
+            //style={{ border: "1px black solid" }}
+            style={(theme) => ({ "box-shadow": theme.shadows.sm })}
             w={200}
             justify="center"
           >

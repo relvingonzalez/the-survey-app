@@ -5,12 +5,15 @@ import { useForm } from "@mantine/form";
 import { NewRoom, Room } from "@/lib/types/rooms";
 import Comment from "../Comment";
 import Files, { FileCallbacks } from "../files/Files.";
-export type RoomProps = FileCallbacks & {
-  room: Room | NewRoom;
-  files: File[];
-  onSave: (room: Partial<Room>) => void;
-  onDelete: (room: Room) => void;
-};
+import RoomPlan, { RoomPlanProps } from "./RoomPlan";
+
+export type RoomProps = FileCallbacks &
+  Pick<RoomPlanProps, "roomPlan" | "onSelectRoomPlan"> & {
+    room: Room | NewRoom;
+    files: File[];
+    onSave: (room: Partial<Room>) => void;
+    onDelete: (room: Room) => void;
+  };
 
 export function isExistingRoom(room: Room | NewRoom): room is Room {
   return (room as Room).id !== undefined;
@@ -18,8 +21,10 @@ export function isExistingRoom(room: Room | NewRoom): room is Room {
 
 export default function RoomComponent({
   room,
+  roomPlan,
   onSave,
   onDelete,
+  onSelectRoomPlan,
   ...filesProps
 }: RoomProps) {
   const form = useForm({
@@ -47,6 +52,7 @@ export default function RoomComponent({
           />
           <Comment {...form.getInputProps("comment")} />
           <Files {...filesProps} hideDrawingButton />
+          <RoomPlan roomPlan={roomPlan} onSelectRoomPlan={onSelectRoomPlan} />
           <Group mb="10" justify="space-between">
             <Button mt="10" disabled={!form.isValid} type="submit">
               Save

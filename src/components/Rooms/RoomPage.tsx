@@ -7,22 +7,25 @@ import { NewRoom, Room } from "@/lib/types/rooms";
 import { Card, Stack, Title } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function RoomPage({ room }: { room: Room | NewRoom }) {
   const [currentRoom, setCurrentRoom] = useState(room);
-  //const [files, setFiles] = useState<File[]>([]);
   const [files, handlers] = useListState<File>([]);
+  const [roomPlan, setRoomPlan] = useState<File>();
+  const router = useRouter();
 
   const handleSave = (room: Partial<Room>) => {
-    console.log("save", room);
     setCurrentRoom((prevState) => {
       const newRoom = Object.assign({}, prevState);
       return { ...newRoom, ...room };
     });
     //navigate to rooomslist
+    router.push("./");
   };
   const handleDelete = (room: Room) => {
     console.log("delete", room);
+    router.push("./");
   };
   const handleSelectFiles = (newFiles: File[]) => {
     handlers.append(...newFiles);
@@ -30,12 +33,17 @@ export default function RoomPage({ room }: { room: Room | NewRoom }) {
   const handleDeleteFile = (i: number) => {
     handlers.remove(i);
   };
+  const handleSelectRoomPlan = (file: File) => {
+    setRoomPlan(file);
+  };
   return (
     <Stack mb="80">
       <Title order={2}>{currentRoom.name}</Title>
       <Card withBorder shadow="sm" radius="md">
         <RoomComponent
           room={currentRoom}
+          roomPlan={roomPlan}
+          onSelectRoomPlan={handleSelectRoomPlan}
           onSave={handleSave}
           onDelete={handleDelete}
           files={files}

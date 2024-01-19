@@ -45,14 +45,29 @@ const transformFileToGalleryFile = (f: File) => {
   return { ...f, url, extension };
 };
 
-const useGalleryFiles = (files: File[]): GalleryFile[] => {
-  const [galleryFiles, setGalleryFiles] = useState<GalleryFile[]>([]);
+const useGalleryFiles = (files?: File[]): GalleryFile[] | undefined => {
+  const [galleryFiles, setGalleryFiles] = useState<GalleryFile[]>();
 
   useEffect(() => {
-    setGalleryFiles(files.map(transformFileToGalleryFile));
+    if (files && files.length) {
+      setGalleryFiles(files.map(transformFileToGalleryFile));
+    }
   }, [files]);
 
   return galleryFiles;
 };
 
 export default useGalleryFiles;
+
+export const useGalleryFile = (file?: File): GalleryFile | undefined => {
+  const [galleryFile, setGalleryFile] = useState<GalleryFile>();
+
+  useEffect(() => {
+    console.log("file changed");
+    if (file) {
+      setGalleryFile(transformFileToGalleryFile(file));
+    }
+  }, [file]);
+
+  return galleryFile;
+};

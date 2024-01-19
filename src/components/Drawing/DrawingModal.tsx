@@ -21,10 +21,17 @@ import { IconInfoCircleFilled, IconServer2 } from "@tabler/icons-react";
 import RackModal from "./CustomTools/Rack/RackModal";
 import { createHardware } from "@/lib/data/rooms";
 
-export type CustomTools = {
-  racks?: Rack[];
-  moreInfo?: MoreInfo[];
-};
+export type CustomTools =
+  | {
+      isRoom: true;
+      racks: Rack[];
+      moreInfo: MoreInfo[];
+    }
+  | {
+      isRoom?: false;
+      racks?: never;
+      moreInfo?: never;
+    };
 
 export type DrawingModalProps = ModalProps &
   CustomTools & {
@@ -35,6 +42,7 @@ export type DrawingModalProps = ModalProps &
 export default function DrawingModal({
   onClose,
   onSave,
+  isRoom,
   racks = [],
   moreInfo = [],
   ...props
@@ -110,7 +118,7 @@ export default function DrawingModal({
         }),
     },
   ];
-  const tools = [...defaultTools, ...customTools];
+  const tools = isRoom ? [...defaultTools, ...customTools] : defaultTools;
   const handleClear = () => {
     handlersRack.setState([]);
     handlersMoreInfo.setState([]);
