@@ -25,7 +25,7 @@ export function Gallery({ files, onDeleteFile }: GalleryProps) {
             key={i}
             pos="relative"
             //style={{ border: "1px black solid" }}
-            style={(theme) => ({ "box-shadow": theme.shadows.sm })}
+            style={(theme) => ({ boxShadow: theme.shadows.sm })}
             w={200}
             justify="center"
           >

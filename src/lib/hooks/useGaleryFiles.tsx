@@ -49,7 +49,7 @@ const useGalleryFiles = (files?: File[]): GalleryFile[] | undefined => {
   const [galleryFiles, setGalleryFiles] = useState<GalleryFile[]>();
 
   useEffect(() => {
-    if (files && files.length) {
+    if (files) {
       setGalleryFiles(files.map(transformFileToGalleryFile));
     }
   }, [files]);

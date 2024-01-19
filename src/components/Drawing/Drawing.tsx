@@ -15,12 +15,7 @@ import {
 } from "react";
 import { Box } from "@mantine/core";
 import { clearCanvas, drawCanvas, prepareCanvas } from "./DrawingFunctions";
-import {
-  DrawingToolBoxTools,
-  Tool,
-  createToolsObject,
-  defaultTools,
-} from "./DrawingToolBox";
+import { DrawingToolBoxTools, Tool, defaultTools } from "./DrawingToolBox";
 
 export type DrawingCanvasRef = {
   canvasRef: MutableRefObject<HTMLCanvasElement | null>;
@@ -58,40 +53,36 @@ export default function Drawing({
   const { ref: tempRef, x: x, y: y } = useMouse();
   const [mouseCoords, setMouseCoords] = useState({ ...initialCoords });
   const [mouseDownFlag, setMouseDownFlag] = useState(false);
-  const [toolsObject, setToolsObject] = useState<Record<string, Tool>>();
   const [tool, setTool] = useState<Tool>();
 
   useEffect(() => {
-    setToolsObject(createToolsObject(tools));
-  }, [tools]);
-
-  useEffect(() => {
-    toolsObject && setTool(toolsObject[activeTool]);
-  }, [activeTool, toolsObject]);
+    activeTool && setTool(tools.find((t) => t.value === activeTool));
+  }, [activeTool, tools]);
 
   const mouseDownHandler = () => {
-    const ctxTemp = tempRef.current.getContext("2d");
-    setMouseCoords({ x: x, y: y });
-    setMouseDownFlag(true);
-    clearCanvas(
-      ctxTemp,
-      tempRef.current.clientWidth,
-      tempRef.current.clientHeight,
-    );
-    tool?.onMouseDown?.(
-      selectedColor,
-      ctxTemp,
-      mouseCoords.x,
-      mouseCoords.y,
-      x,
-      y,
-    );
+    if (tool && !mouseDownFlag) {
+      const ctxTemp = tempRef.current.getContext("2d");
+      setMouseCoords({ x: x, y: y });
+      setMouseDownFlag(true);
+      clearCanvas(
+        ctxTemp,
+        tempRef.current.clientWidth,
+        tempRef.current.clientHeight,
+      );
+      tool.onMouseDown?.(
+        selectedColor,
+        ctxTemp,
+        mouseCoords.x,
+        mouseCoords.y,
+        x,
+        y,
+      );
+    }
   };
 
   const mouseMoveHandler = () => {
-    const ctxTemp = tempRef.current.getContext("2d");
-
     if (tool && mouseDownFlag) {
+      const ctxTemp = tempRef.current.getContext("2d");
       !tool.skipClearOnMove &&
         clearCanvas(
           ctxTemp,
@@ -111,31 +102,28 @@ export default function Drawing({
   };
 
   const mouseUpHandler = () => {
-    const ctx = canvasRef?.current?.getContext("2d");
-    const ctxTemp = tempRef.current.getContext("2d");
+    if (tool && mouseDownFlag) {
+      const ctx = canvasRef?.current?.getContext("2d");
+      const ctxTemp = tempRef.current.getContext("2d");
 
-    tool?.onMouseUp?.(
-      selectedColor,
-      ctxTemp,
-      mouseCoords.x,
-      mouseCoords.y,
-      x,
-      y,
-    );
+      tool.onMouseUp?.(
+        selectedColor,
+        ctxTemp,
+        mouseCoords.x,
+        mouseCoords.y,
+        x,
+        y,
+      );
 
-    if (!ctx) {
-      return;
+      if (!ctx) {
+        return;
+      }
+
+      setMouseCoords({ ...initialCoords });
+      setMouseDownFlag(false);
+
+      drawCanvas(ctx, ctxTemp);
     }
-
-    setMouseCoords({ ...initialCoords });
-    setMouseDownFlag(false);
-    drawCanvas(
-      ctx,
-      tempRef.current,
-      ctxTemp,
-      tempRef.current.width,
-      tempRef.current.height,
-    );
   };
 
   const mouseDownRef = useEventListener("mousedown", mouseDownHandler);

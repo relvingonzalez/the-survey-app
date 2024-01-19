@@ -68,13 +68,9 @@ export function clearCanvasToOriginal(
 
 export function drawCanvas(
   ctx: CanvasRenderingContext2D,
-  canvas: HTMLCanvasElement,
   ctxTemp: CanvasRenderingContext2D,
-  width: number,
-  height: number,
 ) {
-  ctx.drawImage(canvas, 0, 0);
-  clearCanvas(ctxTemp, width, height);
+  ctx.drawImage(ctxTemp.canvas, 0, 0);
 }
 
 export function prepareCanvas(

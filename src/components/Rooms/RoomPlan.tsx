@@ -20,7 +20,7 @@ export default function RoomPlan({
     <Center {...centerProps}>
       <DrawingModal opened={opened} onClose={close} onSave={handleSavePlan} />
       <Image
-        style={(theme) => ({ "box-shadow": theme.shadows.lg })}
+        style={(theme) => ({ boxShadow: theme.shadows.lg })}
         onClick={open}
         alt="Room plan"
         radius="md"
