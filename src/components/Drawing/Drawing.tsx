@@ -16,6 +16,7 @@ import {
 import { Box } from "@mantine/core";
 import { clearCanvas, drawCanvas, prepareCanvas } from "./DrawingFunctions";
 import { DrawingToolBoxTools, Tool, defaultTools } from "./DrawingToolBox";
+import { GalleryFile } from "@/lib/hooks/useGaleryFiles";
 
 export type DrawingCanvasRef = {
   canvasRef: MutableRefObject<HTMLCanvasElement | null>;
@@ -31,12 +32,17 @@ export type DrawingSizeProps = {
   width: number;
 };
 
+export type BackgroundImage = {
+  backgroundImage?: GalleryFile;
+};
+
 export type DrawingProps = PropsWithChildren<
   CanvasHTMLAttributes<HTMLCanvasElement> &
     DrawingStateProps &
     DrawingCanvasRef &
     DrawingToolBoxTools &
-    DrawingSizeProps
+    DrawingSizeProps &
+    BackgroundImage
 >;
 
 const initialCoords = { x: 0, y: 0 };
@@ -47,6 +53,7 @@ export default function Drawing({
   selectedColor,
   canvasRef,
   tools = defaultTools,
+  backgroundImage,
   children,
   ...props
 }: DrawingProps) {
@@ -58,6 +65,19 @@ export default function Drawing({
   useEffect(() => {
     activeTool && setTool(tools.find((t) => t.value === activeTool));
   }, [activeTool, tools]);
+
+  // This needs to run every time.
+  useEffect(() => {
+    if (backgroundImage) {
+      const img = new Image();
+      img.onload = function () {
+        // execute drawImage statements here
+        const ctxTemp = tempRef.current.getContext("2d");
+        ctxTemp.drawImage(img, 0, 0);
+      };
+      img.src = backgroundImage.url;
+    }
+  }, [backgroundImage, tempRef]);
 
   const mouseDownHandler = () => {
     if (tool && !mouseDownFlag) {

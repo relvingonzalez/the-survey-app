@@ -6,11 +6,9 @@ export function drawRect(
   x: number,
   y: number,
 ) {
+  ctx.fillStyle = selectedColor;
   ctx.beginPath();
   ctx.moveTo(startX, startY);
-  ctx.fillStyle = selectedColor;
-  ctx.strokeStyle = selectedColor;
-  ctx.clearRect(startX, startY, x - startX, y - startY);
   ctx.fillRect(startX, startY, x - startX, y - startY);
 }
 
@@ -22,10 +20,10 @@ export function drawLine(
   x: number,
   y: number,
 ) {
-  ctx.beginPath(); // begin
   ctx.lineWidth = 5;
   ctx.lineCap = "round";
   ctx.strokeStyle = selectedColor;
+  ctx.beginPath(); // begin
   ctx.moveTo(startX, startY); // from
   ctx.lineTo(x, y); // to
   ctx.stroke(); // draw it!

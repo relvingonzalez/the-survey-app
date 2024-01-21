@@ -1,7 +1,15 @@
+import { brandTitle } from "@/lib/constants/constants";
 import { Processes, Questions } from "@/lib/types/question";
 import { Site } from "@/lib/types/sites";
 import { Card, CardSection, Group, Text, Button } from "@mantine/core";
-import { IconInfoCircleFilled, IconAddressBook } from "@tabler/icons-react";
+import {
+  IconInfoCircleFilled,
+  IconAddressBook,
+  IconSignature,
+  IconSettingsCog,
+  IconEdit,
+  IconHelpSquare,
+} from "@tabler/icons-react";
 import Link from "next/link";
 
 type SiteOverviewProps = {
@@ -45,8 +53,14 @@ export default function SiteOverview({
       </Card>
 
       <Card withBorder mt="10" shadow="sm" radius="md">
-        <CardSection inheritPadding py="xs">
-          <Group justify="start">
+        <CardSection
+          inheritPadding
+          data-first-section="true"
+          withBorder
+          py="xs"
+        >
+          <Group justify="startr">
+            <IconHelpSquare />
             <Text size="xl" fw={500}>
               Questions
             </Text>
@@ -76,8 +90,14 @@ export default function SiteOverview({
       </Card>
 
       <Card withBorder mt="10" shadow="sm" radius="md">
-        <CardSection inheritPadding py="xs">
+        <CardSection
+          inheritPadding
+          data-first-section="true"
+          withBorder
+          py="xs"
+        >
           <Group justify="start">
+            <IconEdit />
             <Text size="xl" fw={500}>
               Rooms/Layouts
             </Text>
@@ -106,8 +126,14 @@ export default function SiteOverview({
       </Card>
 
       <Card withBorder mt="10" shadow="sm" radius="md">
-        <CardSection inheritPadding py="xs">
+        <CardSection
+          data-first-section="true"
+          withBorder
+          inheritPadding
+          py="xs"
+        >
           <Group justify="start">
+            <IconSettingsCog />
             <Text size="xl" fw={500}>
               Processes
             </Text>
@@ -131,6 +157,33 @@ export default function SiteOverview({
             w="fit-content"
           >
             Go
+          </Button>
+        </Group>
+      </Card>
+
+      <Card withBorder mt="10" shadow="sm" radius="md">
+        <CardSection
+          data-first-section="true"
+          withBorder
+          inheritPadding
+          py="xs"
+        >
+          <Group justify="start">
+            <IconSignature />
+            <Text size="xl" fw={500}>
+              {brandTitle} Sign-Off
+            </Text>
+          </Group>
+        </CardSection>
+        <Group justify="right">
+          <Button
+            variant="warning"
+            component={Link}
+            href={`${site.siteCode}/signatures`}
+            mt="8"
+            w="fit-content"
+          >
+            Sign-Off
           </Button>
         </Group>
       </Card>

@@ -33,4 +33,5 @@ export const navLinks: NavLinks = {
   questions: { href: "questions", title: "Questions", hideOnSidebar: true },
   processes: { href: "processes", title: "Processes", hideOnSidebar: true },
   rooms: { href: "rooms", title: "Rooms", hideOnSidebar: true },
+  signatures: { href: "signatures", title: "Signatures", hideOnSidebar: true },
 };

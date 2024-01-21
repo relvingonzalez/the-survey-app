@@ -6,7 +6,7 @@ import {
   ModalProps,
   ModalRoot,
 } from "@mantine/core";
-import Drawing from "./Drawing";
+import Drawing, { BackgroundImage } from "./Drawing";
 import { useRef, useState } from "react";
 import DrawingToolBox, { defaultTools } from "./DrawingToolBox";
 import {
@@ -34,21 +34,27 @@ export type CustomTools =
     };
 
 export type DrawingModalProps = ModalProps &
-  CustomTools & {
+  CustomTools &
+  BackgroundImage & {
     file?: File;
+    isSignature?: boolean;
     onSave?: (files: File[]) => void;
   };
 
 export default function DrawingModal({
   onClose,
   onSave,
+  backgroundImage,
   isRoom,
+  isSignature,
   racks = [],
   moreInfo = [],
   ...props
 }: DrawingModalProps) {
   const [selectedColor, setSelectedColor] = useState("#2e2e2e");
-  const [activeTool, setActiveTool] = useState("line");
+  const [activeTool, setActiveTool] = useState(
+    isSignature ? "freeHand" : "line",
+  );
   const { ref, height } = useElementSize(); // elementSize does not have top and bottom padding, so I had to add 32
   const { width, height: viewportHeight } = useViewportSize();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -118,7 +124,11 @@ export default function DrawingModal({
         }),
     },
   ];
-  const tools = isRoom ? [...defaultTools, ...customTools] : defaultTools;
+  const tools = isRoom
+    ? [...defaultTools, ...customTools]
+    : isSignature
+      ? defaultTools.filter((v) => v.value === "freeHand")
+      : defaultTools;
   const handleClear = () => {
     handlersRack.setState([]);
     handlersMoreInfo.setState([]);
@@ -168,6 +178,7 @@ export default function DrawingModal({
               selectedColor={selectedColor}
               width={width}
               tools={tools}
+              backgroundImage={backgroundImage}
             >
               {localMoreInfo.map((mI, i) => (
                 <IconInfoCircleFilled

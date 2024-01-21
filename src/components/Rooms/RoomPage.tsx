@@ -33,7 +33,8 @@ export default function RoomPage({ room }: { room: Room | NewRoom }) {
   const handleDeleteFile = (i: number) => {
     handlers.remove(i);
   };
-  const handleSelectRoomPlan = (file: File) => {
+  const handleSaveDrawing = (file: File) => {
+    // TODO save to indexedDB
     setRoomPlan(file);
   };
   return (
@@ -42,8 +43,8 @@ export default function RoomPage({ room }: { room: Room | NewRoom }) {
       <Card withBorder shadow="sm" radius="md">
         <RoomComponent
           room={currentRoom}
-          roomPlan={roomPlan}
-          onSelectRoomPlan={handleSelectRoomPlan}
+          plan={roomPlan}
+          onSaveDrawing={handleSaveDrawing}
           onSave={handleSave}
           onDelete={handleDelete}
           files={files}
