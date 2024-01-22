@@ -139,10 +139,14 @@ export default function Drawing({
         return;
       }
 
+      drawCanvas(ctx, ctxTemp);
       setMouseCoords({ ...initialCoords });
       setMouseDownFlag(false);
-
-      drawCanvas(ctx, ctxTemp);
+      clearCanvas(
+        ctxTemp,
+        tempRef.current.clientWidth,
+        tempRef.current.clientHeight,
+      );
     }
   };
 
@@ -150,12 +154,48 @@ export default function Drawing({
   const mouseMoveRef = useEventListener("mousemove", mouseMoveHandler);
   const mouseUpRef = useEventListener("mouseup", mouseUpHandler);
 
+  const touchStartHandler = (e: TouchEvent) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent("mousedown", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    tempRef.current.dispatchEvent(mouseEvent);
+  };
+
+  const touchMoveHandler = (e: TouchEvent) => {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const mouseEvent = new MouseEvent("mousemove", {
+      clientX: touch.clientX,
+      clientY: touch.clientY,
+    });
+    tempRef.current.dispatchEvent(mouseEvent);
+  };
+
+  const touchEndHandler = (e: TouchEvent) => {
+    e.preventDefault();
+    const mouseEvent = new MouseEvent("mouseup", {
+      clientX: e.changedTouches[0].clientX - mouseCoords.x,
+      clientY: e.changedTouches[0].clientY - mouseCoords.y,
+    });
+    tempRef.current.dispatchEvent(mouseEvent);
+  };
+
+  const touchStartRef = useEventListener("touchstart", touchStartHandler);
+  const touchMoveRef = useEventListener("touchmove", touchMoveHandler);
+  const touchEndRef = useEventListener("touchend", touchEndHandler);
+
   // Merge refs
   const mergedRef = useMergedRef(
     tempRef,
     mouseDownRef,
     mouseMoveRef,
     mouseUpRef,
+    touchStartRef,
+    touchMoveRef,
+    touchEndRef,
   );
 
   // Resize

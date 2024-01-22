@@ -35,8 +35,8 @@ export default function ClickableDrawing({
         alt="Room plan"
         radius="md"
         src={galleryFile?.url}
-        h={400}
-        w={600}
+        mah={400}
+        maw={600}
         fallbackSrc={fallbackSrc}
       />
     </Center>

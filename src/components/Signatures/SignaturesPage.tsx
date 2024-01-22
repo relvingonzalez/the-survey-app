@@ -31,7 +31,7 @@ export default function SignaturesPage({ siteCode }: SignaturesPageProps) {
   return (
     <>
       <Title order={2}>Sign Off</Title>
-      <Flex gap="md">
+      <Flex gap="md" wrap="wrap">
         <Stack>
           <Title order={3}>Engineer</Title>
           <ClickableDrawing
