@@ -8,8 +8,8 @@ export default function DiscSpaceCard() {
   const [percentFilled, setPercentFilled] = useState(0);
 
   useEffect(() => {
-    if (window.navigator) {
-      window.navigator.storage.estimate().then((estimate) => {
+    if (navigator && navigator.storage && navigator.storage.estimate) {
+      navigator.storage.estimate().then((estimate) => {
         const usage = estimate.usage || 0;
         const quota = estimate.quota || 1;
         const spaceLeft = (usage / quota) * 100;
