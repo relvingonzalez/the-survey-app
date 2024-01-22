@@ -46,11 +46,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <Sidebar navLinks={navLinks} />
       </AppShellNavbar>
       <AppShellMain>
-        <NavBreadcrumbs navLinks={navLinks} />
-        <ScrollArea
-          p="md"
-          h="calc(100vh - var(--app-shell-header-height, 0px) - var(--app-shell-footer-height, 0px))"
-        >
+        <ScrollArea p="md" h="calc(100vh - 120px">
+          <NavBreadcrumbs navLinks={navLinks} />
           {children}
         </ScrollArea>
       </AppShellMain>
