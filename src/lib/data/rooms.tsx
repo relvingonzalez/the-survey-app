@@ -16,8 +16,8 @@ export const dummyRack: Rack = {
 };
 
 export const dummyMoreInfo: MoreInfo = {
-  x: 1.23,
-  y: 34,
+  x: 12.23,
+  y: 89,
   info: "Amazing Info",
 };
 
@@ -25,7 +25,7 @@ export const dummyRoom: Room = {
   id: "1",
   name: "Dummy Room",
   comment: "",
-  racks: [dummyRack, dummyRack],
+  racks: [dummyRack],
   moreInfo: [dummyMoreInfo],
 };
 
@@ -36,5 +36,12 @@ export const createHardware = (args?: Partial<Hardware>): Hardware => ({
   from: "",
   to: "",
   details: "",
+  ...args,
+});
+
+export const createMoreInfo = (args?: Partial<MoreInfo>): MoreInfo => ({
+  info: "",
+  x: 0,
+  y: 0,
   ...args,
 });

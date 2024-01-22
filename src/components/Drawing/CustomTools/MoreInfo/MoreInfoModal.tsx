@@ -4,6 +4,7 @@ import { useForm } from "@mantine/form";
 import { MoreInfo } from "@/lib/types/rooms";
 import Files from "@/components/files/Files.";
 import { useListState } from "@mantine/hooks";
+import { createMoreInfo } from "@/lib/data/rooms";
 
 export type MoreInfoProps = ModalProps & {
   moreInfo: MoreInfo;
@@ -11,7 +12,7 @@ export type MoreInfoProps = ModalProps & {
   onSave: (info: string, files: File[]) => void;
 };
 export default function MoreInfoModal({
-  moreInfo,
+  moreInfo = createMoreInfo(),
   existingFiles = [],
   onSave,
   onClose,

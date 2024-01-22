@@ -55,7 +55,13 @@ export default function RoomComponent({
           />
           <Comment {...form.getInputProps("comment")} />
           <Files {...filesProps} hideDrawingButton />
-          <ClickableDrawing file={plan} onSaveDrawing={onSaveDrawing} />
+          <ClickableDrawing
+            file={plan}
+            onSaveDrawing={onSaveDrawing}
+            isRoom
+            racks={form.values.racks}
+            moreInfo={form.values.moreInfo}
+          />
           <Group mb="10" justify="space-between">
             <Button mt="10" disabled={!form.isValid} type="submit">
               Save

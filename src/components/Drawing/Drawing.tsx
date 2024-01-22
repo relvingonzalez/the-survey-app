@@ -1,9 +1,4 @@
-import {
-  useEventListener,
-  useMergedRef,
-  useMouse,
-  useWindowEvent,
-} from "@mantine/hooks";
+import { useEventListener, useMergedRef, useWindowEvent } from "@mantine/hooks";
 import classes from "./Drawing.module.css";
 import {
   CanvasHTMLAttributes,
@@ -11,12 +6,14 @@ import {
   PropsWithChildren,
   useCallback,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { Box } from "@mantine/core";
 import { clearCanvas, drawCanvas, prepareCanvas } from "./DrawingFunctions";
 import { DrawingToolBoxTools, Tool, defaultTools } from "./DrawingToolBox";
 import { GalleryFile } from "@/lib/hooks/useGaleryFiles";
+import { getMousePosition, getTouchPosition } from "@/lib/utils/functions";
 
 export type DrawingCanvasRef = {
   canvasRef: MutableRefObject<HTMLCanvasElement | null>;
@@ -57,7 +54,7 @@ export default function Drawing({
   children,
   ...props
 }: DrawingProps) {
-  const { ref: tempRef, x: x, y: y } = useMouse();
+  const tempRef = useRef<HTMLCanvasElement>(null);
   const [mouseCoords, setMouseCoords] = useState({ ...initialCoords });
   const [mouseDownFlag, setMouseDownFlag] = useState(false);
   const [tool, setTool] = useState<Tool>();
@@ -72,120 +69,172 @@ export default function Drawing({
       const img = new Image();
       img.onload = function () {
         // execute drawImage statements here
-        const ctxTemp = tempRef.current.getContext("2d");
-        ctxTemp.drawImage(img, 0, 0);
+        const ctxTemp = tempRef.current?.getContext("2d");
+        ctxTemp?.drawImage(img, 0, 0);
       };
       img.src = backgroundImage.url;
     }
   }, [backgroundImage, tempRef]);
 
-  const mouseDownHandler = () => {
-    if (tool && !mouseDownFlag) {
-      const ctxTemp = tempRef.current.getContext("2d");
-      setMouseCoords({ x: x, y: y });
-      setMouseDownFlag(true);
-      clearCanvas(
-        ctxTemp,
-        tempRef.current.clientWidth,
-        tempRef.current.clientHeight,
-      );
-      tool.onMouseDown?.(
-        selectedColor,
-        ctxTemp,
-        mouseCoords.x,
-        mouseCoords.y,
-        x,
-        y,
-      );
-    }
-  };
+  const handleDown = useCallback(
+    (x: number, y: number) => {
+      if (tool && !mouseDownFlag && tempRef.current) {
+        const ctxTemp = tempRef.current.getContext("2d");
+        setMouseCoords({ x: x, y: y });
+        setMouseDownFlag(true);
+        if (!ctxTemp) {
+          return;
+        }
 
-  const mouseMoveHandler = () => {
-    if (tool && mouseDownFlag) {
-      const ctxTemp = tempRef.current.getContext("2d");
-      !tool.skipClearOnMove &&
         clearCanvas(
           ctxTemp,
           tempRef.current.clientWidth,
           tempRef.current.clientHeight,
         );
-      tool.setCoordsOnMove && setMouseCoords({ x: x, y: y });
-      tool.onMouseMove?.(
-        selectedColor,
-        ctxTemp,
-        mouseCoords.x,
-        mouseCoords.y,
-        x,
-        y,
-      );
-    }
-  };
-
-  const mouseUpHandler = () => {
-    if (tool && mouseDownFlag) {
-      const ctx = canvasRef?.current?.getContext("2d");
-      const ctxTemp = tempRef.current.getContext("2d");
-
-      tool.onMouseUp?.(
-        selectedColor,
-        ctxTemp,
-        mouseCoords.x,
-        mouseCoords.y,
-        x,
-        y,
-      );
-
-      if (!ctx) {
-        return;
+        tool.onMouseDown?.(
+          selectedColor,
+          ctxTemp,
+          mouseCoords.x,
+          mouseCoords.y,
+          x,
+          y,
+        );
       }
+    },
+    [mouseCoords.x, mouseCoords.y, mouseDownFlag, selectedColor, tool],
+  );
 
-      drawCanvas(ctx, ctxTemp);
-      setMouseCoords({ ...initialCoords });
-      setMouseDownFlag(false);
-      clearCanvas(
-        ctxTemp,
-        tempRef.current.clientWidth,
-        tempRef.current.clientHeight,
-      );
-    }
-  };
+  const handleMove = useCallback(
+    (x: number, y: number) => {
+      if (tool && mouseDownFlag && tempRef.current) {
+        const ctxTemp = tempRef.current.getContext("2d");
+        if (!ctxTemp) {
+          return;
+        }
+
+        !tool.skipClearOnMove &&
+          clearCanvas(
+            ctxTemp,
+            tempRef.current.clientWidth,
+            tempRef.current.clientHeight,
+          );
+        tool.setCoordsOnMove && setMouseCoords({ x: x, y: y });
+        tool.onMouseMove?.(
+          selectedColor,
+          ctxTemp,
+          mouseCoords.x,
+          mouseCoords.y,
+          x,
+          y,
+        );
+      }
+    },
+    [mouseCoords.x, mouseCoords.y, mouseDownFlag, selectedColor, tool],
+  );
+
+  const handleUp = useCallback(
+    (x: number, y: number) => {
+      if (tool && mouseDownFlag && tempRef.current) {
+        const ctx = canvasRef?.current?.getContext("2d");
+        const ctxTemp = tempRef.current.getContext("2d");
+        if (!ctxTemp) {
+          return;
+        }
+        tool.onMouseUp?.(
+          selectedColor,
+          ctxTemp,
+          mouseCoords.x,
+          mouseCoords.y,
+          x,
+          y,
+        );
+
+        if (ctx) {
+          drawCanvas(ctx, ctxTemp);
+          setMouseCoords({ x: x, y: y });
+          setMouseDownFlag(false);
+          clearCanvas(
+            ctxTemp,
+            tempRef.current.clientWidth,
+            tempRef.current.clientHeight,
+          );
+        }
+      }
+    },
+    [
+      canvasRef,
+      mouseCoords.x,
+      mouseCoords.y,
+      mouseDownFlag,
+      selectedColor,
+      tool,
+    ],
+  );
+
+  const mouseDownHandler = useCallback(
+    (e: MouseEvent) => {
+      const { x, y } = getMousePosition(tempRef, e);
+      handleDown(x, y);
+    },
+    [handleDown],
+  );
+
+  const mouseMoveHandler = useCallback(
+    (e: MouseEvent) => {
+      const { x, y } = getMousePosition(tempRef, e);
+      handleMove(x, y);
+    },
+    [handleMove],
+  );
+
+  const mouseUpHandler = useCallback(
+    (e: MouseEvent) => {
+      const { x, y } = getMousePosition(tempRef, e);
+      handleUp(x, y);
+    },
+    [handleUp],
+  );
+
+  const touchStartHandler = useCallback(
+    (e: TouchEvent) => {
+      e.preventDefault();
+      const { x, y } = getTouchPosition(tempRef, e);
+      handleDown(x, y);
+    },
+    [handleDown],
+  );
+
+  const touchMoveHandler = useCallback(
+    (e: TouchEvent) => {
+      e.preventDefault();
+      const { x, y } = getTouchPosition(tempRef, e);
+      handleMove(x, y);
+    },
+    [handleMove],
+  );
+
+  const touchEndHandler = useCallback(
+    (e: TouchEvent) => {
+      e.preventDefault();
+      const { x, y } = getTouchPosition(tempRef, e);
+      handleUp(x, y);
+    },
+    [handleUp],
+  );
 
   const mouseDownRef = useEventListener("mousedown", mouseDownHandler);
   const mouseMoveRef = useEventListener("mousemove", mouseMoveHandler);
   const mouseUpRef = useEventListener("mouseup", mouseUpHandler);
 
-  const touchStartHandler = (e: TouchEvent) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent("mousedown", {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    });
-    tempRef.current.dispatchEvent(mouseEvent);
-  };
-
-  const touchMoveHandler = (e: TouchEvent) => {
-    e.preventDefault();
-    const touch = e.touches[0];
-    const mouseEvent = new MouseEvent("mousemove", {
-      clientX: touch.clientX,
-      clientY: touch.clientY,
-    });
-    tempRef.current.dispatchEvent(mouseEvent);
-  };
-
-  const touchEndHandler = (e: TouchEvent) => {
-    e.preventDefault();
-    const mouseEvent = new MouseEvent("mouseup", {
-      clientX: e.changedTouches[0].clientX - mouseCoords.x,
-      clientY: e.changedTouches[0].clientY - mouseCoords.y,
-    });
-    tempRef.current.dispatchEvent(mouseEvent);
-  };
-
-  const touchStartRef = useEventListener("touchstart", touchStartHandler);
-  const touchMoveRef = useEventListener("touchmove", touchMoveHandler);
-  const touchEndRef = useEventListener("touchend", touchEndHandler);
+  const touchStartRef = useEventListener("touchstart", touchStartHandler, {
+    passive: false,
+  });
+  const touchMoveRef = useEventListener("touchmove", touchMoveHandler, {
+    passive: false,
+  });
+  const touchEndRef = useEventListener("touchend", touchEndHandler, {
+    passive: false,
+  });
 
   // Merge refs
   const mergedRef = useMergedRef(
@@ -201,6 +250,9 @@ export default function Drawing({
   // Resize
   const handleResize = useCallback(() => {
     const ctx = canvasRef?.current?.getContext("2d");
+    if (!ctx) {
+      return;
+    }
 
     if (ctx?.canvas) {
       ctx.canvas.height = height;
@@ -208,7 +260,10 @@ export default function Drawing({
       prepareCanvas(ctx, width, height);
     }
 
-    const ctxTemp = tempRef.current.getContext("2d");
+    const ctxTemp = tempRef.current?.getContext("2d");
+    if (!ctxTemp) {
+      return;
+    }
     ctxTemp.canvas.height = height;
     ctxTemp.canvas.width = width;
     prepareCanvas(ctxTemp, width, height);

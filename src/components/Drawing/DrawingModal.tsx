@@ -64,6 +64,10 @@ export default function DrawingModal({
     useDisclosure(false);
   const [localRacks, handlersRack] = useListState<Rack>(racks);
   const [localMoreInfo, handlersMoreInfo] = useListState<MoreInfo>(moreInfo);
+  const [currentMoreInfo, setCurrentMoreInfo] = useState<MoreInfo>(
+    localMoreInfo[0],
+  );
+  const [currentRack, setCurrentRack] = useState<Rack>(localRacks[0]);
   const customTools = [
     {
       label: "More Info",
@@ -133,25 +137,34 @@ export default function DrawingModal({
     handlersRack.setState([]);
     handlersMoreInfo.setState([]);
   };
+  const handleMoreInfoOpen = (i: number) => {
+    setCurrentMoreInfo(localMoreInfo[i]);
+    moreInfoOpen();
+  };
+  const handleRackOpen = (i: number) => {
+    setCurrentRack(localRacks[i]);
+    rackOpen();
+  };
 
   return (
     <>
-      {localMoreInfo[0] && (
-        <MoreInfoModal
-          onClose={moreInfoClose}
-          onSave={moreInfoClose}
-          opened={moreInfoModalOpened}
-          moreInfo={localMoreInfo[0]}
-          existingFiles={[]}
-        />
-      )}
+      <MoreInfoModal
+        onClose={moreInfoClose}
+        onSave={moreInfoClose}
+        opened={moreInfoModalOpened}
+        moreInfo={currentMoreInfo}
+        existingFiles={[]}
+        zIndex={300}
+      />
+
       {localRacks[0] && (
         <RackModal
           onClose={rackClose}
           onSave={rackClose}
           opened={rackModalOpened}
-          rack={localRacks[0]}
+          rack={currentRack}
           existingFiles={[]}
+          zIndex={300}
         />
       )}
       <ModalRoot {...props} onClose={onClose} fullScreen>
@@ -184,7 +197,7 @@ export default function DrawingModal({
                 <IconInfoCircleFilled
                   key={i}
                   style={{ position: "absolute", left: mI.x, top: mI.y }}
-                  onClick={moreInfoOpen}
+                  onClick={() => handleMoreInfoOpen(i)}
                 />
               ))}
 
@@ -192,7 +205,7 @@ export default function DrawingModal({
                 <IconServer2
                   key={i}
                   style={{ position: "absolute", left: r.x, top: r.y }}
-                  onClick={rackOpen}
+                  onClick={() => handleRackOpen(i)}
                 />
               ))}
             </Drawing>
