@@ -1,12 +1,13 @@
-export const dummySite = {
+import { Site } from "../types/sites";
+
+export const dummySite: Site = {
+  id: 1,
   siteCode: "WUHD45",
-  location: `Triumph Outlet FFM
-    Some Street 123
-    60327 Frankfurt am Main`,
-  questionnaire: "something",
-  answers: "something else",
-  sketches: 3,
-  process: "another thing",
+  name: "Triumph Outlet FFM",
+  street: "ome Street 123",
+  city: "Frankfurt",
+  state: "Germany",
+  phone: "123-234-3456",
 };
 
 export const dummySites = [dummySite, dummySite];

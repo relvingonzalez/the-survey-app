@@ -1,10 +1,11 @@
 export type SiteCode = string;
 
 export type Site = {
+  id: number;
+  name: string;
   siteCode: SiteCode;
-  location: string;
-  questionnaire: string;
-  answers: string;
-  sketches: number;
-  process: string;
+  street: string;
+  city: string;
+  state: string;
+  phone: string;
 };

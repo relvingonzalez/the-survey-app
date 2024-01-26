@@ -1,6 +1,16 @@
 import { DownloadSites } from "@/components/Sites/Sites";
-import { dummySites } from "@/lib/data/sites";
+import { Site } from "@/lib/types/sites";
+import postgres from "postgres";
+import * as changeKeys from "change-case/keys";
 
-export default function DownloadPage() {
-  return <DownloadSites sites={dummySites} />;
+async function getData() {
+  const sql = postgres(process.env.DATABASE_URL, { ssl: "require" });
+
+  const response = await sql<Site[]>`SELECT * FROM site`;
+  return response.map((v) => changeKeys.camelCase(v) as Site);
+}
+
+export default async function DownloadPage() {
+  const sites = await getData();
+  return <DownloadSites sites={sites} />;
 }

@@ -45,7 +45,10 @@ export default function SiteOverview({
           </Group>
         </CardSection>
         <Text mt="10" inherit>
-          {site.location}
+          {site.street}
+        </Text>
+        <Text>
+          {site.city}, {site.state}
         </Text>
         <Button mt="4" w="fit-content" leftSection={<IconInfoCircleFilled />}>
           Details

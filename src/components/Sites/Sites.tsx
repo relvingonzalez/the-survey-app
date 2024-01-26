@@ -28,7 +28,8 @@ const siteProgress = (site: Site) => {
       <TableTbody>
         <TableTr>
           <TableTd>Questions:</TableTd>
-          <TableTd>1/{site.questionnaire.length}</TableTd>
+          <TableTd>{site.phone}</TableTd>
+          {/* <TableTd>1/{site.questionnaire.length}</TableTd> */}
         </TableTr>
         <TableTr>
           <TableTd>Sketches:</TableTd>
@@ -36,7 +37,7 @@ const siteProgress = (site: Site) => {
         </TableTr>
         <TableTr>
           <TableTd>Processes:</TableTd>
-          <TableTd>5/{site.process.length}</TableTd>
+          {/* <TableTd>5/{site.process.length}</TableTd> */}
         </TableTr>
       </TableTbody>
     </Table>
@@ -48,8 +49,11 @@ function Sites({ sites, download }: SitesProps) {
     <TableTr key={`${site.siteCode}-${index}`}>
       <TableTd>{site.siteCode}</TableTd>
       <TableTd>
-        <Text>{site.location}</Text>
-        {download && <Text>{site.questionnaire ? "Yes" : "No"}</Text>}
+        <Text>{site.name}</Text>
+        <Text>{site.street}</Text>
+        <Text>
+          {site.city}, {site.state}
+        </Text>
       </TableTd>
       {!download && <TableTd>{siteProgress(site)}</TableTd>}
       <TableTd>
