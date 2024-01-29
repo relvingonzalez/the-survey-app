@@ -1,3 +1,6 @@
+"use client";
+
+import { downloadSite } from "@/lib/api/actions";
 import { Site } from "@/lib/types/sites";
 import {
   Group,
@@ -19,8 +22,10 @@ import Link from "next/link";
 
 type SitesProps = {
   sites: Site[];
-  download?: boolean;
-};
+} & (
+  | { download: true; onDownload: (site: Site) => void }
+  | { download?: false; onDownload?: never }
+);
 
 const siteProgress = (site: Site) => {
   return (
@@ -44,7 +49,7 @@ const siteProgress = (site: Site) => {
   );
 };
 
-function Sites({ sites, download }: SitesProps) {
+function Sites({ sites, download, onDownload }: SitesProps) {
   const rows = sites.map((site, index) => (
     <TableTr key={`${site.siteCode}-${index}`}>
       <TableTd>{site.siteCode}</TableTd>
@@ -59,8 +64,8 @@ function Sites({ sites, download }: SitesProps) {
       <TableTd>
         {download ? (
           <Group>
-            <IconInfoCircleFilled className="text-red" />
-            <IconDownload />
+            <IconInfoCircleFilled />
+            <IconDownload onClick={() => onDownload(site)} />
           </Group>
         ) : (
           <Group>
@@ -92,7 +97,12 @@ function Sites({ sites, download }: SitesProps) {
 }
 
 export function DownloadSites({ sites }: SitesProps) {
-  return <Sites sites={sites} download />;
+  const onDownload = (site: Site) => {
+    downloadSite(site);
+  };
+  // open progress modal
+  // progress modal should have state in the shape of {step, progress, text}
+  return <Sites sites={sites} download onDownload={onDownload} />;
 }
 
 export function LocalSites({ sites }: SitesProps) {

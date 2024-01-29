@@ -161,6 +161,7 @@ type ListOptions = string[];
 
 export type QuestionType =
   | "checkbox"
+  | "collection"
   | "datetime"
   | "days"
   | "email"
@@ -172,8 +173,7 @@ export type QuestionType =
   | "phone"
   | "text"
   | "time"
-  | "yes/no"
-  | "collection";
+  | "yes/no";
 
 type BaseQuestion = {
   id?: UUID;
