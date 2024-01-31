@@ -1,6 +1,5 @@
 "use client";
 
-import { downloadSite } from "@/lib/api/actions";
 import { Site } from "@/lib/types/sites";
 import {
   Group,
@@ -23,7 +22,7 @@ import Link from "next/link";
 type SitesProps = {
   sites: Site[];
 } & (
-  | { download: true; onDownload: (site: Site) => void }
+  | { download: true; onDownload: (site: Site) => Promise<void> }
   | { download?: false; onDownload?: never }
 );
 
@@ -96,13 +95,26 @@ function Sites({ sites, download, onDownload }: SitesProps) {
   );
 }
 
-export function DownloadSites({ sites }: SitesProps) {
-  const onDownload = (site: Site) => {
-    downloadSite(site);
+export function DownloadSites({
+  sites,
+}: Omit<SitesProps, "download" | "onDownload">) {
+  const handleDownload = async (site: Site) => {
+    try {
+      const response = await fetch(`download/${site.id}/api/`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error(error);
+    }
   };
   // open progress modal
   // progress modal should have state in the shape of {step, progress, text}
-  return <Sites sites={sites} download onDownload={onDownload} />;
+  return <Sites sites={sites} download onDownload={handleDownload} />;
 }
 
 export function LocalSites({ sites }: SitesProps) {
