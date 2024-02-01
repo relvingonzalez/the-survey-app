@@ -1,12 +1,13 @@
 import { DownloadSites } from "@/components/Sites/Sites";
 import { Site } from "@/lib/types/sites";
 import postgres from "postgres";
-import * as changeKeys from "change-case/keys";
+import { transformEntriesFromServer } from "@/lib/utils/functions";
+import { ServerSite } from "@/lib/types/server";
 
 async function getData() {
   const sql = postgres(process.env.DATABASE_URL, { ssl: "require" });
-  const response = await sql<Site[]>`SELECT * FROM site`;
-  return response.map((v) => changeKeys.camelCase(v) as Site);
+  const response = await sql<ServerSite[]>`SELECT * FROM site`;
+  return transformEntriesFromServer<ServerSite, Site>(response);
 }
 
 export default async function DownloadPage() {

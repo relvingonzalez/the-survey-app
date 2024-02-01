@@ -1,6 +1,7 @@
 import { RefObject } from "react";
 import { Person, Salutation } from "../types/question";
 import { NewRoom } from "../types/rooms";
+import * as changeKeys from "change-case/keys";
 
 export const createPerson = (
   salut: Salutation = undefined,
@@ -80,3 +81,19 @@ export const getTouchPosition = (
     return { x: touch.clientX, y: touch.clientY };
   }
 };
+
+export function transformEntryFromServer<T extends object, K>(data: T) {
+  return changeKeys.camelCase(data) as K;
+}
+
+export function transformEntriesFromServer<T extends object, K>(data: T[]) {
+  return data.map((v) => transformEntryFromServer<T, K>(v));
+}
+
+export function transformEntryToServer<T extends object, K>(data: T) {
+  return changeKeys.snakeCase(data) as K;
+}
+
+export function transformEntriesToServer<T extends object, K>(data: T[]) {
+  return data.map((v) => transformEntryToServer<T, K>(v));
+}

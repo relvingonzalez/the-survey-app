@@ -1,5 +1,6 @@
 "use client";
 
+import { populate } from "@/lib/dexie/helper";
 import { Site } from "@/lib/types/sites";
 import {
   Group,
@@ -98,6 +99,8 @@ function Sites({ sites, download, onDownload }: SitesProps) {
 export function DownloadSites({
   sites,
 }: Omit<SitesProps, "download" | "onDownload">) {
+  //Check if already downloaded. Want to overwrite?
+  // If yes, delete all local data and download new.
   const handleDownload = async (site: Site) => {
     try {
       const response = await fetch(`download/${site.id}/api/`, {
@@ -107,7 +110,8 @@ export function DownloadSites({
         },
       });
       const data = await response.json();
-      console.log(data);
+      await populate(data);
+      alert(`downloaded site ${site.siteCode}`);
     } catch (error) {
       console.error(error);
     }
