@@ -23,16 +23,19 @@ export type ServerQuestion = {
 
 export type ServerQuestionResponse = ServerResponse & {
   id: number;
+  project_id: number;
   question_id: number;
 };
 
 export type ServerProcessResponse = ServerResponse & {
   id: number;
+  project_id: number;
   process_id: number;
 };
 
 export type ServerRackQuestionResponse = ServerResponse & {
   id: number;
+  project_id: number;
   rack_id: number;
   rack_question_id: number;
 };
@@ -45,6 +48,7 @@ export type ServerRoom = {
 
 export type ServerMoreInfo = {
   id: number;
+  project_id: number;
   room_id: number;
   info: string;
   x: Coordinate;
@@ -53,6 +57,7 @@ export type ServerMoreInfo = {
 
 export type ServerRack = {
   id: number;
+  project_id: number;
   room_id: number;
   name: string;
   x: Coordinate;
@@ -61,6 +66,7 @@ export type ServerRack = {
 
 export type ServerHardware = {
   id: number;
+  project_id: number;
   rack_id: number;
   name: string;
   from_slot: string;

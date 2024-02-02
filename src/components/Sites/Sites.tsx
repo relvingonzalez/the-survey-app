@@ -1,5 +1,7 @@
 "use client";
 
+import { useLiveQuery } from "dexie-react-hooks";
+import { db } from "@/lib/dexie/db";
 import { populate } from "@/lib/dexie/helper";
 import { Site } from "@/lib/types/sites";
 import {
@@ -19,35 +21,55 @@ import {
   IconSettingsFilled,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { LocalSiteProject } from "@/lib/types/local";
+import { DexieSiteProject } from "@/lib/types/dexie";
 
 type SitesProps = {
-  sites: Site[];
+  sites: LocalSiteProject[] | DexieSiteProject[];
 } & (
-  | { download: true; onDownload: (site: Site) => Promise<void> }
+  | { download: true; onDownload: (site: LocalSiteProject) => Promise<void> }
   | { download?: false; onDownload?: never }
 );
 
-const siteProgress = (site: Site) => {
+function SiteProgress({ site }: { site: DexieSiteProject }) {
+  const questionsCount = useLiveQuery(() =>
+    db.questions.where({ projectId: site.projectId }).count(),
+  );
+  const questionResponsesCount = useLiveQuery(() =>
+    db.questionResponses.where({ projectId: site.projectId }).count(),
+  );
+  const processesCount = useLiveQuery(() =>
+    db.processes.where({ projectId: site.projectId }).count(),
+  );
+  const processResponsesCount = useLiveQuery(() =>
+    db.processResponses.where({ projectId: site.projectId }).count(),
+  );
+  const roomsCount = useLiveQuery(() =>
+    db.rooms.where({ projectId: site.projectId }).count(),
+  );
   return (
     <Table withColumnBorders>
       <TableTbody>
         <TableTr>
           <TableTd>Questions:</TableTd>
-          <TableTd>{site.phone}</TableTd>
-          {/* <TableTd>1/{site.questionnaire.length}</TableTd> */}
+          <TableTd>
+            {questionResponsesCount}/{questionsCount}
+          </TableTd>
         </TableTr>
         <TableTr>
           <TableTd>Sketches:</TableTd>
-          <TableTd>3</TableTd>
+          <TableTd>{roomsCount}</TableTd>
         </TableTr>
         <TableTr>
           <TableTd>Processes:</TableTd>
-          {/* <TableTd>5/{site.process.length}</TableTd> */}
+          <TableTd>
+            {processResponsesCount}/{processesCount}
+          </TableTd>
         </TableTr>
       </TableTbody>
     </Table>
   );
-};
+}
 
 function Sites({ sites, download, onDownload }: SitesProps) {
   const rows = sites.map((site, index) => (
@@ -60,7 +82,11 @@ function Sites({ sites, download, onDownload }: SitesProps) {
           {site.city}, {site.state}
         </Text>
       </TableTd>
-      {!download && <TableTd>{siteProgress(site)}</TableTd>}
+      {!download && (
+        <TableTd>
+          <SiteProgress site={site} />
+        </TableTd>
+      )}
       <TableTd>
         {download ? (
           <Group>
@@ -121,6 +147,12 @@ export function DownloadSites({
   return <Sites sites={sites} download onDownload={handleDownload} />;
 }
 
-export function LocalSites({ sites }: SitesProps) {
+export function LocalSites() {
+  const sites = useLiveQuery(() => db.siteProjects.toArray());
+
+  if (!sites) {
+    return <Text>You have not downloaded any sites yet</Text>;
+  }
+
   return <Sites sites={sites} />;
 }

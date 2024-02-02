@@ -28,7 +28,7 @@ export class TheSurveyAppDB extends Dexie {
 
   constructor() {
     super("theSurveyApp");
-    this.version(1).stores({
+    this.version(2).stores({
       siteProjects:
         "++localId, projectId, &id, name, siteCode, street, city, state, phone",
       questions:
@@ -38,13 +38,16 @@ export class TheSurveyAppDB extends Dexie {
       rackQuestions:
         "++localId, &id, &projectId, type, subheading, order, question, options",
       rooms: "++localId, &id, projectId, name",
-      racks: "++localId, &id, roomId, name, x, y",
-      moreInfos: "++localId, &id, roomId, info, x, y",
-      hardwares: "++localId, &id, rackId, name, fromSlot, toSlot, details",
-      questionResponses: "++localId, &id, questionId, response, comment",
-      processResponses: "++localId, &id, questionId, response, comment",
+      racks: "++localId, &id, projectId, roomId, name, x, y",
+      moreInfos: "++localId, &id, projectId, roomId, info, x, y",
+      hardwares:
+        "++localId, &id, ProjectId, rackId, name, fromSlot, toSlot, details",
+      questionResponses:
+        "++localId, &id, projectId, questionId, response, comment",
+      processResponses:
+        "++localId, &id, projectId, questionId, response, comment",
       rackQuestionResponses:
-        "++localId, &id, rackId, rackQuestionId, response, comment",
+        "++localId, &id, projectId, rackId, rackQuestionId, response, comment",
     });
   }
 }

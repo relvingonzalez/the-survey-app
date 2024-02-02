@@ -2,14 +2,31 @@ import { LocalDownloadSiteData } from "../types/local";
 import { db } from "./db";
 
 export async function populate(data: LocalDownloadSiteData) {
-  await db.siteProjects.add(data.siteProject);
-  await db.questions.bulkAdd(data.questions);
-  await db.processes.bulkAdd(data.processes);
-  await db.rackQuestions.bulkAdd(data.rackQuestions);
-  await db.questionResponses.bulkAdd(data.questionResponses);
-  await db.processResponses.bulkAdd(data.processResponses);
-  await db.rooms.bulkAdd(data.rooms);
-  await db.moreInfos.bulkAdd(data.moreInfos);
-  await db.racks.bulkAdd(data.racks);
-  await db.hardwares.bulkAdd(data.hardwares);
+  return db.transaction(
+    "rw",
+    [
+      db.siteProjects,
+      db.questions,
+      db.processes,
+      db.rackQuestions,
+      db.questionResponses,
+      db.processResponses,
+      db.rooms,
+      db.moreInfos,
+      db.racks,
+      db.hardwares,
+    ],
+    () => {
+      db.siteProjects.add(data.siteProject);
+      db.questions.bulkAdd(data.questions);
+      db.processes.bulkAdd(data.processes);
+      db.rackQuestions.bulkAdd(data.rackQuestions);
+      db.questionResponses.bulkAdd(data.questionResponses);
+      db.processResponses.bulkAdd(data.processResponses);
+      db.rooms.bulkAdd(data.rooms);
+      db.moreInfos.bulkAdd(data.moreInfos);
+      db.racks.bulkAdd(data.racks);
+      db.hardwares.bulkAdd(data.hardwares);
+    },
+  );
 }
