@@ -1,4 +1,10 @@
-import { LocalDownloadSiteData } from "../types/local";
+import {
+  DexieProcess,
+  DexieProcessResponse,
+  DexieQuestion,
+  DexieQuestionResponse,
+} from "../types/dexie";
+import { LocalDownloadSiteData, LocalSiteProject } from "../types/local";
 import { db } from "./db";
 
 export async function populate(data: LocalDownloadSiteData) {
@@ -29,4 +35,30 @@ export async function populate(data: LocalDownloadSiteData) {
       db.hardwares.bulkAdd(data.hardwares);
     },
   );
+}
+
+export function getNextUnansweredQuestion(
+  site?: LocalSiteProject,
+  questions?: DexieQuestion[],
+  questionResponses?: DexieQuestionResponse[],
+) {
+  const unansweredQuestion = questions?.find((q) => {
+    const res = questionResponses?.find((qR) => qR.questionId === q.id);
+    return !res || !res.response;
+  });
+
+  return unansweredQuestion || (questions && questions[0]);
+}
+
+export function getNextUnansweredProcess(
+  site?: LocalSiteProject,
+  processes?: DexieProcess[],
+  processResponses?: DexieProcessResponse[],
+) {
+  const unansweredProcess = processes?.find((q) => {
+    const res = processResponses?.find((pR) => pR.processId === q.id);
+    return !res || !res.response;
+  });
+
+  return unansweredProcess || (processes && processes[0]);
 }

@@ -1,6 +1,7 @@
+"use client";
+
 import { brandTitle } from "@/lib/constants/constants";
-import { Processes, Questions } from "@/lib/types/question";
-import { Site } from "@/lib/types/sites";
+import { useLiveQuery } from "dexie-react-hooks";
 import { Card, CardSection, Group, Text, Button } from "@mantine/core";
 import {
   IconInfoCircleFilled,
@@ -11,22 +12,53 @@ import {
   IconHelpSquare,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { db } from "@/lib/dexie/db";
+import {
+  getNextUnansweredProcess,
+  getNextUnansweredQuestion,
+} from "@/lib/dexie/helper";
 
 type SiteOverviewProps = {
-  site: Site;
-  questions: Questions;
-  processes: Processes;
+  siteCode: string;
 };
 
-export default function SiteOverview({
-  site,
-  questions,
-  processes,
-}: SiteOverviewProps) {
-  const nextQuestion =
-    questions.find((q) => !q.answer.value)?.id || questions[0].id;
-  const nextProcess =
-    processes.find((p) => !p.answer.value)?.id || processes[0].id;
+export default function SiteOverview({ siteCode }: SiteOverviewProps) {
+  const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
+  const projectId = site ? site.projectId : 0;
+  const questions = useLiveQuery(
+    () => db.questions.where({ projectId: projectId }).sortBy("order"),
+    [projectId],
+  );
+  const questionResponses = useLiveQuery(
+    () => db.questionResponses.where({ projectId: projectId }).toArray(),
+    [projectId],
+  );
+  const processes = useLiveQuery(
+    () => db.processes.where({ projectId: projectId }).sortBy("order"),
+    [projectId],
+  );
+  const processResponses = useLiveQuery(
+    () => db.processResponses.where({ projectId: projectId }).toArray(),
+    [projectId],
+  );
+  const roomsCount = useLiveQuery(
+    () => db.rooms.where({ projectId: projectId }).count(),
+    [projectId],
+  );
+  const nextQuestion = getNextUnansweredQuestion(
+    site,
+    questions,
+    questionResponses,
+  );
+  const nextProcess = getNextUnansweredProcess(
+    site,
+    processes,
+    processResponses,
+  );
+
+  if (!site) {
+    return null;
+  }
 
   return (
     <>
@@ -45,6 +77,9 @@ export default function SiteOverview({
           </Group>
         </CardSection>
         <Text mt="10" inherit>
+          {site.name}
+        </Text>
+        <Text inherit>
           {site.street}
         </Text>
         <Text>
@@ -70,7 +105,9 @@ export default function SiteOverview({
           </Group>
         </CardSection>
 
-        <Text mt="10">Total: 32, Answered: 3</Text>
+        <Text mt="10">
+          Total: {questions?.length}, Answered: {questionResponses?.length}
+        </Text>
         <Group justify="space-between">
           <Button
             component={Link}
@@ -83,7 +120,7 @@ export default function SiteOverview({
           </Button>
           <Button
             component={Link}
-            href={`${site.siteCode}/questions/${nextQuestion}`}
+            href={`${site.siteCode}/questions/${nextQuestion?.order}`}
             mt="8"
             w="fit-content"
           >
@@ -106,7 +143,7 @@ export default function SiteOverview({
             </Text>
           </Group>
         </CardSection>
-        <Text mt="10">Drawings: 2</Text>
+        <Text mt="10">Drawings: {roomsCount}</Text>
         <Group justify="space-between">
           <Button
             component={Link}
@@ -142,7 +179,9 @@ export default function SiteOverview({
             </Text>
           </Group>
         </CardSection>
-        <Text mt="10">Total: 32, Answered: 3</Text>
+        <Text mt="10">
+          Total: {processes?.length}, Answered: {processResponses?.length}
+        </Text>
         <Group justify="space-between">
           <Button
             component={Link}
@@ -155,7 +194,7 @@ export default function SiteOverview({
           </Button>
           <Button
             component={Link}
-            href={`${site.siteCode}/processes/${nextProcess}`}
+            href={`${site.siteCode}/processes/${nextProcess?.order}`}
             mt="8"
             w="fit-content"
           >

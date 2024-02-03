@@ -3,7 +3,7 @@ export type SiteCode = string;
 export type Site = {
   id: number;
   name: string;
-  siteCode: SiteCode;
+  siteCode: string;
   street: string;
   city: string;
   state: string;
