@@ -2,8 +2,7 @@
 
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/dexie/db";
-import { populate } from "@/lib/dexie/helper";
-import { Site } from "@/lib/types/sites";
+import { deleteProject, populate } from "@/lib/dexie/helper";
 import {
   Group,
   Table,
@@ -23,6 +22,9 @@ import {
 import Link from "next/link";
 import { LocalSiteProject } from "@/lib/types/local";
 import { DexieSiteProject } from "@/lib/types/dexie";
+import DownloadModal from "../DownloadModal";
+import { useDisclosure } from "@mantine/hooks";
+import { useState } from "react";
 
 type SitesProps = {
   sites: LocalSiteProject[] | DexieSiteProject[];
@@ -125,10 +127,40 @@ function Sites({ sites, download, onDownload }: SitesProps) {
 export function DownloadSites({
   sites,
 }: Omit<SitesProps, "download" | "onDownload">) {
-  //Check if already downloaded. Want to overwrite?
-  // If yes, delete all local data and download new.
-  const handleDownload = async (site: Site) => {
+  const [opened, { open, close }] = useDisclosure(false);
+  const [selectedSite, setSelectedSite] = useState<LocalSiteProject>();
+  const [active, setActive] = useState(0);
+  const [statusText, setStatusText] = useState("");
+  const [progressValue, setProgressValue] = useState(0);
+
+  const handleDownload = async (site: LocalSiteProject) => {
+    setSelectedSite(site);
+    setActive(1);
+    setProgressValue(10);
+    setStatusText("Verifying site has not been downloaded already...");
+    const localSite = await db.siteProjects.get({ projectId: site.projectId });
+    open();
+    if (localSite) {
+      setStatusText(
+        "Site already downloaded, override data? DANGER: All unsynced progress for this site will be lost.",
+      );
+    } else {
+      continueDownload(site);
+    }
+  };
+
+  const handleOnContinue = async () => {
+    selectedSite && (await deleteProject(selectedSite.projectId));
+    setStatusText("Deleting Project from Local Storage");
+    setProgressValue(40);
+    selectedSite && continueDownload(selectedSite);
+  };
+
+  const continueDownload = async (site: LocalSiteProject) => {
     try {
+      setActive(2);
+      setStatusText("Downloading Data");
+      setProgressValue(33);
       const response = await fetch(`download/${site.id}/api/`, {
         method: "GET",
         headers: {
@@ -136,15 +168,32 @@ export function DownloadSites({
         },
       });
       const data = await response.json();
+      setActive(3);
+      setStatusText("Saving to Local Storage");
+      setProgressValue(66);
+
       await populate(data);
-      alert(`downloaded site ${site.siteCode}`);
     } catch (error) {
       console.error(error);
+    } finally {
+      setStatusText("Success!");
+      setProgressValue(100);
     }
   };
-  // open progress modal
-  // progress modal should have state in the shape of {step, progress, text}
-  return <Sites sites={sites} download onDownload={handleDownload} />;
+
+  return (
+    <>
+      <DownloadModal
+        statusText={statusText}
+        progressValue={progressValue}
+        active={active}
+        opened={opened}
+        onClose={close}
+        onContinue={handleOnContinue}
+      />
+      <Sites sites={sites} download onDownload={handleDownload} />
+    </>
+  );
 }
 
 export function LocalSites() {

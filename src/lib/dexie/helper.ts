@@ -37,6 +37,36 @@ export async function populate(data: LocalDownloadSiteData) {
   );
 }
 
+export async function deleteProject(projectId: number) {
+  return db.transaction(
+    "rw",
+    [
+      db.siteProjects,
+      db.questions,
+      db.processes,
+      db.rackQuestions,
+      db.questionResponses,
+      db.processResponses,
+      db.rooms,
+      db.moreInfos,
+      db.racks,
+      db.hardwares,
+    ],
+    () => {
+      db.siteProjects.where({ projectId }).delete();
+      db.questions.where({ projectId }).delete();
+      db.processes.where({ projectId }).delete();
+      db.rackQuestions.where({ projectId }).delete();
+      db.questionResponses.where({ projectId }).delete();
+      db.processResponses.where({ projectId }).delete();
+      db.rooms.where({ projectId }).delete();
+      db.moreInfos.where({ projectId }).delete();
+      db.racks.where({ projectId }).delete();
+      db.hardwares.where({ projectId }).delete();
+    },
+  );
+}
+
 export function getNextUnansweredQuestion(
   site?: LocalSiteProject,
   questions?: DexieQuestion[],

@@ -20,6 +20,7 @@ export default function ProgressModal({
   showButtons,
   onClose,
   onContinue,
+  children,
   title = "Download",
   ...props
 }: ProgressModalProps) {
@@ -30,27 +31,28 @@ export default function ProgressModal({
         backgroundOpacity: 0.55,
         blur: 3,
       }}
-      size="xl"
       title={title}
       onClose={onClose}
     >
-      <Text>{statusText}</Text>
+      {children}
+      <Text mt="40" mb="20">
+        {statusText}
+      </Text>
       <Progress value={progressValue} />
 
       {showButtons && (
         <Group mt="xl">
           <Button
-            disabled={progressValue > 0 && progressValue < 100}
+            disabled={progressValue > 10 && progressValue < 100}
             onClick={onClose}
           >
             Close
           </Button>
-          <Button
-            disabled={progressValue > 0 && progressValue < 100}
-            onClick={onContinue}
-          >
-            Continue
-          </Button>
+          {progressValue <= 10 && (
+            <Button variant="danger" onClick={onContinue}>
+              Continue
+            </Button>
+          )}
         </Group>
       )}
     </Modal>

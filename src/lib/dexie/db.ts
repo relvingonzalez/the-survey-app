@@ -41,7 +41,7 @@ export class TheSurveyAppDB extends Dexie {
       racks: "++localId, &id, projectId, roomId, name, x, y",
       moreInfos: "++localId, &id, projectId, roomId, info, x, y",
       hardwares:
-        "++localId, &id, ProjectId, rackId, name, fromSlot, toSlot, details",
+        "++localId, &id, projectId, rackId, name, fromSlot, toSlot, details",
       questionResponses:
         "++localId, &id, projectId, questionId, response, comment",
       processResponses:
