@@ -79,9 +79,7 @@ export default function SiteOverview({ siteCode }: SiteOverviewProps) {
         <Text mt="10" inherit>
           {site.name}
         </Text>
-        <Text inherit>
-          {site.street}
-        </Text>
+        <Text inherit>{site.street}</Text>
         <Text>
           {site.city}, {site.state}
         </Text>
