@@ -1,6 +1,5 @@
 //import { getSite } from "@/app/utils";
-import QuestionList from "@/components/Questions/QuestionList";
-import { dummyQuestions } from "@/lib/data/questions";
+import { QuestionList } from "@/components/Questions/QuestionList";
 import { SiteCode } from "@/lib/types/sites";
 
 export default async function ListPage({
@@ -8,9 +7,5 @@ export default async function ListPage({
 }: {
   params: { siteCode: SiteCode };
 }) {
-  //const site = await getSite(siteCode);
-  console.log(siteCode);
-
-  const questions = dummyQuestions;
-  return <QuestionList isQuestion items={questions} />;
+  return <QuestionList siteCode={siteCode} />;
 }
