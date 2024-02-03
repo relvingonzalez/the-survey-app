@@ -16,7 +16,6 @@ import {
   ActionIcon,
 } from "@mantine/core";
 import {
-  IconInfoCircleFilled,
   IconDownload,
   IconSettingsFilled,
 } from "@tabler/icons-react";
