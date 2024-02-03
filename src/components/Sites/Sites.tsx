@@ -13,6 +13,7 @@ import {
   TableThead,
   TableTfoot,
   Text,
+  ActionIcon,
 } from "@mantine/core";
 import {
   IconInfoCircleFilled,
@@ -92,8 +93,10 @@ function Sites({ sites, download, onDownload }: SitesProps) {
       <TableTd>
         {download ? (
           <Group>
-            <IconInfoCircleFilled />
-            <IconDownload onClick={() => onDownload(site)} />
+            {/* <IconInfoCircleFilled /> */}
+            <ActionIcon onClick={() => onDownload(site)}>
+              <IconDownload />
+            </ActionIcon>
           </Group>
         ) : (
           <Group>
@@ -133,11 +136,19 @@ export function DownloadSites({
   const [statusText, setStatusText] = useState("");
   const [progressValue, setProgressValue] = useState(0);
 
+  const handleStatusUpdate = (step: number, progress: number, text: string) => {
+    setActive(step);
+    setStatusText(text);
+    setProgressValue(progress);
+  };
+
   const handleDownload = async (site: LocalSiteProject) => {
     setSelectedSite(site);
-    setActive(1);
-    setProgressValue(10);
-    setStatusText("Verifying site has not been downloaded already...");
+    handleStatusUpdate(
+      1,
+      10,
+      "Verifying site has not been downloaded already...",
+    );
     const localSite = await db.siteProjects.get({ projectId: site.projectId });
     open();
     if (localSite) {
@@ -151,16 +162,13 @@ export function DownloadSites({
 
   const handleOnContinue = async () => {
     selectedSite && (await deleteProject(selectedSite.projectId));
-    setStatusText("Deleting Project from Local Storage");
-    setProgressValue(40);
+    handleStatusUpdate(1, 25, "Deleting Project from Local Storage");
     selectedSite && continueDownload(selectedSite);
   };
 
   const continueDownload = async (site: LocalSiteProject) => {
     try {
-      setActive(2);
-      setStatusText("Downloading Data");
-      setProgressValue(33);
+      handleStatusUpdate(2, 33, "Downloading Data");
       const response = await fetch(`download/${site.id}/api/`, {
         method: "GET",
         headers: {
@@ -168,16 +176,17 @@ export function DownloadSites({
         },
       });
       const data = await response.json();
-      setActive(3);
-      setStatusText("Saving to Local Storage");
-      setProgressValue(66);
-
+      handleStatusUpdate(3, 66, "Saving to Local Storage");
       await populate(data);
     } catch (error) {
+      //TODO make progressValue red and icon X red
       console.error(error);
     } finally {
-      setStatusText("Success!");
-      setProgressValue(100);
+      handleStatusUpdate(
+        3,
+        100,
+        "You have successfully downloaded this site into your device.",
+      );
     }
   };
 
