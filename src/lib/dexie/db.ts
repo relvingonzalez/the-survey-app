@@ -28,15 +28,15 @@ export class TheSurveyAppDB extends Dexie {
 
   constructor() {
     super("theSurveyApp");
-    this.version(2).stores({
+    this.version(5).stores({
       siteProjects:
         "++localId, projectId, &id, name, siteCode, street, city, state, phone",
       questions:
-        "++localId, &id, projectId, type, subheading, order, question, options",
+        "++localId, &id, [projectId+order], type, subheading, question, options",
       processes:
-        "++localId, &id, projectId, type, subheading, order, question, options",
+        "++localId, &id, [projectId+order], type, subheading, question, options",
       rackQuestions:
-        "++localId, &id, &projectId, type, subheading, order, question, options",
+        "++localId, &id, [projectId+order], type, subheading, question, options",
       rooms: "++localId, &id, projectId, name",
       racks: "++localId, &id, projectId, roomId, name, x, y",
       moreInfos: "++localId, &id, projectId, roomId, info, x, y",
@@ -45,7 +45,7 @@ export class TheSurveyAppDB extends Dexie {
       questionResponses:
         "++localId, &id, projectId, questionId, response, comment",
       processResponses:
-        "++localId, &id, projectId, questionId, response, comment",
+        "++localId, &id, projectId, processId, response, comment",
       rackQuestionResponses:
         "++localId, &id, projectId, rackId, rackQuestionId, response, comment",
     });

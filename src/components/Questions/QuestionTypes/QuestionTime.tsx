@@ -5,7 +5,7 @@ import { ActionIcon, Group, rem } from "@mantine/core";
 import { TimeInput, TimeInputProps } from "@mantine/dates";
 import { IconClock } from "@tabler/icons-react";
 import { useRef } from "react";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionTimeProps = {
   question: TimeQuestion;
@@ -19,6 +19,7 @@ export default function QuestionTime({
 }: QuestionTimeProps) {
   const refFrom = useRef<HTMLInputElement>(null);
   const refTo = useRef<HTMLInputElement>(null);
+  const value = question.answer.value || { fromTime: "", toTime: "" };
 
   const pickerControlFrom = (
     <ActionIcon
@@ -47,11 +48,11 @@ export default function QuestionTime({
         label="From"
         ref={refFrom}
         rightSection={pickerControlFrom}
-        defaultValue={question.answer.value.fromTime}
+        defaultValue={value.fromTime}
         onChange={(e) =>
           onAnswered({
             fromTime: e.target.value,
-            toTime: question.answer.value.toTime,
+            toTime: value.toTime,
           })
         }
       />
@@ -60,10 +61,10 @@ export default function QuestionTime({
         label="To"
         ref={refTo}
         rightSection={pickerControlTo}
-        defaultValue={question.answer.value.toTime}
+        defaultValue={value.toTime}
         onChange={(e) =>
           onAnswered({
-            fromTime: question.answer.value.fromTime,
+            fromTime: value.fromTime,
             toTime: e.target.value,
           })
         }

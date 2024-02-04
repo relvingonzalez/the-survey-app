@@ -17,6 +17,7 @@ export async function populate(data: LocalDownloadSiteData) {
       db.rackQuestions,
       db.questionResponses,
       db.processResponses,
+      db.rackQuestionResponses,
       db.rooms,
       db.moreInfos,
       db.racks,
@@ -29,6 +30,7 @@ export async function populate(data: LocalDownloadSiteData) {
       db.rackQuestions.bulkAdd(data.rackQuestions);
       db.questionResponses.bulkAdd(data.questionResponses);
       db.processResponses.bulkAdd(data.processResponses);
+      db.rackQuestionResponses.bulkAdd(data.rackQuestionResponses);
       db.rooms.bulkAdd(data.rooms);
       db.moreInfos.bulkAdd(data.moreInfos);
       db.racks.bulkAdd(data.racks);
@@ -47,6 +49,7 @@ export async function deleteProject(projectId: number) {
       db.rackQuestions,
       db.questionResponses,
       db.processResponses,
+      db.rackQuestionResponses,
       db.rooms,
       db.moreInfos,
       db.racks,
@@ -59,6 +62,7 @@ export async function deleteProject(projectId: number) {
       db.rackQuestions.where({ projectId }).delete();
       db.questionResponses.where({ projectId }).delete();
       db.processResponses.where({ projectId }).delete();
+      db.rackQuestionResponses.where({ projectId }).delete();
       db.rooms.where({ projectId }).delete();
       db.moreInfos.where({ projectId }).delete();
       db.racks.where({ projectId }).delete();

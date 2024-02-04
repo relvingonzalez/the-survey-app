@@ -27,7 +27,7 @@ import {
 } from "@tabler/icons-react";
 import { createPerson } from "@/lib/utils/functions";
 import { UseFormReturnType, isEmail, matches, useForm } from "@mantine/form";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionPersonProps = {
   question: PersonQuestion;
@@ -137,9 +137,9 @@ export default function QuestionText({
   question,
   onAnswered,
 }: QuestionPersonProps) {
-  const [addNew, setAddNew] = useState(
-    !question.answer.value.length ? true : false,
-  );
+  const value = question.answer.value || [];
+
+  const [addNew, setAddNew] = useState(!value.length ? true : false);
   const onAddNewClick = () => {
     setAddNew(true);
   };
@@ -150,14 +150,14 @@ export default function QuestionText({
   };
 
   const onSaveNewPerson = (person: Person) => {
-    const newPersons = [...question.answer.value];
+    const newPersons = [...value];
     newPersons.push(person);
     onAnswered(newPersons);
     resetNewPerson();
   };
 
   const onDeletePerson = (i: number) => {
-    const newPersons = [...question.answer.value];
+    const newPersons = [...value];
     newPersons.splice(i, 1);
     onAnswered(newPersons);
   };
@@ -180,7 +180,7 @@ export default function QuestionText({
 
   return (
     <Grid>
-      {question.answer.value.map((p, i) => (
+      {value.map((p, i) => (
         <GridCol key={i} span={4}>
           <ExistingPerson person={p} onDelete={() => onDeletePerson(i)} />
         </GridCol>

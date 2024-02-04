@@ -16,8 +16,9 @@ export type LocalQuestion = Omit<ServerQuestion, "project_id"> & {
 
 export type LocalQuestionResponse = Omit<
   ServerQuestionResponse,
-  "question_id" | "project_id"
+  "question_id" | "project_id" | "id"
 > & {
+  id?: number;
   questionId: number;
   projectId: number;
 };

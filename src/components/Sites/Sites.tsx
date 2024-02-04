@@ -15,10 +15,7 @@ import {
   Text,
   ActionIcon,
 } from "@mantine/core";
-import {
-  IconDownload,
-  IconSettingsFilled,
-} from "@tabler/icons-react";
+import { IconDownload, IconSettingsFilled } from "@tabler/icons-react";
 import Link from "next/link";
 import { LocalSiteProject } from "@/lib/types/local";
 import { DexieSiteProject } from "@/lib/types/dexie";

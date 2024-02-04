@@ -1,6 +1,6 @@
 import { EmailQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { TextInput, TextInputProps } from "@mantine/core";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionEmailProps = {
   question: EmailQuestion;
@@ -19,10 +19,11 @@ export default function QuestionEmail({
   onAnswered,
   ...props
 }: QuestionEmailProps) {
+  const value = question.answer.value || "";
   return (
     <TextInput
       {...props}
-      value={question.answer.value}
+      value={value}
       label="Email"
       type="email"
       placeholder="email@example.com"

@@ -1,6 +1,6 @@
 import { CheckboxQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { Checkbox, CheckboxProps } from "@mantine/core";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionCheckboxProps = {
   question: CheckboxQuestion;
@@ -12,9 +12,12 @@ export default function QuestionCheckbox({
   onAnswered,
   ...props
 }: QuestionCheckboxProps) {
+  const value =
+    question.answer.value ||
+    Object.fromEntries(question.listOptions.map((x) => [x, false]));
   // Make a copy, change the checked option, and submit the changes
   const checkedOption = (option: string, checked: boolean) => {
-    const newValue = structuredClone(question.answer.value);
+    const newValue = structuredClone(value);
     newValue[option] = checked;
     onAnswered(newValue);
   };
@@ -28,7 +31,7 @@ export default function QuestionCheckbox({
             label={option}
             key={i}
             mt="10"
-            checked={!!question.answer.value[option]}
+            checked={!!value[option]}
             onChange={(e) => {
               checkedOption(option, e.currentTarget.checked);
             }}

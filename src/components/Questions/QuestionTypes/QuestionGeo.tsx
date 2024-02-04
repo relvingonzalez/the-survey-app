@@ -9,7 +9,7 @@ import {
 } from "@mantine/core";
 import { GeoQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { MouseEventHandler } from "react";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionGeoProps = {
   question: GeoQuestion;
@@ -31,7 +31,8 @@ export default function QuestionGeo({
   onAnswered,
   ...props
 }: QuestionGeoProps) {
-  const coords = question.answer.value.split(",");
+  const value = question.answer.value || ",";
+  const coords = value.split(",");
   const pattern =
     "^[-+]?([1-8]?d(.d+)?|90(.0+)?),s*[-+]?(180(.0+)?|((1[0-7]d)|([1-9]?d))(.d+)?)$";
   const getLocation: MouseEventHandler<HTMLButtonElement> = () => {

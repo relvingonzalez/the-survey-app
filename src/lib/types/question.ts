@@ -1,6 +1,3 @@
-import QuestionType from "@/components/Questions/QuestionType";
-import { UUID } from "./util";
-
 // Value option types
 export type Day = "Mon" | "Tue" | "Wed" | "Thur" | "Fri" | "Sat" | "Sun";
 export type Salutation = "Mr" | "Ms" | undefined;
@@ -29,16 +26,16 @@ export type EntryAnswers = Question[];
 export type Entries = Exclude<Question, "CollectionQuestion">[];
 
 // Question Answer Value types
-type StringValue = { value: string };
-type StringOrNullValue = { value: string | null };
-type CheckboxValue = { value: Record<string, boolean> };
-type DateTimeValue = { value: Date };
-type DaysValue = { value: Day[] };
-type MultipleValue = { value: string[] };
-type PersonValue = { value: Person[] };
-type TimeValue = { value: Time };
-type YesNoValue = { value: YesNo };
-type CollectionValue = { value: EntryAnswers[] };
+type StringValue = { value?: string };
+type StringOrNullValue = { value?: string | null };
+type CheckboxValue = { value?: Record<string, boolean> };
+type DateTimeValue = { value?: Date };
+type DaysValue = { value?: Day[] };
+type MultipleValue = { value?: string[] };
+type PersonValue = { value?: Person[] };
+type TimeValue = { value?: Time };
+type YesNoValue = { value?: YesNo };
+type CollectionValue = { value?: EntryAnswers[] };
 
 export type QuestionValue =
   | StringValue
@@ -176,7 +173,7 @@ export type QuestionType =
   | "yes/no";
 
 type BaseQuestion = {
-  id?: UUID;
+  id?: number;
   hasComment?: boolean;
   displayValue?: string;
   hasDrawing?: boolean;

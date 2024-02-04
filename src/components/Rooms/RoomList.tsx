@@ -25,16 +25,16 @@ export default function RoomList({ siteCode }: RoomListProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
   const projectId = site ? site.projectId : 0;
   const rooms = useLiveQuery(
-    () => db.rooms.where({ projectId: projectId }).toArray(),
+    () => db.rooms.where({ projectId }).toArray(),
     [projectId],
   );
   const moreInfos = useLiveQuery(
-    () => db.moreInfos.where({ projectId: projectId }).toArray(),
+    () => db.moreInfos.where({ projectId }).toArray(),
     [projectId],
   );
 
   const racks = useLiveQuery(
-    () => db.racks.where({ projectId: projectId }).toArray(),
+    () => db.racks.where({ projectId }).toArray(),
     [projectId],
   );
 

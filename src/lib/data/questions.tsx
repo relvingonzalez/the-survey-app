@@ -1,9 +1,8 @@
 import { Question, Questions, TextQuestion } from "../types/question";
-import { UUID } from "../types/util";
 import { createPerson } from "../utils/functions";
 
 export const dummyQuestion: TextQuestion = {
-  id: "1",
+  id: 1,
   question: "How hot is the Sun?",
   sub1: "The most important question",
   answer: {
@@ -18,7 +17,7 @@ export const dummyQuestion: TextQuestion = {
 };
 
 export const dummyQuestion2: Question = {
-  id: "2",
+  id: 2,
   question: "What is your phone?",
   sub1: "The most important question",
   answer: {
@@ -32,8 +31,8 @@ export const dummyQuestion2: Question = {
   hasComment: false,
 };
 
-function createQuestion<QuestionType>(
-  id: UUID,
+export function createQuestion<QuestionType>(
+  id: number,
   type: QuestionType,
   question?: string,
   others?: Partial<Extract<Question, { type: QuestionType }>>,
@@ -49,23 +48,23 @@ function createQuestion<QuestionType>(
 export const dummyQuestions: Questions = [
   dummyQuestion,
   dummyQuestion2,
-  createQuestion("3", "email", "Type your Email"),
-  createQuestion("4", "list", "What is your favorite vacation spot?", {
+  createQuestion(3, "email", "Type your Email"),
+  createQuestion(4, "list", "What is your favorite vacation spot?", {
     listOptions: ["Brazil", "Norway", "USA", "Denmark"],
   }),
-  createQuestion("5", "checkbox", "Where have you looked?", {
+  createQuestion(5, "checkbox", "Where have you looked?", {
     listOptions: ["under the bed", "Behind the counters", "under the sink"],
     answer: { comment: "", value: {} },
   }),
-  createQuestion("6", "multiple", "What countries have you visited?", {
+  createQuestion(6, "multiple", "What countries have you visited?", {
     listOptions: ["Brazil", "Norway", "USA", "Denmark"],
     answer: {
       comment: "",
       value: [],
     },
   }),
-  createQuestion("7", "geo", "Get your coordinates"),
-  createQuestion("8", "person", "Add contacts", {
+  createQuestion(7, "geo", "Get your coordinates"),
+  createQuestion(8, "person", "Add contacts", {
     answer: {
       comment: "",
       value: [
@@ -74,7 +73,7 @@ export const dummyQuestions: Questions = [
       ],
     },
   }),
-  createQuestion("9", "time", "When is this site open", {
+  createQuestion(9, "time", "When is this site open", {
     answer: {
       comment: "",
       value: {
@@ -83,22 +82,22 @@ export const dummyQuestions: Questions = [
       },
     },
   }),
-  createQuestion("10", "days", "What days is it open", {
+  createQuestion(10, "days", "What days is it open", {
     answer: {
       comment: "",
       value: ["Tue", "Sat"],
     },
   }),
-  createQuestion("11", "datetime", "When is this site open", {
+  createQuestion(11, "datetime", "When is this site open", {
     answer: {
       comment: "",
       value: new Date(),
     },
   }),
-  createQuestion("12", "collection", "What Collection?", {
+  createQuestion(12, "collection", "What Collection?", {
     entries: [
-      createQuestion("3", "email", "Type your Email"),
-      createQuestion("4", "list", "What is your favorite vacation spot?", {
+      createQuestion(3, "email", "Type your Email"),
+      createQuestion(4, "list", "What is your favorite vacation spot?", {
         listOptions: ["Brazil", "Norway", "USA", "Denmark"],
       }),
     ],
@@ -106,10 +105,10 @@ export const dummyQuestions: Questions = [
       comment: "",
       value: [
         [
-          createQuestion("3", "email", "Type your Email", {
+          createQuestion(3, "email", "Type your Email", {
             answer: { comment: "", value: "mail23@mail.com" },
           }),
-          createQuestion("4", "list", "What is your favorite vacation spot?", {
+          createQuestion(4, "list", "What is your favorite vacation spot?", {
             listOptions: ["Brazil", "Norway", "USA", "Denmark"],
             answer: {
               comment: "Nada",
@@ -118,10 +117,10 @@ export const dummyQuestions: Questions = [
           }),
         ],
         [
-          createQuestion("3", "email", "Type your Email", {
+          createQuestion(3, "email", "Type your Email", {
             answer: { comment: "", value: "mail@mail.com" },
           }),
-          createQuestion("4", "list", "What is your favorite vacation spot?", {
+          createQuestion(4, "list", "What is your favorite vacation spot?", {
             listOptions: ["Brazil", "Norway", "USA", "Denmark"],
             answer: {
               comment: "Nada",
@@ -132,7 +131,7 @@ export const dummyQuestions: Questions = [
       ],
     },
   }),
-  createQuestion("13", "yes/no", "Yes or no?", {
+  createQuestion(13, "yes/no", "Yes or no?", {
     answer: { value: "No", comment: "" },
   }),
 ];

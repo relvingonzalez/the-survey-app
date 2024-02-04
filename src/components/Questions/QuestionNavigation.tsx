@@ -1,6 +1,5 @@
 "use client";
 
-import { UUID } from "@/lib/types/util";
 import { Button, Group } from "@mantine/core";
 import {
   IconChevronLeft,
@@ -10,21 +9,21 @@ import {
 import Link from "next/link";
 
 type QuestionNavigationProps = {
-  prevId?: UUID;
-  nextId?: UUID;
+  prev?: number;
+  next?: number;
 };
 
 export default function QuestionNavigation({
-  nextId,
-  prevId,
+  next,
+  prev,
 }: QuestionNavigationProps) {
   return (
     <Group justify="space-between">
       <Button
         component={Link}
-        onClick={(event) => !prevId && event.preventDefault()}
-        disabled={!prevId}
-        href={`./${prevId}`}
+        onClick={(event) => !prev && event.preventDefault()}
+        disabled={!prev}
+        href={`./${prev}`}
         mt="8"
         w="fit-content"
         leftSection={<IconChevronLeft />}
@@ -43,9 +42,9 @@ export default function QuestionNavigation({
       </Button>
       <Button
         component={Link}
-        onClick={(event) => !nextId && event.preventDefault()}
-        disabled={!nextId}
-        href={`./${nextId}`}
+        onClick={(event) => !next && event.preventDefault()}
+        disabled={!next}
+        href={`./${next}`}
         mt="8"
         w="fit-content"
         leftSection={<IconChevronRight />}

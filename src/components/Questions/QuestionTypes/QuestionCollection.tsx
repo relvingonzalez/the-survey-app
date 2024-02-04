@@ -23,8 +23,8 @@ import {
 } from "@/lib/types/question";
 import { useState } from "react";
 import { IconLayoutGridAdd, IconTrash, IconX } from "@tabler/icons-react";
-import QuestionType from "../QuestionType";
-import { WithQuestionCallback } from "../Question";
+import QuestionType from "../QuestionByTypeComponent";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionCollectionProps = {
   question: CollectionQuestion;
@@ -87,7 +87,8 @@ type EntriesProps = Omit<QuestionCollectionProps, "onAnswered"> & {
   onDelete: (i: number) => void;
 };
 function Entries({ question, onDelete }: EntriesProps) {
-  const rows = question.answer.value.map((entryAnswers, index) => (
+  const value = question.answer.value || [];
+  const rows = value.map((entryAnswers, index) => (
     <TableTr key={`${index}`}>
       {entryAnswers.map((entryAnswer, j) => (
         <TableTd key={j}>{entryAnswer.answer.value?.toString()}</TableTd>
@@ -126,9 +127,8 @@ export default function QuestionCollection({
   question,
   onAnswered,
 }: QuestionCollectionProps) {
-  const [addNew, setAddNew] = useState(
-    !question.answer.value.length ? true : false,
-  );
+  const value = question.answer.value || [];
+  const [addNew, setAddNew] = useState(!value.length ? true : false);
   const [newEntriesAnswer, setNewEntriesAnswer] = useState<EntryAnswers>([]);
   const onAddNewClick = () => {
     const newEntriesCopy: EntryAnswers = question.entries.map((q) =>
@@ -143,14 +143,14 @@ export default function QuestionCollection({
   };
 
   const onSaveNewQuestion = () => {
-    const newEntriesAnswers = [...question.answer.value];
+    const newEntriesAnswers = [...value];
     newEntriesAnswers.push(newEntriesAnswer);
     onAnswered(newEntriesAnswers);
     resetNewQuestion();
   };
 
   const onDeleteEntriesAnswer = (i: number) => {
-    const newEntriesAnswers = [...question.answer.value];
+    const newEntriesAnswers = [...value];
     newEntriesAnswers.splice(i, 1);
     onAnswered(newEntriesAnswers);
   };

@@ -1,6 +1,6 @@
 import { MultipleQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionMultipleProps = {
   question: MultipleQuestion;
@@ -12,6 +12,8 @@ export default function QuestionListSelect({
   onAnswered,
   ...props
 }: QuestionMultipleProps) {
+  const value = (question.answer.value && question.answer.value) || [];
+  console.log(value, typeof value);
   return (
     <MultiSelect
       {...props}
@@ -19,7 +21,7 @@ export default function QuestionListSelect({
       label="Select"
       placeholder="--Select One or Many--"
       data={question.listOptions}
-      defaultValue={question.answer.value}
+      defaultValue={value}
       onChange={onAnswered}
     />
   );

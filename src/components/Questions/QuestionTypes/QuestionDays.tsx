@@ -1,6 +1,6 @@
 import { Day, DaysQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { Chip, ChipGroup, Group } from "@mantine/core";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionDaysProps = {
   question: DaysQuestion;
@@ -28,12 +28,13 @@ export default function QuestionDays({
   question,
   onAnswered,
 }: QuestionDaysProps) {
+  const value = question.answer.value || [];
   const handleSelected = (v: string[]) => {
     isDayArray(v) && onAnswered(v);
   };
 
   return (
-    <ChipGroup multiple value={question.answer.value} onChange={handleSelected}>
+    <ChipGroup multiple value={value} onChange={handleSelected}>
       <Group justify="left" mt="md">
         {options.map((o, i) => (
           <Chip key={i} value={o.value}>

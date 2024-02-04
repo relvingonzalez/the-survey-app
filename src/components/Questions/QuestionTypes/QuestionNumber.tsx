@@ -1,6 +1,6 @@
 import { NumberQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { TextInput, TextInputProps } from "@mantine/core";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionNumberProps = {
   question: NumberQuestion;
@@ -12,10 +12,11 @@ export default function QuestionNumber({
   onAnswered,
   ...props
 }: QuestionNumberProps) {
+  const value = question.answer.value || "";
   return (
     <TextInput
       {...props}
-      value={question.answer.value}
+      value={value}
       type="number"
       label="Number"
       min="0"

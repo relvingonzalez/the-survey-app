@@ -1,6 +1,6 @@
 import { DateTimeQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { DateTimePicker, DateTimePickerProps } from "@mantine/dates";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionDateTimeProps = {
   question: DateTimeQuestion;
@@ -13,11 +13,12 @@ export default function QuestionDateTime({
   ...props
 }: QuestionDateTimeProps) {
   //question.answer[option]
+  const value = question.answer.value || undefined;
   return (
     <DateTimePicker
       {...props}
       clearable
-      defaultValue={question.answer.value}
+      defaultValue={value}
       valueFormat="YYYY-MMM-DD HH:mm"
       label="Pick date and time"
       onDateChange={(date: Date) => onAnswered(date)}

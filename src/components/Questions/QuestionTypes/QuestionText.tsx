@@ -1,6 +1,6 @@
 import { TextInput, TextInputProps } from "@mantine/core";
 import { TextQuestion, ValueByQuestionType } from "@/lib/types/question";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionTextProps = {
   question: TextQuestion;
@@ -16,10 +16,11 @@ export default function QuestionText({
   onAnswered,
   ...props
 }: QuestionTextProps) {
+  const value = question.answer.value || "";
   return (
     <TextInput
       placeholder="Text"
-      value={question.answer.value}
+      value={value}
       onChange={(e) => {
         onAnswered(e.target.value);
       }}

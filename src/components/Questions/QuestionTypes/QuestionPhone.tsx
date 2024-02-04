@@ -1,6 +1,6 @@
 import { PhoneQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { TextInput, TextInputProps } from "@mantine/core";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionPhoneProps = {
   question: PhoneQuestion;
@@ -16,10 +16,11 @@ export default function QuestionPhone({
   onAnswered,
   ...props
 }: QuestionPhoneProps) {
+  const value = question.answer.value || "";
   return (
     <TextInput
       {...props}
-      value={question.answer.value}
+      value={value}
       type="tel"
       label="Telephone"
       placeholder="+9-(999)999-9999"

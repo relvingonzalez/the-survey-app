@@ -4,7 +4,7 @@ import {
   YesNo,
   YesNoQuestion,
 } from "@/lib/types/question";
-import { WithQuestionCallback } from "../Question";
+import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionYesNoProps = {
   question: YesNoQuestion;
@@ -17,6 +17,7 @@ export default function QuestionYesNo({
   ...props
 }: QuestionYesNoProps) {
   const options: YesNo[] = ["Yes", "No", "Unknown"];
+  const value = question.answer.value || "";
   return (
     <>
       {options.map((option, i) => {
@@ -26,7 +27,7 @@ export default function QuestionYesNo({
             mt="sm"
             key={i}
             label={option}
-            checked={option === question.answer.value}
+            checked={option.toLowerCase() === value.toLowerCase()}
             onChange={(event) =>
               event.currentTarget.checked ? onAnswered(option) : null
             }
