@@ -1,6 +1,6 @@
 "use client";
 
-import { Card, CardSection, Group, Text } from "@mantine/core";
+import { Card, CardSection, Group, Stack, Text } from "@mantine/core";
 import { IconNetwork, IconNetworkOff } from "@tabler/icons-react";
 import { useNetwork } from "@mantine/hooks";
 
@@ -15,17 +15,17 @@ export default function NetworkStatusCard() {
           <Text size="xl" fw={500}>
             Network Status
           </Text>
-          <Text size="sm" c={networkStatus.online ? "teal.6" : "red.6"}>
-            {networkStatus.online ? "Online" : "Offline"}
-          </Text>
         </Group>
       </CardSection>
-      {networkStatus.online && (
-        <Text mt="md">
-          Information about the Network (if available): {networkStatus.type}{" "}
-          {networkStatus.effectiveType}
+      <Stack mt="md">
+        Information about the Network (if available):
+        <Text size="sm" c={networkStatus.online ? "teal.6" : "red.6"}>
+          {networkStatus.online ? "Online" : "Offline"}
         </Text>
-      )}
+        <Text size="sm">
+          {networkStatus.type} {networkStatus.effectiveType}
+        </Text>
+      </Stack>
     </Card>
   );
 }

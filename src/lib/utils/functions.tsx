@@ -98,4 +98,5 @@ export function transformEntriesToServer<T extends object, K>(data: T[]) {
   return data.map((v) => transformEntryToServer<T, K>(v));
 }
 
-export const isString = (value: unknown) => typeof value === 'string' || value instanceof String;
+export const isString = (value: unknown) =>
+  typeof value === "string" || value instanceof String;

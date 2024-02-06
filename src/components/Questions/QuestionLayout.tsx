@@ -1,11 +1,12 @@
 "use client";
 
 import { Card, CardSection, Group, Stack, Text, Title } from "@mantine/core";
-import { PropsWithChildren } from "react";
+import { PropsWithChildren, useEffect } from "react";
 import QuestionNavigation from "./QuestionNavigation";
 import { SiteCode } from "@/lib/types/sites";
 import { db } from "@/lib/dexie/db";
 import { useLiveQuery } from "dexie-react-hooks";
+import { usePathname, useSearchParams } from "next/navigation";
 
 type QuestionLayoutProps = PropsWithChildren & {
   siteCode: SiteCode;
@@ -19,6 +20,8 @@ export default function QuestionLayout({
   siteCode,
   order,
 }: QuestionLayoutProps) {
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const title = isQuestion ? "Questions" : "Processes";
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode }));
   const projectId = site ? site.projectId : 0;
@@ -36,6 +39,16 @@ export default function QuestionLayout({
     question && questionsCount && question.order < questionsCount
       ? question.order + 1
       : undefined;
+
+  useEffect(() => {
+    const exitingFunction = () => {
+      console.log("exiting...", question?.question);
+    };
+
+    if (question && pathname && searchParams) {
+      exitingFunction();
+    }
+  }, [question, pathname, searchParams]);
 
   if (!question) {
     return null;
