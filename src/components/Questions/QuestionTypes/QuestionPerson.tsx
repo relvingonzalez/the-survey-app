@@ -33,7 +33,12 @@ export type QuestionPersonProps = {
   question: PersonQuestion;
 } & WithQuestionCallback<ValueByQuestionType<PersonQuestion>>;
 
-export const salutationOptions = ["Mr", "Ms"];
+const salutationLabels = ["Mr", "Ms"];
+const salutationValues = ["0", "1"];
+export const salutationOptions = salutationLabels.map((_, i) => ({
+  label: salutationLabels[i],
+  value: salutationValues[i],
+}));
 
 function NewPerson({
   form,
@@ -168,7 +173,7 @@ export default function QuestionText({
     clearInputErrorOnChange: true,
     validate: {
       salut: (value) =>
-        value && salutationOptions.includes(value)
+        value && salutationValues.includes(value.toString())
           ? null
           : "Select a salutation",
       firstName: (value) => (value ? null : "First name is required"),

@@ -68,8 +68,8 @@ export const dummyQuestions: Questions = [
     answer: {
       comment: "",
       value: [
-        createPerson("Mr", "Johnny", "Smith", "e@mail.com", "444-555-6666"),
-        createPerson("Ms", "Pat", "Smith", "p@mail.com", "444-555-6666"),
+        createPerson(0, "Johnny", "Smith", "e@mail.com", "444-555-6666"),
+        createPerson(1, "Pat", "Smith", "p@mail.com", "444-555-6666"),
       ],
     },
   }),
@@ -132,6 +132,6 @@ export const dummyQuestions: Questions = [
     },
   }),
   createQuestion(13, "yes/no", "Yes or no?", {
-    answer: { value: "No", comment: "" },
+    answer: { value: false, comment: "" },
   }),
 ];

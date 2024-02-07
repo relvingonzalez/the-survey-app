@@ -9,7 +9,7 @@ export type Day =
   | "Sunday";
 export type Salutation = "Mr" | "Ms" | undefined;
 export type Person = {
-  salut: Salutation;
+  salut: number;
   firstName: string;
   lastName: string;
   email: string;
@@ -41,7 +41,7 @@ type DaysValue = { value?: number[] };
 type MultipleValue = { value?: string[] };
 type PersonValue = { value?: Person[] };
 type TimeValue = { value?: Time };
-type YesNoValue = { value?: YesNo };
+type YesNoValue = { value?: boolean | null };
 type CollectionValue = { value?: EntryAnswers[] };
 
 export type QuestionValue =

@@ -1,9 +1,5 @@
 import { Radio, RadioProps } from "@mantine/core";
-import {
-  ValueByQuestionType,
-  YesNo,
-  YesNoQuestion,
-} from "@/lib/types/question";
+import { ValueByQuestionType, YesNoQuestion } from "@/lib/types/question";
 import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionYesNoProps = {
@@ -16,7 +12,11 @@ export default function QuestionYesNo({
   onAnswered,
   ...props
 }: QuestionYesNoProps) {
-  const options: YesNo[] = ["Yes", "No", "Unknown"];
+  const options = [
+    { label: "Yes", value: true },
+    { label: "No", value: false },
+    { label: "Unknown", value: null },
+  ];
   const value = question.answer.value || "";
   return (
     <>
@@ -26,10 +26,10 @@ export default function QuestionYesNo({
             {...props}
             mt="sm"
             key={i}
-            label={option}
-            checked={option.toLowerCase() === value.toLowerCase()}
+            label={option.label}
+            checked={option.value === value}
             onChange={(event) =>
-              event.currentTarget.checked ? onAnswered(option) : null
+              event.currentTarget.checked ? onAnswered(option.value) : null
             }
           />
         );

@@ -1,10 +1,10 @@
 import { RefObject } from "react";
-import { Person, Salutation } from "../types/question";
+import { Person } from "../types/question";
 import { NewRoom } from "../types/rooms";
 import * as changeKeys from "change-case/keys";
 
 export const createPerson = (
-  salut: Salutation = undefined,
+  salut = 0,
   firstName = "",
   lastName = "",
   email = "",
