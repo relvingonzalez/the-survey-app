@@ -1,5 +1,12 @@
 // Value option types
-export type Day = "Mon" | "Tue" | "Wed" | "Thur" | "Fri" | "Sat" | "Sun";
+export type Day =
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday"
+  | "Sunday";
 export type Salutation = "Mr" | "Ms" | undefined;
 export type Person = {
   salut: Salutation;

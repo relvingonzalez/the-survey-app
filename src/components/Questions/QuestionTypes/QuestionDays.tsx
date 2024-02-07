@@ -7,18 +7,26 @@ export type QuestionDaysProps = {
 } & WithQuestionCallback<ValueByQuestionType<DaysQuestion>>;
 
 type DayOption = {
-  name: string;
-  value: Day;
+  name: Day;
+  value: number;
 };
-const daysOptions: Day[] = ["Mon", "Tue", "Wed", "Thur", "Fri", "Sat", "Sun"];
+const daysOptions: Day[] = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
 const options: DayOption[] = [
-  { name: "Monday", value: "Mon" },
-  { name: "Tuesday", value: "Tue" },
-  { name: "Wednesday", value: "Wed" },
-  { name: "Thursday", value: "Thur" },
-  { name: "Friday", value: "Fri" },
-  { name: "Saturday", value: "Sat" },
-  { name: "Sunday", value: "Sun" },
+  { name: "Monday", value: 1 },
+  { name: "Tuesday", value: 2 },
+  { name: "Wednesday", value: 3 },
+  { name: "Thursday", value: 4 },
+  { name: "Friday", value: 5 },
+  { name: "Saturday", value: 6 },
+  { name: "Sunday", value: 0 },
 ];
 export function isDayArray(days: Day[] | string[]): days is Day[] {
   return (days as Day[]).every((item) => daysOptions.includes(item));
