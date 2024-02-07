@@ -19,26 +19,35 @@ const daysOptions: Day[] = [
   "Saturday",
   "Sunday",
 ];
+
 const options: DayOption[] = [
-  { name: "Monday", value: 1 },
-  { name: "Tuesday", value: 2 },
-  { name: "Wednesday", value: 3 },
-  { name: "Thursday", value: 4 },
-  { name: "Friday", value: 5 },
-  { name: "Saturday", value: 6 },
-  { name: "Sunday", value: 0 },
+  { name: "Monday", value: 2 },
+  { name: "Tuesday", value: 3 },
+  { name: "Wednesday", value: 4 },
+  { name: "Thursday", value: 5 },
+  { name: "Friday", value: 6 },
+  { name: "Saturday", value: 7 },
+  { name: "Sunday", value: 1 },
 ];
 export function isDayArray(days: Day[] | string[]): days is Day[] {
   return (days as Day[]).every((item) => daysOptions.includes(item));
 }
 
+// TODO find a better way so that we dont need || 0 . Probably have a typing that enforces all values will exist in object of options
 export default function QuestionDays({
   question,
   onAnswered,
 }: QuestionDaysProps) {
-  const value = question.answer.value || [];
-  const handleSelected = (v: string[]) => {
-    isDayArray(v) && onAnswered(v);
+  const value = question.answer.value
+    ? question.answer.value.map(
+        (v) => options.find((o) => o.value === v)?.name || "",
+      )
+    : [];
+  const handleSelected = (values: string[]) => {
+    isDayArray(values) &&
+      onAnswered(
+        values.map((v) => options.find((o) => o.name === v)?.value || 0),
+      );
   };
 
   return (
