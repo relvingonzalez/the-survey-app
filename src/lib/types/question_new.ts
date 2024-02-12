@@ -69,19 +69,58 @@ export type Comment = {
   comment: string;
 };
 
-export type TextResponse = BaseResponse & TextValue;
-export type EmailResponse = BaseResponse & EmailValue;
-export type CheckboxResponse = BaseResponse & CheckboxValue;
-export type DateTimeResponse = BaseResponse & DateTimeValue;
-export type DaysResponse = BaseResponse & DaysValue;
-export type MultipleResponse = BaseResponse & MultipleValue;
-export type PersonResponse = BaseResponse & PersonValue;
-export type TimeResponse = BaseResponse & TimeValue;
-export type YesNoResponse = BaseResponse & YesNoValue;
-export type GeoResponse = BaseResponse & GeoValue;
-export type ListResponse = BaseResponse & ListValue;
-export type NumberResponse = BaseResponse & NumberValue;
-export type PhoneResponse = BaseResponse & PhoneValue;
+export type TextResponse = BaseResponse &
+  TextValue & {
+    responseType: "text";
+  };
+export type EmailResponse = BaseResponse &
+  EmailValue & {
+    responseType: "email";
+  };
+export type CheckboxResponse = BaseResponse &
+  CheckboxValue & {
+    responseType: "checkbox";
+  };
+export type DateTimeResponse = BaseResponse &
+  DateTimeValue & {
+    responseType: "datetime";
+  };
+export type DaysResponse = BaseResponse &
+  DaysValue & {
+    responseType: "days";
+  };
+export type MultipleResponse = BaseResponse &
+  MultipleValue & {
+    responseType: "multiple";
+  };
+export type PersonResponse = BaseResponse &
+  PersonValue & {
+    responseType: "person";
+  };
+export type TimeResponse = BaseResponse &
+  TimeValue & {
+    responseType: "time";
+  };
+export type YesNoResponse = BaseResponse &
+  YesNoValue & {
+    responseType: "yes/no";
+  };
+export type GeoResponse = BaseResponse &
+  GeoValue & {
+    responseType: "geo";
+  };
+export type ListResponse = BaseResponse &
+  ListValue & {
+    responseType: "list";
+  };
+export type NumberResponse = BaseResponse &
+  NumberValue & {
+    responseType: "number";
+  };
+export type PhoneResponse = BaseResponse &
+  PhoneValue & {
+    responseType: "phone";
+  };
 
 export type QuestionResponse =
   | PhoneResponse

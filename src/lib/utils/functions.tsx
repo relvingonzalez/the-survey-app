@@ -2,6 +2,7 @@ import { RefObject } from "react";
 import { Person } from "../types/question";
 import { NewRoom } from "../types/rooms";
 import * as changeKeys from "change-case/keys";
+import { DexieResponse } from "../types/dexie";
 
 export const createPerson = (
   salut = 0,
@@ -100,3 +101,50 @@ export function transformEntriesToServer<T extends object, K>(data: T[]) {
 
 export const isString = (value: unknown) =>
   typeof value === "string" || value instanceof String;
+
+export const getDisplayValue = (response?: DexieResponse) => {
+  if (!response) {
+    return "";
+  }
+
+  switch (response.responseType) {
+    case "checkbox":
+      return response.checked ? response.label : "";
+    case "datetime":
+      return response.date.toDateString();
+    case "email":
+      return response.email;
+    case "geo":
+      return `${response.lat}, ${response.long}`;
+    case "list":
+      return response.text;
+    case "multiple":
+      return response.text;
+    case "number":
+      return response.number;
+    case "person":
+      return `${response.firstName} ${response.lastName}`;
+    case "phone":
+      return response.phone;
+    case "text":
+      return response.text;
+    case "time":
+      return `From: ${response.fromTime}, To: ${response.toTime}`;
+    case "yes/no":
+      return response.yesNo === null
+        ? "Unknown"
+        : response.yesNo
+          ? "Yes"
+          : "No";
+  }
+};
+
+export const getDisplayValues = (
+  responses?: DexieResponse | DexieResponse[],
+) => {
+  if (responses instanceof Array) {
+    return responses.map(getDisplayValue).join(", ");
+  } else {
+    return getDisplayValue(responses);
+  }
+};

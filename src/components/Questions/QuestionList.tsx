@@ -4,6 +4,7 @@ import { db } from "@/lib/dexie/db";
 import { getMainQuestions } from "@/lib/dexie/helper";
 import { DexieQuestion, DexieResponse } from "@/lib/types/dexie";
 import { SiteCode } from "@/lib/types/sites";
+import { getDisplayValues } from "@/lib/utils/functions";
 import {
   Button,
   Table,
@@ -27,7 +28,7 @@ type ItemListProps = {
 
 function ItemList({ items, isQuestion, responses }: ItemListProps) {
   const rows = items.map((item, index) => {
-    const response = responses.find((r) => r.questionId === item.id);
+    const response = responses.filter((r) => r.questionId === item.id);
     return (
       <TableTr key={`${item.id}-${index}`}>
         <TableTd>{item.order}</TableTd>
@@ -38,7 +39,7 @@ function ItemList({ items, isQuestion, responses }: ItemListProps) {
             {item.question}
           </Text>
           <Text size="sm" fw="700">
-            {response?.toString()}
+            {getDisplayValues(response)}
           </Text>
         </TableTd>
         <TableTd>

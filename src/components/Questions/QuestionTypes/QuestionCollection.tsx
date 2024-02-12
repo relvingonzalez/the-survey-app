@@ -21,21 +21,22 @@ import { CollectionQuestion } from "@/lib/types/question_new";
 import { IconTrash } from "@tabler/icons-react";
 // import QuestionType from "../QuestionByTypeComponent";
 import { WithQuestionCallback } from "../SurveyItem";
-import { CollectionResponse, QuestionResponse } from "@/lib/types/question_new";
+import { QuestionResponse } from "@/lib/types/question_new";
 import { useLiveQuery } from "dexie-react-hooks";
 import { getCollectionQuestions } from "@/lib/dexie/helper";
 import { DexieQuestion } from "@/lib/types/dexie";
+import { getDisplayValue } from "@/lib/utils/functions";
 
 export type QuestionCollectionProps = {
   question: CollectionQuestion;
-  response: CollectionResponse[];
-} & WithQuestionCallback<CollectionResponse[]>;
+  response: QuestionResponse[];
+} & WithQuestionCallback<QuestionResponse[]>;
 
-export function isCollectionResponse(
-  response: QuestionResponse[],
-): response is CollectionResponse[] {
-  return (response as CollectionResponse[])[0].responseType === "collection";
-}
+// export function isCollectionResponse(
+//   response: QuestionResponse[],
+// ): response is CollectionResponse[] {
+//   return (response as CollectionResponse[])[0].responseType === "collection";
+// }
 
 // type NewEntriesAnswerProps<E extends EntryAnswers> = {
 //   entries: E;
@@ -94,10 +95,14 @@ type EntriesProps = Omit<QuestionCollectionProps, "question" | "onAnswered"> & {
   questions: DexieQuestion[];
   //onDelete: (i: number) => void;
 };
+// response is probably wrong, need responseGroup, grouped by some ID and iterate via response by each groupID
+// response_group_id ?
 function Entries({ questions, response }: EntriesProps) {
   const rows = response.map((r, index) => (
     <TableTr key={`${index}`}>
-      <TableTd>{r?.toString()}</TableTd>
+      {questions.map((q, j) => (
+        <TableTd key={j}>{getDisplayValue(r)}</TableTd>
+      ))}
       <TableTd>
         <ActionIcon
           variant="subtle"
@@ -165,6 +170,7 @@ export default function QuestionCollection({
   //   onAnswered(newEntriesAnswers);
   // };
 
+  console.log(questions);
   if (!questions) {
     return null;
   }

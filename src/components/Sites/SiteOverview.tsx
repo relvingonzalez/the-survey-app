@@ -23,11 +23,11 @@ export default function SiteOverview({ siteCode }: SiteOverviewProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
   const projectId = site ? site.projectId : 0;
   const allQuestions = useLiveQuery(
-    () => db.questions.where({ projectId: projectId }).sortBy("order"),
+    () => db.questions.where({ projectId }).sortBy("order"),
     [projectId],
   );
   const responses = useLiveQuery(
-    () => db.responses.where({ projectId: projectId }).toArray(),
+    () => db.responses.where({ projectId }).toArray(),
     [projectId],
   );
   const questions = allQuestions?.filter((q) => q.questionType === "question");

@@ -1,7 +1,11 @@
-import { Day, DaysQuestion, QuestionResponse } from "@/lib/types/question_new";
+import {
+  Day,
+  DaysQuestion,
+  QuestionResponse,
+  DaysResponse,
+} from "@/lib/types/question_new";
 import { Chip, ChipGroup, Group } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import { DaysResponse } from "@/lib/types/question_new";
 
 export type QuestionDaysProps = {
   question: DaysQuestion;
@@ -69,7 +73,7 @@ const createDaysResponse = (
 export function isDaysResponse(
   response: QuestionResponse[],
 ): response is DaysResponse[] {
-  return (response as DaysResponse[])[0].dayId !== undefined;
+  return (response as DaysResponse[])[0].responseType === "days";
 }
 
 export default function QuestionDays({
