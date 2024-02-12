@@ -22,10 +22,10 @@ export class TheSurveyAppDB extends Dexie {
 
   constructor() {
     super("theSurveyApp");
-    this.version(20).stores({
+    this.version(22).stores({
       siteProjects: "++localId, projectId, &id, name, siteCode",
       questions:
-        "++localId, &id, [projectId+order], [projectId+questionType], [projectId+order+questionType], questionType",
+        "++localId, &id, [projectId+order], [projectId+questionType], [projectId+order+questionType], collectionId, questionType, [projectId+questionType]",
       responses:
         "++localId, responseId, projectId, questionId, [projectId+questionId]",
       comments:

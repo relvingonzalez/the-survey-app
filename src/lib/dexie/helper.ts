@@ -134,3 +134,33 @@ export const getResponse = (projectId?: number, question?: DexieQuestion) => {
 
   return [];
 };
+
+export const getMainQuestions = (
+  projectId?: number,
+  questionType?: QuestionType,
+) => {
+  // Only return main questions filter out questions that belong to a collection
+  if (projectId && questionType) {
+    return db.questions
+      .where({ projectId, questionType })
+      .filter((q) => q.collectionId === null || q.responseType === "collection")
+      .sortBy("order");
+  }
+
+  return [];
+};
+
+export const getCollectionQuestions = (
+  projectId?: number,
+  collectionId?: number,
+) => {
+  // Only return main questions filter out questions that belong to a collection
+  if (projectId && collectionId) {
+    return db.questions
+      .where({ projectId, collectionId })
+      .filter((q) => q.responseType !== "collection")
+      .sortBy("order");
+  }
+
+  return [];
+};

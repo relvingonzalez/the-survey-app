@@ -158,7 +158,6 @@ export type YesNoQuestion = BaseQuestion & {
 
 export type CollectionQuestion = BaseQuestion & {
   responseType: "collection";
-  collectionId?: number;
 };
 
 export type Question =
@@ -174,8 +173,8 @@ export type Question =
   | MultipleQuestion
   | PersonQuestion
   | TimeQuestion
-  | YesNoQuestion;
-//   | CollectionQuestion;
+  | YesNoQuestion
+  | CollectionQuestion;
 
 export type TextQuestionWithResponse = TextQuestion & TextResponse;
 
@@ -206,6 +205,7 @@ type BaseQuestion = {
   id?: number;
   projectId?: number;
   rackId?: number;
+  collectionId?: number;
   question: string;
   order: number;
   subheading?: string;

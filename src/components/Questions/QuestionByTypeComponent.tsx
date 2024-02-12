@@ -24,8 +24,9 @@ import QuestionPerson, {
   isPersonResponse,
 } from "./QuestionTypes/QuestionPerson";
 import QuestionDays, { isDaysResponse } from "./QuestionTypes/QuestionDays";
-//import QuestionCollection from "./QuestionTypes/QuestionCollection";
+import QuestionCollection from "./QuestionTypes/QuestionCollection";
 import { WithQuestionCallback } from "./SurveyItem";
+import { isCollectionResponse } from "./QuestionTypes/QuestionCollection";
 
 export type QuestionTypeProps<
   T extends Question,
@@ -100,9 +101,14 @@ export default function QuestionByTypeComponent<
           onAnswered={onAnswered}
         />
       )}
-      {/* {question.responseType === "collection" && (
-        <QuestionCollection question={question} onAnswered={onAnswered} />
-      )} */}
+      {question.responseType === "collection" &&
+        isCollectionResponse(response) && (
+          <QuestionCollection
+            question={question}
+            response={response}
+            onAnswered={onAnswered}
+          />
+        )}
     </>
   );
 }

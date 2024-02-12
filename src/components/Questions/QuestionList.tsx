@@ -1,6 +1,7 @@
 "use client";
 
 import { db } from "@/lib/dexie/db";
+import { getMainQuestions } from "@/lib/dexie/helper";
 import { DexieQuestion, DexieResponse } from "@/lib/types/dexie";
 import { SiteCode } from "@/lib/types/sites";
 import {
@@ -79,10 +80,7 @@ export function QuestionList({ siteCode }: QuestionListProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
   const projectId = site ? site.projectId : 0;
   const questions = useLiveQuery(
-    () =>
-      db.questions
-        .where({ projectId: projectId, questionType: "question" })
-        .sortBy("order"),
+    () => getMainQuestions(projectId, "question"),
     [projectId],
   );
   const questionResponses = useLiveQuery(
@@ -103,10 +101,7 @@ export function ProcessList({ siteCode }: QuestionListProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
   const projectId = site ? site.projectId : 0;
   const processes = useLiveQuery(
-    () =>
-      db.questions
-        .where({ projectId: projectId, questionType: "process" })
-        .sortBy("order"),
+    () => getMainQuestions(projectId, "process"),
     [projectId],
   );
   const processResponses = useLiveQuery(
