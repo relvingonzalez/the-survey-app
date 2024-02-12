@@ -1,10 +1,12 @@
-import { Day, DaysQuestion, ValueByQuestionType } from "@/lib/types/question";
+import { Day, DaysQuestion, QuestionResponse } from "@/lib/types/question_new";
 import { Chip, ChipGroup, Group } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
+import { DaysResponse } from "@/lib/types/question_new";
 
 export type QuestionDaysProps = {
   question: DaysQuestion;
-} & WithQuestionCallback<ValueByQuestionType<DaysQuestion>>;
+  response: DaysResponse[];
+} & WithQuestionCallback<DaysResponse[]>;
 
 type DayOption = {
   name: Day;
@@ -29,25 +31,76 @@ const options: DayOption[] = [
   { name: "Saturday", value: 7 },
   { name: "Sunday", value: 1 },
 ];
+
+const optionsObject: Record<Day, number> = {
+  Monday: 2,
+  Tuesday: 3,
+  Wednesday: 4,
+  Thursday: 5,
+  Friday: 6,
+  Saturday: 7,
+  Sunday: 1,
+};
+
+const optionsObjectInverted: Record<number, Day> = {
+  2: "Monday",
+  3: "Tuesday",
+  4: "Wednesday",
+  5: "Thursday",
+  6: "Friday",
+  7: "Saturday",
+  1: "Sunday",
+};
+
 export function isDayArray(days: Day[] | string[]): days is Day[] {
   return (days as Day[]).every((item) => daysOptions.includes(item));
 }
 
-// TODO find a better way so that we dont need || 0 . Probably have a typing that enforces all values will exist in object of options
+const createDaysResponse = (
+  { projectId, id: questionId, responseType }: DaysQuestion,
+  dayId: number,
+) => ({
+  projectId,
+  questionId,
+  responseType,
+  dayId,
+});
+
+export function isDaysResponse(
+  response: QuestionResponse[],
+): response is DaysResponse[] {
+  return (response as DaysResponse[])[0].dayId !== undefined;
+}
+
 export default function QuestionDays({
   question,
+  response,
   onAnswered,
 }: QuestionDaysProps) {
-  const value = question.answer.value
-    ? question.answer.value.map(
-        (v) => options.find((o) => o.value === v)?.name || "",
-      )
-    : [];
-  const handleSelected = (values: string[]) => {
-    isDayArray(values) &&
-      onAnswered(
-        values.map((v) => options.find((o) => o.name === v)?.value || 0),
+  const value = response.map((v) => optionsObjectInverted[v.dayId]);
+  const handleSelected = (selection: string[]) => {
+    if (isDayArray(selection)) {
+      // Check if exists or add
+      // TODO set flag to something other than d
+      const result = selection.map((s) => {
+        const res =
+          response.find((r) => optionsObjectInverted[r.dayId] === s) ||
+          createDaysResponse(question, optionsObject[s]);
+        return { ...res, flag: "" };
+      });
+
+      // Check which ones to remove and add flag
+      const selectionsToRemove = daysOptions.filter(
+        (o) => !selection.includes(o),
       );
+      const responsesToRemove = response
+        .filter((r) =>
+          selectionsToRemove.includes(optionsObjectInverted[r.dayId]),
+        )
+        .map((s) => ({ ...s, flag: "d" }));
+
+      onAnswered([...result, ...responsesToRemove]);
+    }
   };
 
   return (

@@ -1,36 +1,21 @@
 import {
   LocalHardware,
   LocalMoreInfo,
-  LocalProcessResponse,
-  LocalQuestion,
-  LocalQuestionResponse,
   LocalRack,
-  LocalRackQuestionResponse,
   LocalRoom,
   LocalSiteProject,
-} from "./local";
+} from "./local_new";
+import { Question, QuestionResponse, Comment } from "./question_new";
 
-export type DexieQuestion = LocalQuestion & {
+export type DexieQuestion = Question & {
   localId?: number;
 };
 
-export type DexieQuestionResponse = LocalQuestionResponse & {
+export type DexieResponse = QuestionResponse & {
   localId?: number;
 };
 
-export type DexieProcess = LocalQuestion & {
-  localId?: number;
-};
-
-export type DexieProcessResponse = LocalProcessResponse & {
-  localId?: number;
-};
-
-export type DexieRackQuestion = LocalQuestion & {
-  localId?: number;
-};
-
-export type DexieRackQuestionResponse = LocalRackQuestionResponse & {
+export type DexieComment = Comment & {
   localId?: number;
 };
 

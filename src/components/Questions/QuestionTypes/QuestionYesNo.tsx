@@ -1,23 +1,30 @@
 import { Radio, RadioProps } from "@mantine/core";
-import { ValueByQuestionType, YesNoQuestion } from "@/lib/types/question";
 import { WithQuestionCallback } from "../SurveyItem";
+import { QuestionResponse, YesNoResponse } from "@/lib/types/question_new";
 
 export type QuestionYesNoProps = {
-  question: YesNoQuestion;
-} & WithQuestionCallback<ValueByQuestionType<YesNoQuestion>> &
+  response: YesNoResponse[];
+} & WithQuestionCallback<YesNoResponse> &
   RadioProps;
 
+export function isYesNoResponse(
+  response: QuestionResponse[],
+): response is YesNoResponse[] {
+  return (response as YesNoResponse[])[0]?.responseType === "yes/no";
+}
+
+const options = [
+  { label: "Yes", value: true },
+  { label: "No", value: false },
+  { label: "Unknown", value: null },
+];
+
 export default function QuestionYesNo({
-  question,
+  response,
   onAnswered,
   ...props
 }: QuestionYesNoProps) {
-  const options = [
-    { label: "Yes", value: true },
-    { label: "No", value: false },
-    { label: "Unknown", value: null },
-  ];
-  const value = question.answer.value || "";
+  const responseValue = response[0];
   return (
     <>
       {options.map((option, i) => {
@@ -27,9 +34,11 @@ export default function QuestionYesNo({
             mt="sm"
             key={i}
             label={option.label}
-            checked={option.value === value}
+            checked={option.value === responseValue.yesNo}
             onChange={(event) =>
-              event.currentTarget.checked ? onAnswered(option.value) : null
+              event.currentTarget.checked
+                ? onAnswered({ ...responseValue, yesNo: option.value })
+                : null
             }
           />
         );

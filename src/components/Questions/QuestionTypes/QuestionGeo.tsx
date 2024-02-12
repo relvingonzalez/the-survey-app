@@ -7,13 +7,13 @@ import {
   TextInput,
   TextInputProps,
 } from "@mantine/core";
-import { GeoQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { MouseEventHandler } from "react";
 import { WithQuestionCallback } from "../SurveyItem";
+import { GeoResponse, QuestionResponse } from "@/lib/types/question_new";
 
 export type QuestionGeoProps = {
-  question: GeoQuestion;
-} & WithQuestionCallback<ValueByQuestionType<GeoQuestion>> &
+  response: GeoResponse[];
+} & WithQuestionCallback<GeoResponse> &
   TextInputProps;
 
 const options: PositionOptions = {
@@ -22,17 +22,22 @@ const options: PositionOptions = {
   maximumAge: 0,
 };
 
+export function isGeoResponse(
+  response: QuestionResponse[],
+): response is GeoResponse[] {
+  return (response as GeoResponse[])[0]?.responseType === "geo";
+}
+
 const errors: PositionErrorCallback = (err) => {
   console.warn(`ERROR(${err.code}): ${err.message}`);
 };
 
 export default function QuestionGeo({
-  question,
+  response,
   onAnswered,
   ...props
 }: QuestionGeoProps) {
-  const value = question.answer.value || ",";
-  const coords = value.split(",");
+  const responseValue = response[0];
   const pattern =
     "^[-+]?([1-8]?d(.d+)?|90(.0+)?),s*[-+]?(180(.0+)?|((1[0-7]d)|([1-9]?d))(.d+)?)$";
   const getLocation: MouseEventHandler<HTMLButtonElement> = () => {
@@ -57,12 +62,17 @@ export default function QuestionGeo({
   };
 
   const success: PositionCallback = (pos) => {
-    const crd = pos.coords;
-    onAnswered(`${crd.latitude}, ${crd.longitude}`);
+    const { latitude: lat, longitude: long } = pos.coords;
+    onAnswered({ ...responseValue, lat, long });
   };
 
   const onChange = (value: string) => {
-    onAnswered(value);
+    const coords = value.split(",");
+    onAnswered({
+      ...responseValue,
+      lat: parseFloat(coords[0]),
+      long: parseFloat(coords[1]),
+    });
   };
 
   return (
@@ -73,14 +83,14 @@ export default function QuestionGeo({
           name="geo"
           placeholder="49.4550734,11.0794632"
           id="oGPS"
-          value={question.answer.value}
+          value={`${responseValue.lat}, ${responseValue.long}`}
           pattern={pattern}
           onChange={(e) => onChange(e.target.value)}
           {...props}
         />
-        {coords.length && (
+        {responseValue && (
           <Anchor
-            href={`https://maps.google.com/maps?q=${coords[0]},${coords[1]}`}
+            href={`https://maps.google.com/maps?q=${responseValue.lat},${responseValue.long}`}
           >
             Go to maps
           </Anchor>

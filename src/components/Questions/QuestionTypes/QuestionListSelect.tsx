@@ -1,27 +1,42 @@
 import { Select, SelectProps } from "@mantine/core";
-import { ListQuestion, ValueByQuestionType } from "@/lib/types/question";
+import {
+  ListQuestion,
+  ListResponse,
+  QuestionResponse,
+} from "@/lib/types/question_new";
 import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionListSelectProps = {
   question: ListQuestion;
-} & WithQuestionCallback<ValueByQuestionType<ListQuestion>> &
+  response: ListResponse[];
+} & WithQuestionCallback<ListResponse> &
   SelectProps;
+
+export function isListResponse(
+  response: QuestionResponse[],
+): response is ListResponse[] {
+  return (response as ListResponse[])[0]?.responseType === "list";
+}
 
 export default function QuestionListSelect({
   question,
+  response,
   onAnswered,
   ...props
 }: QuestionListSelectProps) {
-  const value = question.answer.value || "";
+  const responseValue = response[0];
+  const handleOnChange = (value: string | null) => {
+    onAnswered({ ...responseValue, text: value });
+  };
   return (
     <Select
       {...props}
       name="list"
       label="Select"
-      value={value}
+      value={responseValue.text}
       placeholder="--Select One--"
-      data={question.listOptions}
-      onChange={onAnswered}
+      data={question.options}
+      onChange={handleOnChange}
     />
   );
 }

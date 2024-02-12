@@ -1,10 +1,10 @@
-import { EmailQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { TextInput, TextInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
+import { EmailResponse, QuestionResponse } from "@/lib/types/question_new";
 
 export type QuestionEmailProps = {
-  question: EmailQuestion;
-} & WithQuestionCallback<ValueByQuestionType<EmailQuestion>> &
+  response: EmailResponse[];
+} & WithQuestionCallback<EmailResponse> &
   TextInputProps;
 
 export const emailPattern =
@@ -14,22 +14,31 @@ export const emailPatternRegex = new RegExp(
   /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/,
 );
 
+export function isEmailResponse(
+  response: QuestionResponse[],
+): response is EmailResponse[] {
+  return (response as EmailResponse[])[0]?.responseType === "email";
+}
+
 export default function QuestionEmail({
-  question,
+  response,
   onAnswered,
   ...props
 }: QuestionEmailProps) {
-  const value = question.answer.value || "";
+  const responseValue = response[0];
+  const handleOnChange = (value: string) => {
+    onAnswered({ ...responseValue, email: value });
+  };
   return (
     <TextInput
       {...props}
-      value={value}
+      value={responseValue.email}
       label="Email"
       type="email"
       placeholder="email@example.com"
       pattern={emailPattern}
       onChange={(e) => {
-        onAnswered(e.target.value);
+        handleOnChange(e.target.value);
       }}
     />
   );

@@ -1,25 +1,31 @@
 "use client";
 
-import { TimeQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { ActionIcon, Group, rem } from "@mantine/core";
 import { TimeInput, TimeInputProps } from "@mantine/dates";
 import { IconClock } from "@tabler/icons-react";
 import { useRef } from "react";
 import { WithQuestionCallback } from "../SurveyItem";
+import { QuestionResponse, TimeResponse } from "@/lib/types/question_new";
 
 export type QuestionTimeProps = {
-  question: TimeQuestion;
-} & WithQuestionCallback<ValueByQuestionType<TimeQuestion>> &
+  response: TimeResponse[];
+} & WithQuestionCallback<TimeResponse> &
   TimeInputProps;
 
+export function isTimeResponse(
+  response: QuestionResponse[],
+): response is TimeResponse[] {
+  return (response as TimeResponse[])[0]?.responseType === "time";
+}
+
 export default function QuestionTime({
-  question,
+  response,
   onAnswered,
   ...props
 }: QuestionTimeProps) {
+  const responseValue = response[0];
   const refFrom = useRef<HTMLInputElement>(null);
   const refTo = useRef<HTMLInputElement>(null);
-  const value = question.answer.value || { fromTime: "", toTime: "" };
 
   const pickerControlFrom = (
     <ActionIcon
@@ -48,12 +54,9 @@ export default function QuestionTime({
         label="From"
         ref={refFrom}
         rightSection={pickerControlFrom}
-        defaultValue={value.fromTime}
+        defaultValue={responseValue.fromTime}
         onChange={(e) =>
-          onAnswered({
-            fromTime: e.target.value,
-            toTime: value.toTime,
-          })
+          onAnswered({ ...responseValue, fromTime: e.target.value })
         }
       />
       <TimeInput
@@ -61,12 +64,9 @@ export default function QuestionTime({
         label="To"
         ref={refTo}
         rightSection={pickerControlTo}
-        defaultValue={value.toTime}
+        defaultValue={responseValue.toTime}
         onChange={(e) =>
-          onAnswered({
-            fromTime: value.fromTime,
-            toTime: e.target.value,
-          })
+          onAnswered({ ...responseValue, toTime: e.target.value })
         }
       />
     </Group>

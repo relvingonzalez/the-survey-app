@@ -1,27 +1,32 @@
-import { DateTimeQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { DateTimePicker, DateTimePickerProps } from "@mantine/dates";
 import { WithQuestionCallback } from "../SurveyItem";
+import { DateTimeResponse, QuestionResponse } from "@/lib/types/question_new";
 
 export type QuestionDateTimeProps = {
-  question: DateTimeQuestion;
-} & WithQuestionCallback<ValueByQuestionType<DateTimeQuestion>> &
+  response: DateTimeResponse[];
+} & WithQuestionCallback<DateTimeResponse> &
   DateTimePickerProps;
 
+export function isDateTimeResponse(
+  response: QuestionResponse[],
+): response is DateTimeResponse[] {
+  return (response as DateTimeResponse[])[0]?.responseType === "datetime";
+}
+
 export default function QuestionDateTime({
-  question,
+  response,
   onAnswered,
   ...props
 }: QuestionDateTimeProps) {
-  //question.answer[option]
-  const value = question.answer.value || undefined;
+  const responseValue = response[0];
   return (
     <DateTimePicker
       {...props}
       clearable
-      defaultValue={value}
+      defaultValue={responseValue.date}
       valueFormat="YYYY-MMM-DD HH:mm"
       label="Pick date and time"
-      onDateChange={(date: Date) => onAnswered(date)}
+      onDateChange={(date: Date) => onAnswered({ ...responseValue, date })}
     />
   );
 }

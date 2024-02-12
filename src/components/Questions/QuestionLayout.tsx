@@ -7,6 +7,7 @@ import { SiteCode } from "@/lib/types/sites";
 import { db } from "@/lib/dexie/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { usePathname, useSearchParams } from "next/navigation";
+import { getNextQuestion, getPrevQuestion } from "@/lib/dexie/helper";
 
 type QuestionLayoutProps = PropsWithChildren & {
   siteCode: SiteCode;
@@ -20,25 +21,25 @@ export default function QuestionLayout({
   siteCode,
   order,
 }: QuestionLayoutProps) {
+  const questionType = isQuestion ? "question" : "process";
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const title = isQuestion ? "Questions" : "Processes";
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode }));
   const projectId = site ? site.projectId : 0;
-  const table = isQuestion ? db.questions : db.processes;
   const question = useLiveQuery(
-    () => table.get({ projectId, order }),
-    [projectId, order],
+    () => db.questions.get({ projectId, order, questionType }),
+    [projectId, questionType, order],
   );
-  const questionsCount = useLiveQuery(
-    () => table.where({ projectId }).count(),
-    [table, projectId],
+  const prev = useLiveQuery(
+    () => getPrevQuestion(projectId, questionType, question),
+    [projectId, question, questionType],
   );
-  const prev = question && question.order > 0 ? question.order - 1 : undefined;
-  const next =
-    question && questionsCount && question.order < questionsCount
-      ? question.order + 1
-      : undefined;
+
+  const next = useLiveQuery(
+    () => getNextQuestion(projectId, questionType, question),
+    [projectId, question, questionType],
+  );
 
   useEffect(() => {
     const exitingFunction = () => {
@@ -69,7 +70,7 @@ export default function QuestionLayout({
         </CardSection>
         {children}
       </Card>
-      <QuestionNavigation prev={prev} next={next} />
+      <QuestionNavigation prev={prev?.order} next={next?.order} />
     </Stack>
   );
 }

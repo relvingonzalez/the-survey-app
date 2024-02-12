@@ -13,10 +13,7 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { db } from "@/lib/dexie/db";
-import {
-  getNextUnansweredProcess,
-  getNextUnansweredQuestion,
-} from "@/lib/dexie/helper";
+import { getNextUnansweredQuestion } from "@/lib/dexie/helper";
 
 type SiteOverviewProps = {
   siteCode: string;
@@ -25,36 +22,28 @@ type SiteOverviewProps = {
 export default function SiteOverview({ siteCode }: SiteOverviewProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
   const projectId = site ? site.projectId : 0;
-  const questions = useLiveQuery(
+  const allQuestions = useLiveQuery(
     () => db.questions.where({ projectId: projectId }).sortBy("order"),
     [projectId],
   );
-  const questionResponses = useLiveQuery(
-    () => db.questionResponses.where({ projectId: projectId }).toArray(),
+  const responses = useLiveQuery(
+    () => db.responses.where({ projectId: projectId }).toArray(),
     [projectId],
   );
-  const processes = useLiveQuery(
-    () => db.processes.where({ projectId: projectId }).sortBy("order"),
-    [projectId],
+  const questions = allQuestions?.filter((q) => q.questionType === "question");
+  const processes = allQuestions?.filter((q) => q.questionType === "process");
+  const questionResponses = responses?.filter(
+    (r) => questions?.find((q) => q.id === r.questionId),
   );
-  const processResponses = useLiveQuery(
-    () => db.processResponses.where({ projectId: projectId }).toArray(),
-    [projectId],
+  const processResponses = responses?.filter(
+    (r) => processes?.find((q) => q.id === r.questionId),
   );
   const roomsCount = useLiveQuery(
     () => db.rooms.where({ projectId: projectId }).count(),
     [projectId],
   );
-  const nextQuestion = getNextUnansweredQuestion(
-    site,
-    questions,
-    questionResponses,
-  );
-  const nextProcess = getNextUnansweredProcess(
-    site,
-    processes,
-    processResponses,
-  );
+  const nextQuestion = getNextUnansweredQuestion(site, questions);
+  const nextProcess = getNextUnansweredQuestion(site, processes);
 
   if (!site) {
     return null;

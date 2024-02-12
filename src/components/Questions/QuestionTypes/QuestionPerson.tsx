@@ -15,8 +15,10 @@ import {
 import {
   Person,
   PersonQuestion,
-  ValueByQuestionType,
-} from "@/lib/types/question";
+  PersonResponse,
+  QuestionResponse,
+  Salutation,
+} from "@/lib/types/question_new";
 import { phonePatternRegex } from "./QuestionPhone";
 import { useState } from "react";
 import {
@@ -25,27 +27,52 @@ import {
   IconX,
   IconUserPlus,
 } from "@tabler/icons-react";
-import { createPerson } from "@/lib/utils/functions";
 import { UseFormReturnType, isEmail, matches, useForm } from "@mantine/form";
 import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionPersonProps = {
   question: PersonQuestion;
-} & WithQuestionCallback<ValueByQuestionType<PersonQuestion>>;
+  response: PersonResponse[];
+} & WithQuestionCallback<PersonResponse | PersonResponse[]>;
+
+export function isPersonResponse(
+  response: QuestionResponse[],
+): response is PersonResponse[] {
+  return (response as PersonResponse[])[0]?.responseType === "person";
+}
 
 const salutationLabels = ["Mr", "Ms"];
 const salutationValues = ["0", "1"];
+const salutations: Record<number, Salutation> = {
+  0: "Mr",
+  1: "Ms",
+};
 export const salutationOptions = salutationLabels.map((_, i) => ({
   label: salutationLabels[i],
   value: salutationValues[i],
 }));
+
+export const createPersonResponse = ({
+  projectId,
+  id: questionId,
+  responseType,
+}: PersonQuestion): PersonResponse => ({
+  projectId,
+  questionId,
+  responseType,
+  salutationId: -1,
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+});
 
 function NewPerson({
   form,
   onSave,
   onCancel,
 }: {
-  form: UseFormReturnType<Person>;
+  form: UseFormReturnType<PersonResponse>;
   onSave: (person: Person) => void;
   onCancel: () => void;
 }) {
@@ -64,12 +91,12 @@ function NewPerson({
       <CardSection inheritPadding py="xs">
         <form onSubmit={form.onSubmit((values) => onSave(values))}>
           <Select
-            name="salutaion"
+            name="salutation"
             label="Select Salutation"
             placeholder="--Select One--"
             withAsterisk
             data={salutationOptions}
-            {...form.getInputProps("salut")}
+            {...form.getInputProps("salutationId")}
           />
           <TextInput
             label="First Name"
@@ -123,7 +150,8 @@ function ExistingPerson({
       <CardSection withBorder inheritPadding py="xs">
         <Group justify="space-between">
           <Text size="xl" fw={500}>
-            {person.salut} {person.firstName} {person.lastName}
+            {person.salutationId && salutations[person.salutationId]}{" "}
+            {person.firstName} {person.lastName}
           </Text>
           <ActionIcon variant="subtle" color="red" onClick={onDelete}>
             <IconTrash />
@@ -140,11 +168,10 @@ function ExistingPerson({
 
 export default function QuestionText({
   question,
+  response,
   onAnswered,
 }: QuestionPersonProps) {
-  const value = question.answer.value || [];
-
-  const [addNew, setAddNew] = useState(!value.length ? true : false);
+  const [addNew, setAddNew] = useState(!response.length ? true : false);
   const onAddNewClick = () => {
     setAddNew(true);
   };
@@ -155,24 +182,21 @@ export default function QuestionText({
   };
 
   const onSaveNewPerson = (person: Person) => {
-    const newPersons = [...value];
-    newPersons.push(person);
-    onAnswered(newPersons);
+    onAnswered({ ...createPersonResponse(question), ...person });
     resetNewPerson();
   };
 
   const onDeletePerson = (i: number) => {
-    const newPersons = [...value];
-    newPersons.splice(i, 1);
-    onAnswered(newPersons);
+    const deletedPerson = { ...response[i], flag: "d" };
+    onAnswered(deletedPerson);
   };
 
   const form = useForm({
-    initialValues: createPerson(),
+    initialValues: createPersonResponse(question),
     validateInputOnChange: true,
     clearInputErrorOnChange: true,
     validate: {
-      salut: (value) =>
+      salutationId: (value) =>
         value && salutationValues.includes(value.toString())
           ? null
           : "Select a salutation",
@@ -185,7 +209,7 @@ export default function QuestionText({
 
   return (
     <Grid>
-      {value.map((p, i) => (
+      {response.map((p, i) => (
         <GridCol key={i} span={4}>
           <ExistingPerson person={p} onDelete={() => onDeletePerson(i)} />
         </GridCol>

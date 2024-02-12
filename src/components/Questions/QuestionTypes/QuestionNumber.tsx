@@ -1,33 +1,34 @@
-import { NumberQuestion, ValueByQuestionType } from "@/lib/types/question";
-import { TextInput, TextInputProps } from "@mantine/core";
+import { NumberInput, NumberInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
+import { NumberResponse, QuestionResponse } from "@/lib/types/question_new";
 
 export type QuestionNumberProps = {
-  question: NumberQuestion;
-} & WithQuestionCallback<ValueByQuestionType<NumberQuestion>> &
-  TextInputProps;
+  response: NumberResponse[];
+} & WithQuestionCallback<NumberResponse> &
+  NumberInputProps;
+
+export function isNumberResponse(
+  response: QuestionResponse[],
+): response is NumberResponse[] {
+  return (response as NumberResponse[])[0]?.responseType === "number";
+}
 
 export default function QuestionNumber({
-  question,
+  response,
   onAnswered,
   ...props
 }: QuestionNumberProps) {
-  const value = question.answer.value || "";
+  const responseValue = response[0];
+  const handleOnChange = (value: string | number) => {
+    onAnswered({ ...responseValue, number: Number(value) });
+  };
   return (
-    <TextInput
+    <NumberInput
       {...props}
-      value={value}
-      type="number"
+      value={responseValue.number}
       label="Number"
-      min="0"
-      onKeyDown={(event) => {
-        if (!/[0-9]/.test(event.key)) {
-          event.preventDefault();
-        }
-      }}
-      onChange={(e) => {
-        onAnswered(e.target.value);
-      }}
+      min={0}
+      onChange={handleOnChange}
     />
   );
 }

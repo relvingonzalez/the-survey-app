@@ -1,6 +1,6 @@
 //import { getSite } from "@/app/utils";
 
-import { Process } from "@/components/Questions/SurveyItem";
+import Question from "@/components/Questions/SurveyItem";
 import { SiteCode } from "@/lib/types/sites";
 
 export default async function QuestionPage({
@@ -8,5 +8,7 @@ export default async function QuestionPage({
 }: {
   params: { siteCode: SiteCode; order: string };
 }) {
-  return <Process siteCode={siteCode} order={parseInt(order)} />;
+  return (
+    <Question siteCode={siteCode} order={parseInt(order)} type="process" />
+  );
 }

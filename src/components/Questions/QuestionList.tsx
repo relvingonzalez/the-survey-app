@@ -1,12 +1,7 @@
 "use client";
 
 import { db } from "@/lib/dexie/db";
-import {
-  DexieProcess,
-  DexieProcessResponse,
-  DexieQuestion,
-  DexieQuestionResponse,
-} from "@/lib/types/dexie";
+import { DexieQuestion, DexieResponse } from "@/lib/types/dexie";
 import { SiteCode } from "@/lib/types/sites";
 import {
   Button,
@@ -23,26 +18,18 @@ import { IconSettings } from "@tabler/icons-react";
 import { useLiveQuery } from "dexie-react-hooks";
 import Link from "next/link";
 
-type ItemListProps =
-  | {
-      isQuestion?: false;
-      items: DexieProcess[];
-      responses: DexieProcessResponse[];
-    }
-  | {
-      isQuestion: true;
-      items: DexieQuestion[];
-      responses: DexieQuestionResponse[];
-    };
+type ItemListProps = {
+  isQuestion?: boolean;
+  items: DexieQuestion[];
+  responses: DexieResponse[];
+};
 
 function ItemList({ items, isQuestion, responses }: ItemListProps) {
   const rows = items.map((item, index) => {
-    const response = isQuestion
-      ? responses.find((r) => r.questionId === item.id)
-      : responses.find((r) => r.processId === item.id);
+    const response = responses.find((r) => r.questionId === item.id);
     return (
       <TableTr key={`${item.id}-${index}`}>
-        <TableTd>{item.id}</TableTd>
+        <TableTd>{item.order}</TableTd>
         <TableTd>{item.subheading}</TableTd>
         <TableTd>
           <Text size="sm" fs="italic">
@@ -50,14 +37,14 @@ function ItemList({ items, isQuestion, responses }: ItemListProps) {
             {item.question}
           </Text>
           <Text size="sm" fw="700">
-            {response?.response?.toString()}
+            {response?.toString()}
           </Text>
         </TableTd>
         <TableTd>
           <Button
             component={Link}
             href={`${isQuestion ? "questions" : "processes"}/${item.order}`}
-            variant={response?.response ? "light" : "default"}
+            variant={response ? "light" : "default"}
           >
             <IconSettings />
           </Button>
@@ -92,11 +79,14 @@ export function QuestionList({ siteCode }: QuestionListProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
   const projectId = site ? site.projectId : 0;
   const questions = useLiveQuery(
-    () => db.questions.where({ projectId: projectId }).sortBy("order"),
+    () =>
+      db.questions
+        .where({ projectId: projectId, questionType: "question" })
+        .sortBy("order"),
     [projectId],
   );
   const questionResponses = useLiveQuery(
-    () => db.questionResponses.where({ projectId: projectId }).toArray(),
+    () => db.responses.where({ projectId: projectId }).toArray(),
     [projectId],
   );
 
@@ -113,11 +103,14 @@ export function ProcessList({ siteCode }: QuestionListProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
   const projectId = site ? site.projectId : 0;
   const processes = useLiveQuery(
-    () => db.processes.where({ projectId: projectId }).sortBy("order"),
+    () =>
+      db.questions
+        .where({ projectId: projectId, questionType: "process" })
+        .sortBy("order"),
     [projectId],
   );
   const processResponses = useLiveQuery(
-    () => db.processResponses.where({ projectId: projectId }).toArray(),
+    () => db.responses.where({ projectId: projectId }).toArray(),
     [projectId],
   );
 

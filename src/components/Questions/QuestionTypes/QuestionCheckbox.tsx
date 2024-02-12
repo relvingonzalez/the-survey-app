@@ -1,39 +1,62 @@
-import { CheckboxQuestion, ValueByQuestionType } from "@/lib/types/question";
 import { Checkbox, CheckboxProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
+import {
+  CheckboxQuestion,
+  CheckboxResponse,
+  QuestionResponse,
+} from "@/lib/types/question_new";
 
 export type QuestionCheckboxProps = {
   question: CheckboxQuestion;
-} & WithQuestionCallback<ValueByQuestionType<CheckboxQuestion>> &
+  response: CheckboxResponse[];
+} & WithQuestionCallback<CheckboxResponse> &
   CheckboxProps;
+
+export function isCheckboxResponse(
+  response: QuestionResponse[],
+): response is CheckboxResponse[] {
+  return (response as CheckboxResponse[])[0].responseType === "checkbox";
+}
+
+const createCheckboxResponse = (
+  { projectId, id: questionId, responseType }: CheckboxQuestion,
+  label: string,
+) => ({
+  projectId,
+  questionId,
+  responseType,
+  label,
+  checked: false,
+});
 
 export default function QuestionCheckbox({
   question,
+  response,
   onAnswered,
   ...props
 }: QuestionCheckboxProps) {
-  const value =
-    question.answer.value ||
-    Object.fromEntries(question.listOptions.map((x) => [x, false]));
-  // Make a copy, change the checked option, and submit the changes
-  const checkedOption = (option: string, checked: boolean) => {
-    const newValue = structuredClone(value);
-    newValue[option] = checked;
-    onAnswered(newValue);
+  const checkedOption = (
+    optionResponse: CheckboxResponse,
+    checked: boolean,
+  ) => {
+    onAnswered({ ...optionResponse, checked });
   };
 
   return (
     <>
-      {question.listOptions.map((option, i) => {
+      {question.options.map((option, i) => {
+        const optionResponse =
+          response.find((r) => r.label === option) ||
+          createCheckboxResponse(question, option);
         return (
           <Checkbox
             {...props}
             label={option}
             key={i}
             mt="10"
-            checked={!!value[option]}
+            checked={optionResponse.checked}
             onChange={(e) => {
-              checkedOption(option, e.currentTarget.checked);
+              checkedOption(optionResponse, e.currentTarget.checked);
             }}
           />
         );

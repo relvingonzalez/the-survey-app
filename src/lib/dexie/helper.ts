@@ -1,10 +1,6 @@
-import {
-  DexieProcess,
-  DexieProcessResponse,
-  DexieQuestion,
-  DexieQuestionResponse,
-} from "../types/dexie";
-import { LocalDownloadSiteData, LocalSiteProject } from "../types/local";
+import { DexieQuestion, DexieResponse } from "../types/dexie";
+import { LocalDownloadSiteData, LocalSiteProject } from "../types/local_new";
+import { QuestionType } from "../types/question_new";
 import { db } from "./db";
 
 export async function populate(data: LocalDownloadSiteData) {
@@ -13,11 +9,8 @@ export async function populate(data: LocalDownloadSiteData) {
     [
       db.siteProjects,
       db.questions,
-      db.processes,
-      db.rackQuestions,
-      db.questionResponses,
-      db.processResponses,
-      db.rackQuestionResponses,
+      db.responses,
+      db.comments,
       db.rooms,
       db.moreInfos,
       db.racks,
@@ -26,11 +19,8 @@ export async function populate(data: LocalDownloadSiteData) {
     () => {
       db.siteProjects.add(data.siteProject);
       db.questions.bulkAdd(data.questions);
-      db.processes.bulkAdd(data.processes);
-      db.rackQuestions.bulkAdd(data.rackQuestions);
-      db.questionResponses.bulkAdd(data.questionResponses);
-      db.processResponses.bulkAdd(data.processResponses);
-      db.rackQuestionResponses.bulkAdd(data.rackQuestionResponses);
+      db.responses.bulkAdd(data.responses);
+      db.comments.bulkAdd(data.comments);
       db.rooms.bulkAdd(data.rooms);
       db.moreInfos.bulkAdd(data.moreInfos);
       db.racks.bulkAdd(data.racks);
@@ -45,11 +35,8 @@ export async function deleteProject(projectId: number) {
     [
       db.siteProjects,
       db.questions,
-      db.processes,
-      db.rackQuestions,
-      db.questionResponses,
-      db.processResponses,
-      db.rackQuestionResponses,
+      db.responses,
+      db.comments,
       db.rooms,
       db.moreInfos,
       db.racks,
@@ -58,11 +45,8 @@ export async function deleteProject(projectId: number) {
     () => {
       db.siteProjects.where({ projectId }).delete();
       db.questions.where({ projectId }).delete();
-      db.processes.where({ projectId }).delete();
-      db.rackQuestions.where({ projectId }).delete();
-      db.questionResponses.where({ projectId }).delete();
-      db.processResponses.where({ projectId }).delete();
-      db.rackQuestionResponses.where({ projectId }).delete();
+      db.responses.where({ projectId }).delete();
+      db.comments.where({ projectId }).delete();
       db.rooms.where({ projectId }).delete();
       db.moreInfos.where({ projectId }).delete();
       db.racks.where({ projectId }).delete();
@@ -74,25 +58,79 @@ export async function deleteProject(projectId: number) {
 export function getNextUnansweredQuestion(
   site?: LocalSiteProject,
   questions?: DexieQuestion[],
-  questionResponses?: DexieQuestionResponse[],
 ) {
-  const unansweredQuestion = questions?.find((q) => {
-    const res = questionResponses?.find((qR) => qR.questionId === q.id);
-    return !res || !res.response;
-  });
-
-  return unansweredQuestion || (questions && questions[0]);
+  return questions?.find((q) => !q.id) || (questions && questions[0]);
 }
 
-export function getNextUnansweredProcess(
-  site?: LocalSiteProject,
-  processes?: DexieProcess[],
-  processResponses?: DexieProcessResponse[],
-) {
-  const unansweredProcess = processes?.find((q) => {
-    const res = processResponses?.find((pR) => pR.processId === q.id);
-    return !res || !res.response;
-  });
+export const getPrevQuestion = async (
+  projectId: number,
+  questionType: QuestionType,
+  question?: DexieQuestion,
+) => {
+  if (question) {
+    const questions = await db.questions
+      .where({ projectId, questionType })
+      .sortBy("order");
+    const currentIndex = questions.findIndex((q) => q.id === question.id);
+    return currentIndex > 0 ? questions[currentIndex - 1] : undefined;
+  }
+  return undefined;
+};
 
-  return unansweredProcess || (processes && processes[0]);
-}
+export const getNextQuestion = async (
+  projectId: number,
+  questionType: QuestionType,
+  question?: DexieQuestion,
+) => {
+  if (question) {
+    const questions = await db.questions
+      .where({ projectId, questionType })
+      .sortBy("order");
+    const currentIndex = questions.findIndex((q) => q.id === question.id);
+    return currentIndex < questions.length
+      ? questions[currentIndex + 1]
+      : undefined;
+  }
+  return undefined;
+};
+
+export const updateComment = (value: string, localId?: number) => {
+  return db.transaction("rw", db.comments, () => {
+    if (localId) {
+      db.comments.where({ localId }).modify({ comment: value });
+    }
+  });
+};
+
+export const insertOrModifyResponse = (response: DexieResponse) => {
+  if (response.localId) {
+    return db.responses
+      .where({ localId: response.localId })
+      .modify({ ...response });
+  } else {
+    return db.responses.add(response);
+  }
+};
+
+export const insertOrModifyResponses = (responses: DexieResponse[]) => {
+  return responses.map(insertOrModifyResponse);
+};
+
+export const getComment = (projectId?: number, question?: DexieQuestion) => {
+  if (projectId && question) {
+    return db.comments.get({ projectId, questionId: question?.id });
+  }
+
+  return undefined;
+};
+
+export const getResponse = (projectId?: number, question?: DexieQuestion) => {
+  // TODO add when flag not equals d?
+  if (projectId && question) {
+    return db.responses
+      .where({ projectId, questionId: question?.id })
+      .toArray();
+  }
+
+  return [];
+};
