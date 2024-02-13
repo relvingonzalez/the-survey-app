@@ -1,5 +1,5 @@
 import { DexieQuestion, DexieResponse } from "../types/dexie";
-import { LocalDownloadSiteData, LocalSiteProject } from "../types/local_new";
+import { LocalDownloadSiteData } from "../types/local_new";
 import { QuestionType } from "../types/question_new";
 import { db } from "./db";
 
@@ -56,10 +56,13 @@ export async function deleteProject(projectId: number) {
 }
 
 export function getNextUnansweredQuestion(
-  site?: LocalSiteProject,
   questions?: DexieQuestion[],
+  responses?: DexieResponse[],
 ) {
-  return questions?.find((q) => !q.id) || (questions && questions[0]);
+  return (
+    questions?.find((q) => !responses?.find((r) => r.questionId === q.id)) ||
+    (questions && questions[0])
+  );
 }
 
 export const getPrevQuestion = async (

@@ -7,7 +7,7 @@ import { SiteCode } from "@/lib/types/sites";
 import { db } from "@/lib/dexie/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { usePathname, useSearchParams } from "next/navigation";
-import { getNextQuestion, getPrevQuestion } from "@/lib/dexie/helper";
+import { useQuestionNavigation } from "@/lib/hooks/useQuestionNavigation";
 
 type QuestionLayoutProps = PropsWithChildren & {
   siteCode: SiteCode;
@@ -27,44 +27,36 @@ export default function QuestionLayout({
   const title = isQuestion ? "Questions" : "Processes";
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode }));
   const projectId = site ? site.projectId : 0;
-  const question = useLiveQuery(
-    () => db.questions.get({ projectId, order, questionType }),
-    [projectId, questionType, order],
-  );
-  const prev = useLiveQuery(
-    () => getPrevQuestion(projectId, questionType, question),
-    [projectId, question, questionType],
-  );
-
-  const next = useLiveQuery(
-    () => getNextQuestion(projectId, questionType, question),
-    [projectId, question, questionType],
+  const { current, prev, next } = useQuestionNavigation(
+    projectId,
+    order,
+    questionType,
   );
 
   useEffect(() => {
     const exitingFunction = () => {
-      console.log("exiting...", question?.question);
+      console.log("exiting...", current?.question);
     };
 
-    if (question && pathname && searchParams) {
+    if (current && pathname && searchParams) {
       exitingFunction();
     }
-  }, [question, pathname, searchParams]);
+  }, [current, pathname, searchParams]);
 
-  if (!question) {
+  if (!current) {
     return null;
   }
 
   return (
     <Stack mb="80">
       <Title order={2}>
-        {title}: {question.subheading}
+        {title}: {current.subheading}
       </Title>
       <Card withBorder shadow="sm" radius="md">
         <CardSection inheritPadding py="xs">
           <Group justify="start">
             <Text size="xl" fw={500}>
-              {question.order}.{question.question}
+              {current.order}.{current.question}
             </Text>
           </Group>
         </CardSection>

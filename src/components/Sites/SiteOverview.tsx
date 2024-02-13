@@ -14,7 +14,7 @@ import {
 import Link from "next/link";
 import { db } from "@/lib/dexie/db";
 import { getNextUnansweredQuestion } from "@/lib/dexie/helper";
-import { useCounts } from "@/lib/hooks/useCounts";
+import { useQuestionsWithCounts } from "@/lib/hooks/useQuestionsWithCounts";
 
 type SiteOverviewProps = {
   siteCode: string;
@@ -25,14 +25,15 @@ export default function SiteOverview({ siteCode }: SiteOverviewProps) {
   const {
     questions,
     processes,
+    allResponses,
     roomsCount,
     questionsCount,
     processesCount,
     questionResponsesCount,
     processResponsesCount,
-  } = useCounts(site);
-  const nextQuestion = getNextUnansweredQuestion(site, questions);
-  const nextProcess = getNextUnansweredQuestion(site, processes);
+  } = useQuestionsWithCounts(site);
+  const nextQuestion = getNextUnansweredQuestion(questions, allResponses);
+  const nextProcess = getNextUnansweredQuestion(processes, allResponses);
 
   if (!site) {
     return null;

@@ -22,7 +22,7 @@ import { DexieSiteProject } from "@/lib/types/dexie";
 import DownloadModal from "../DownloadModal";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
-import { useCounts } from "@/lib/hooks/useCounts";
+import { useQuestionsWithCounts } from "@/lib/hooks/useQuestionsWithCounts";
 
 type SitesProps = {
   sites: LocalSiteProject[] | DexieSiteProject[];
@@ -38,7 +38,7 @@ function SiteProgress({ site }: { site: DexieSiteProject }) {
     processesCount,
     questionResponsesCount,
     processResponsesCount,
-  } = useCounts(site);
+  } = useQuestionsWithCounts(site);
   return (
     <Table withColumnBorders>
       <TableTbody>

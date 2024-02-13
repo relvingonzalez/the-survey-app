@@ -2,10 +2,10 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../dexie/db";
 import { DexieSiteProject } from "../types/dexie";
 
-export const useCounts = (site?: DexieSiteProject) => {
+export const useQuestionsWithCounts = (site?: DexieSiteProject) => {
   const allQuestions = useLiveQuery(() => {
     if (site) {
-      return db.questions.where({ projectId: site.projectId }).toArray();
+      return db.questions.where({ projectId: site.projectId }).sortBy("order");
     }
     return [];
   }, [site]);
@@ -35,6 +35,7 @@ export const useCounts = (site?: DexieSiteProject) => {
   return {
     questions,
     processes,
+    allResponses,
     roomsCount,
     questionsCount,
     processesCount,
