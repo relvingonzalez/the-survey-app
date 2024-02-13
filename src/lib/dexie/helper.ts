@@ -164,3 +164,26 @@ export const getCollectionQuestions = (
 
   return [];
 };
+
+export const questionResponsesCounts = (
+  allQuestions?: DexieQuestion[],
+  allResponses?: DexieResponse[],
+) => {
+  const questions = allQuestions?.filter((q) => q.questionType === "question");
+  const processes = allQuestions?.filter((q) => q.questionType === "process");
+  const questionsCount = questions?.length;
+  const processesCount = processes?.length;
+  const questionResponsesCount = questions?.filter(
+    (q) => allResponses?.find((r) => q.id === r.questionId),
+  ).length;
+  const processResponsesCount = processes?.filter(
+    (q) => allResponses?.find((r) => q.id === r.questionId),
+  ).length;
+
+  return {
+    questionsCount,
+    processesCount,
+    questionResponsesCount,
+    processResponsesCount,
+  };
+};

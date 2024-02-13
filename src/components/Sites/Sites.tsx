@@ -22,6 +22,7 @@ import { DexieSiteProject } from "@/lib/types/dexie";
 import DownloadModal from "../DownloadModal";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
+import { useCounts } from "@/lib/hooks/useCounts";
 
 type SitesProps = {
   sites: LocalSiteProject[] | DexieSiteProject[];
@@ -31,28 +32,13 @@ type SitesProps = {
 );
 
 function SiteProgress({ site }: { site: DexieSiteProject }) {
-  const allQuestions = useLiveQuery(() =>
-    db.questions.where({ projectId: site.projectId }).toArray(),
-  );
-  const responses = useLiveQuery(() =>
-    db.responses.where({ projectId: site.projectId }).toArray(),
-  );
-  const roomsCount = useLiveQuery(() =>
-    db.rooms.where({ projectId: site.projectId }).count(),
-  );
-
-  const questions = allQuestions?.filter((q) => q.questionType === "question");
-  const processes = allQuestions?.filter((q) => q.questionType === "process");
-  const questionsCount = questions?.filter((q) => q.questionType === "question")
-    .length;
-  const processesCount = questions?.filter((q) => q.questionType === "process")
-    .length;
-  const questionResponsesCount = responses?.filter(
-    (r) => questions?.find((q) => q.id === r.questionId),
-  ).length;
-  const processResponsesCount = responses?.filter(
-    (r) => processes?.find((q) => q.id === r.questionId),
-  ).length;
+  const {
+    roomsCount,
+    questionsCount,
+    processesCount,
+    questionResponsesCount,
+    processResponsesCount,
+  } = useCounts(site);
   return (
     <Table withColumnBorders>
       <TableTbody>

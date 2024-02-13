@@ -14,6 +14,7 @@ import {
 import Link from "next/link";
 import { db } from "@/lib/dexie/db";
 import { getNextUnansweredQuestion } from "@/lib/dexie/helper";
+import { useCounts } from "@/lib/hooks/useCounts";
 
 type SiteOverviewProps = {
   siteCode: string;
@@ -21,27 +22,15 @@ type SiteOverviewProps = {
 
 export default function SiteOverview({ siteCode }: SiteOverviewProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
-  const projectId = site ? site.projectId : 0;
-  const allQuestions = useLiveQuery(
-    () => db.questions.where({ projectId }).sortBy("order"),
-    [projectId],
-  );
-  const responses = useLiveQuery(
-    () => db.responses.where({ projectId }).toArray(),
-    [projectId],
-  );
-  const questions = allQuestions?.filter((q) => q.questionType === "question");
-  const processes = allQuestions?.filter((q) => q.questionType === "process");
-  const questionResponses = responses?.filter(
-    (r) => questions?.find((q) => q.id === r.questionId),
-  );
-  const processResponses = responses?.filter(
-    (r) => processes?.find((q) => q.id === r.questionId),
-  );
-  const roomsCount = useLiveQuery(
-    () => db.rooms.where({ projectId: projectId }).count(),
-    [projectId],
-  );
+  const {
+    questions,
+    processes,
+    roomsCount,
+    questionsCount,
+    processesCount,
+    questionResponsesCount,
+    processResponsesCount,
+  } = useCounts(site);
   const nextQuestion = getNextUnansweredQuestion(site, questions);
   const nextProcess = getNextUnansweredQuestion(site, processes);
 
@@ -93,7 +82,7 @@ export default function SiteOverview({ siteCode }: SiteOverviewProps) {
         </CardSection>
 
         <Text mt="10">
-          Total: {questions?.length}, Answered: {questionResponses?.length}
+          Total: {questionsCount}, Answered: {questionResponsesCount}
         </Text>
         <Group justify="space-between">
           <Button
@@ -167,7 +156,7 @@ export default function SiteOverview({ siteCode }: SiteOverviewProps) {
           </Group>
         </CardSection>
         <Text mt="10">
-          Total: {processes?.length}, Answered: {processResponses?.length}
+          Total: {processesCount}, Answered: {processResponsesCount}
         </Text>
         <Group justify="space-between">
           <Button
