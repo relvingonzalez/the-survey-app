@@ -12,10 +12,10 @@ export type QuestionMultipleProps = {
 } & WithQuestionCallback<MultipleResponse[]> &
   MultiSelectProps;
 
-const createMultipleResponse = (
+export const createMultipleResponse = (
   { projectId, id: questionId, responseType }: MultipleQuestion,
-  text: string,
-) => ({
+  text = "",
+): MultipleResponse => ({
   projectId,
   questionId,
   responseType,
@@ -25,7 +25,7 @@ const createMultipleResponse = (
 export function isMultipleResponse(
   response: QuestionResponse[],
 ): response is MultipleResponse[] {
-  return (response as MultipleResponse[])[0].responseType === "multiple";
+  return (response as MultipleResponse[])[0]?.responseType === "multiple";
 }
 
 export default function QuestionListSelect({

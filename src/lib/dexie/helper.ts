@@ -1,7 +1,19 @@
+import { createMultipleResponse } from "@/components/Questions/QuestionTypes/QuestionMultiple";
 import { DexieQuestion, DexieResponse } from "../types/dexie";
 import { LocalDownloadSiteData } from "../types/local_new";
 import { QuestionType } from "../types/question_new";
 import { db } from "./db";
+import { createCheckboxResponse } from "@/components/Questions/QuestionTypes/QuestionCheckbox";
+import { createDateTimeResponse } from "@/components/Questions/QuestionTypes/QuestionDateTime";
+import { createEmailResponse } from "@/components/Questions/QuestionTypes/QuestionEmail";
+import { createGeoResponse } from "@/components/Questions/QuestionTypes/QuestionGeo";
+import { createListResponse } from "@/components/Questions/QuestionTypes/QuestionListSelect";
+import { createNumberResponse } from "@/components/Questions/QuestionTypes/QuestionNumber";
+import { createPersonResponse } from "@/components/Questions/QuestionTypes/QuestionPerson";
+import { createPhoneResponse } from "@/components/Questions/QuestionTypes/QuestionPhone";
+import { createTextResponse } from "@/components/Questions/QuestionTypes/QuestionText";
+import { createTimeResponse } from "@/components/Questions/QuestionTypes/QuestionTime";
+import { createYesNoResponse } from "@/components/Questions/QuestionTypes/QuestionYesNo";
 
 export async function populate(data: LocalDownloadSiteData) {
   return db.transaction(
@@ -127,12 +139,17 @@ export const getComment = (projectId?: number, question?: DexieQuestion) => {
   return undefined;
 };
 
-export const getResponse = (projectId?: number, question?: DexieQuestion) => {
+export const getResponse = async (
+  projectId?: number,
+  question?: DexieQuestion,
+) => {
   // TODO add when flag not equals d?
   if (projectId && question) {
-    return db.responses
+    const response = await db.responses
       .where({ projectId, questionId: question?.id })
       .toArray();
+
+    return response.length ? response : createResponseByQuestion(question);
   }
 
   return [];
@@ -189,4 +206,49 @@ export const questionResponsesCounts = (
     questionResponsesCount,
     processResponsesCount,
   };
+};
+
+export const createResponseByQuestion = (
+  question: DexieQuestion,
+): DexieResponse[] => {
+  const response: DexieResponse[] = [];
+  switch (question.responseType) {
+    case "checkbox":
+      response.push(createCheckboxResponse(question, ""));
+      break;
+    case "datetime":
+      response.push(createDateTimeResponse(question));
+      break;
+    case "email":
+      response.push(createEmailResponse(question));
+      break;
+    case "geo":
+      response.push(createGeoResponse(question));
+      break;
+    case "list":
+      response.push(createListResponse(question));
+      break;
+    case "multiple":
+      response.push(createMultipleResponse(question, ""));
+      break;
+    case "number":
+      response.push(createNumberResponse(question));
+      break;
+    case "person":
+      response.push(createPersonResponse(question));
+      break;
+    case "phone":
+      response.push(createPhoneResponse(question));
+      break;
+    case "text":
+      response.push(createTextResponse(question));
+      break;
+    case "time":
+      response.push(createTimeResponse(question));
+      break;
+    case "yes/no":
+      response.push(createYesNoResponse(question));
+      break;
+  }
+  return response;
 };

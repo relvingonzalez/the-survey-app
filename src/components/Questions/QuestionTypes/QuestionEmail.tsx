@@ -1,6 +1,10 @@
 import { TextInput, TextInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import { EmailResponse, QuestionResponse } from "@/lib/types/question_new";
+import {
+  EmailQuestion,
+  EmailResponse,
+  QuestionResponse,
+} from "@/lib/types/question_new";
 
 export type QuestionEmailProps = {
   response: EmailResponse[];
@@ -19,6 +23,16 @@ export function isEmailResponse(
 ): response is EmailResponse[] {
   return (response as EmailResponse[])[0]?.responseType === "email";
 }
+
+export const createEmailResponse = (
+  { projectId, id: questionId, responseType }: EmailQuestion,
+  email: string = "",
+): EmailResponse => ({
+  projectId,
+  questionId,
+  responseType,
+  email,
+});
 
 export default function QuestionEmail({
   response,

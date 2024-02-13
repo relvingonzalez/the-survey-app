@@ -5,7 +5,11 @@ import { TimeInput, TimeInputProps } from "@mantine/dates";
 import { IconClock } from "@tabler/icons-react";
 import { useRef } from "react";
 import { WithQuestionCallback } from "../SurveyItem";
-import { QuestionResponse, TimeResponse } from "@/lib/types/question_new";
+import {
+  QuestionResponse,
+  TimeQuestion,
+  TimeResponse,
+} from "@/lib/types/question_new";
 
 export type QuestionTimeProps = {
   response: TimeResponse[];
@@ -17,6 +21,18 @@ export function isTimeResponse(
 ): response is TimeResponse[] {
   return (response as TimeResponse[])[0]?.responseType === "time";
 }
+
+export const createTimeResponse = (
+  { projectId, id: questionId, responseType }: TimeQuestion,
+  fromTime = new Date().toISOString(),
+  toTime = new Date().toISOString(),
+): TimeResponse => ({
+  projectId,
+  questionId,
+  responseType,
+  fromTime,
+  toTime,
+});
 
 export default function QuestionTime({
   response,

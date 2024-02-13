@@ -38,13 +38,13 @@ type TextValue = { text: string };
 type NumberValue = { number: number };
 type ListValue = { text: string | null };
 type EmailValue = { email: string };
-type CheckboxValue = { label: string; checked: boolean };
+type CheckboxValue = { label: string; checked?: boolean };
 type DateTimeValue = { date: Date };
 type DaysValue = { dayId: number };
 type MultipleValue = { text: string };
 type PersonValue = Person;
 type TimeValue = Time;
-type YesNoValue = { yesNo?: YesNo };
+type YesNoValue = { yesNo: YesNo };
 type GeoValue = { lat: number; long: number };
 type PhoneValue = { phone: string };
 

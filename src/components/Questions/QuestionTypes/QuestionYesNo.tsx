@@ -1,6 +1,10 @@
 import { Radio, RadioProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import { QuestionResponse, YesNoResponse } from "@/lib/types/question_new";
+import {
+  QuestionResponse,
+  YesNoQuestion,
+  YesNoResponse,
+} from "@/lib/types/question_new";
 
 export type QuestionYesNoProps = {
   response: YesNoResponse[];
@@ -12,6 +16,16 @@ export function isYesNoResponse(
 ): response is YesNoResponse[] {
   return (response as YesNoResponse[])[0]?.responseType === "yes/no";
 }
+
+export const createYesNoResponse = (
+  { projectId, id: questionId, responseType }: YesNoQuestion,
+  yesNo = null,
+): YesNoResponse => ({
+  projectId,
+  questionId,
+  responseType,
+  yesNo,
+});
 
 const options = [
   { label: "Yes", value: true },

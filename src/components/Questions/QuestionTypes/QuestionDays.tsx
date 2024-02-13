@@ -60,10 +60,10 @@ export function isDayArray(days: Day[] | string[]): days is Day[] {
   return (days as Day[]).every((item) => daysOptions.includes(item));
 }
 
-const createDaysResponse = (
+export const createDaysResponse = (
   { projectId, id: questionId, responseType }: DaysQuestion,
   dayId: number,
-) => ({
+): DaysResponse => ({
   projectId,
   questionId,
   responseType,
@@ -73,7 +73,7 @@ const createDaysResponse = (
 export function isDaysResponse(
   response: QuestionResponse[],
 ): response is DaysResponse[] {
-  return (response as DaysResponse[])[0].responseType === "days";
+  return (response as DaysResponse[])[0]?.responseType === "days";
 }
 
 export default function QuestionDays({

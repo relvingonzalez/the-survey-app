@@ -21,6 +21,16 @@ export function isTextResponse(
   return (response as TextResponse[])[0]?.responseType === "text";
 }
 
+export const createTextResponse = (
+  { projectId, id: questionId, responseType }: TextQuestion,
+  text = "",
+): TextResponse => ({
+  projectId,
+  questionId,
+  responseType,
+  text,
+});
+
 export default function QuestionText({
   response,
   onAnswered,

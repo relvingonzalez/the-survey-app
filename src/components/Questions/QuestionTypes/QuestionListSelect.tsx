@@ -18,6 +18,16 @@ export function isListResponse(
   return (response as ListResponse[])[0]?.responseType === "list";
 }
 
+export const createListResponse = (
+  { projectId, id: questionId, responseType }: ListQuestion,
+  text = "",
+): ListResponse => ({
+  projectId,
+  questionId,
+  responseType,
+  text,
+});
+
 export default function QuestionListSelect({
   question,
   response,

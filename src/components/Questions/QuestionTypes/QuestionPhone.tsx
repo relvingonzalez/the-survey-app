@@ -1,6 +1,10 @@
 import { TextInput, TextInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import { PhoneResponse, QuestionResponse } from "@/lib/types/question_new";
+import {
+  PhoneQuestion,
+  PhoneResponse,
+  QuestionResponse,
+} from "@/lib/types/question_new";
 
 export type QuestionPhoneProps = {
   response: PhoneResponse[];
@@ -16,6 +20,16 @@ export function isPhoneResponse(
 ): response is PhoneResponse[] {
   return (response as PhoneResponse[])[0]?.responseType === "phone";
 }
+
+export const createPhoneResponse = (
+  { projectId, id: questionId, responseType }: PhoneQuestion,
+  phone = "",
+): PhoneResponse => ({
+  projectId,
+  questionId,
+  responseType,
+  phone,
+});
 
 export default function QuestionPhone({
   response,

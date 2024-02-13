@@ -9,7 +9,11 @@ import {
 } from "@mantine/core";
 import { MouseEventHandler } from "react";
 import { WithQuestionCallback } from "../SurveyItem";
-import { GeoResponse, QuestionResponse } from "@/lib/types/question_new";
+import {
+  GeoQuestion,
+  GeoResponse,
+  QuestionResponse,
+} from "@/lib/types/question_new";
 
 export type QuestionGeoProps = {
   response: GeoResponse[];
@@ -27,6 +31,18 @@ export function isGeoResponse(
 ): response is GeoResponse[] {
   return (response as GeoResponse[])[0]?.responseType === "geo";
 }
+
+export const createGeoResponse = (
+  { projectId, id: questionId, responseType }: GeoQuestion,
+  lat = 0,
+  long = 0,
+): GeoResponse => ({
+  projectId,
+  questionId,
+  responseType,
+  lat,
+  long,
+});
 
 const errors: PositionErrorCallback = (err) => {
   console.warn(`ERROR(${err.code}): ${err.message}`);

@@ -15,13 +15,13 @@ export type QuestionCheckboxProps = {
 export function isCheckboxResponse(
   response: QuestionResponse[],
 ): response is CheckboxResponse[] {
-  return (response as CheckboxResponse[])[0].responseType === "checkbox";
+  return (response as CheckboxResponse[])[0]?.responseType === "checkbox";
 }
 
-const createCheckboxResponse = (
+export const createCheckboxResponse = (
   { projectId, id: questionId, responseType }: CheckboxQuestion,
   label: string,
-) => ({
+): CheckboxResponse => ({
   projectId,
   questionId,
   responseType,

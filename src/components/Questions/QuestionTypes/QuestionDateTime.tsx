@@ -1,6 +1,10 @@
 import { DateTimePicker, DateTimePickerProps } from "@mantine/dates";
 import { WithQuestionCallback } from "../SurveyItem";
-import { DateTimeResponse, QuestionResponse } from "@/lib/types/question_new";
+import {
+  DateTimeQuestion,
+  DateTimeResponse,
+  QuestionResponse,
+} from "@/lib/types/question_new";
 
 export type QuestionDateTimeProps = {
   response: DateTimeResponse[];
@@ -12,6 +16,16 @@ export function isDateTimeResponse(
 ): response is DateTimeResponse[] {
   return (response as DateTimeResponse[])[0]?.responseType === "datetime";
 }
+
+export const createDateTimeResponse = (
+  { projectId, id: questionId, responseType }: DateTimeQuestion,
+  date = new Date(),
+): DateTimeResponse => ({
+  projectId,
+  questionId,
+  responseType,
+  date,
+});
 
 export default function QuestionDateTime({
   response,

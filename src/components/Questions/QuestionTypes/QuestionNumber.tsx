@@ -1,6 +1,10 @@
 import { NumberInput, NumberInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import { NumberResponse, QuestionResponse } from "@/lib/types/question_new";
+import {
+  NumberQuestion,
+  NumberResponse,
+  QuestionResponse,
+} from "@/lib/types/question_new";
 
 export type QuestionNumberProps = {
   response: NumberResponse[];
@@ -12,6 +16,16 @@ export function isNumberResponse(
 ): response is NumberResponse[] {
   return (response as NumberResponse[])[0]?.responseType === "number";
 }
+
+export const createNumberResponse = (
+  { projectId, id: questionId, responseType }: NumberQuestion,
+  number = 0,
+): NumberResponse => ({
+  projectId,
+  questionId,
+  responseType,
+  number,
+});
 
 export default function QuestionNumber({
   response,
