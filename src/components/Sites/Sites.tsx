@@ -164,9 +164,11 @@ export function DownloadSites({
   };
 
   const handleOnContinue = async () => {
-    selectedSite && (await deleteProject(selectedSite.projectId));
-    handleStatusUpdate(1, 25, "Deleting Project from Local Storage");
-    selectedSite && continueDownload(selectedSite);
+    if (selectedSite) {
+      handleStatusUpdate(1, 25, "Deleting Project from Local Storage");
+      await deleteProject(selectedSite.projectId);
+      continueDownload(selectedSite);
+    }
   };
 
   const continueDownload = async (site: LocalSiteProject) => {
