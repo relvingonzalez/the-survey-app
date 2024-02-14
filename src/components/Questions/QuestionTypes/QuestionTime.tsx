@@ -12,6 +12,7 @@ import {
 } from "@/lib/types/question_new";
 
 export type QuestionTimeProps = {
+  question: TimeQuestion;
   response: TimeResponse[];
 } & WithQuestionCallback<TimeResponse> &
   TimeInputProps;
@@ -19,13 +20,15 @@ export type QuestionTimeProps = {
 export function isTimeResponse(
   response: QuestionResponse[],
 ): response is TimeResponse[] {
-  return (response as TimeResponse[])[0]?.responseType === "time";
+  return (
+    (response as TimeResponse[])[0]?.responseType === "time" || !response.length
+  );
 }
 
 export const createTimeResponse = (
   { projectId, id: questionId, responseType }: TimeQuestion,
-  fromTime = new Date().toISOString(),
-  toTime = new Date().toISOString(),
+  fromTime?: string,
+  toTime?: string,
 ): TimeResponse => ({
   projectId,
   questionId,
@@ -35,11 +38,12 @@ export const createTimeResponse = (
 });
 
 export default function QuestionTime({
+  question,
   response,
   onAnswered,
   ...props
 }: QuestionTimeProps) {
-  const responseValue = response[0];
+  const responseValue = response[0] || createTimeResponse(question);
   const refFrom = useRef<HTMLInputElement>(null);
   const refTo = useRef<HTMLInputElement>(null);
 

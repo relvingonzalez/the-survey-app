@@ -16,8 +16,8 @@ export type Person = {
   phone: string;
 };
 type Time = {
-  fromTime: string;
-  toTime: string;
+  fromTime?: string;
+  toTime?: string;
 };
 export type YesNoLabel = "Yes" | "No" | "Unknown";
 export type YesNo = boolean | null;
@@ -35,17 +35,17 @@ export type YesNo = boolean | null;
 
 // Question Response Value types
 type TextValue = { text: string };
-type NumberValue = { number: number };
+type NumberValue = { number?: number };
 type ListValue = { text: string | null };
 type EmailValue = { email: string };
 type CheckboxValue = { label: string; checked?: boolean };
-type DateTimeValue = { date: Date };
+type DateTimeValue = { date: Date | null };
 type DaysValue = { dayId: number };
 type MultipleValue = { text: string };
 type PersonValue = Person;
 type TimeValue = Time;
 type YesNoValue = { yesNo: YesNo };
-type GeoValue = { lat: number; long: number };
+type GeoValue = { lat: number | null; long: number | null };
 type PhoneValue = { phone: string };
 
 export type QuestionValue =

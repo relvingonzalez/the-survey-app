@@ -16,6 +16,7 @@ import {
 } from "@/lib/types/question_new";
 
 export type QuestionGeoProps = {
+  question: GeoQuestion;
   response: GeoResponse[];
 } & WithQuestionCallback<GeoResponse> &
   TextInputProps;
@@ -29,13 +30,15 @@ const options: PositionOptions = {
 export function isGeoResponse(
   response: QuestionResponse[],
 ): response is GeoResponse[] {
-  return (response as GeoResponse[])[0]?.responseType === "geo";
+  return (
+    (response as GeoResponse[])[0]?.responseType === "geo" || !response.length
+  );
 }
 
 export const createGeoResponse = (
   { projectId, id: questionId, responseType }: GeoQuestion,
-  lat = 0,
-  long = 0,
+  lat = null,
+  long = null,
 ): GeoResponse => ({
   projectId,
   questionId,
@@ -49,11 +52,12 @@ const errors: PositionErrorCallback = (err) => {
 };
 
 export default function QuestionGeo({
+  question,
   response,
   onAnswered,
   ...props
 }: QuestionGeoProps) {
-  const responseValue = response[0];
+  const responseValue = response[0] || createGeoResponse(question);
   const pattern =
     "^[-+]?([1-8]?d(.d+)?|90(.0+)?),s*[-+]?(180(.0+)?|((1[0-7]d)|([1-9]?d))(.d+)?)$";
   const getLocation: MouseEventHandler<HTMLButtonElement> = () => {

@@ -7,6 +7,7 @@ import {
 } from "@/lib/types/question_new";
 
 export type QuestionEmailProps = {
+  question: EmailQuestion;
   response: EmailResponse[];
 } & WithQuestionCallback<EmailResponse> &
   TextInputProps;
@@ -21,7 +22,10 @@ export const emailPatternRegex = new RegExp(
 export function isEmailResponse(
   response: QuestionResponse[],
 ): response is EmailResponse[] {
-  return (response as EmailResponse[])[0]?.responseType === "email";
+  return (
+    (response as EmailResponse[])[0]?.responseType === "email" ||
+    !response.length
+  );
 }
 
 export const createEmailResponse = (
@@ -35,11 +39,12 @@ export const createEmailResponse = (
 });
 
 export default function QuestionEmail({
+  question,
   response,
   onAnswered,
   ...props
 }: QuestionEmailProps) {
-  const responseValue = response[0];
+  const responseValue = response[0] || createEmailResponse(question);
   const handleOnChange = (value: string) => {
     onAnswered({ ...responseValue, email: value });
   };

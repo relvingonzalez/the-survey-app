@@ -7,6 +7,7 @@ import {
 } from "@/lib/types/question_new";
 
 export type QuestionYesNoProps = {
+  question: YesNoQuestion;
   response: YesNoResponse[];
 } & WithQuestionCallback<YesNoResponse> &
   RadioProps;
@@ -14,7 +15,10 @@ export type QuestionYesNoProps = {
 export function isYesNoResponse(
   response: QuestionResponse[],
 ): response is YesNoResponse[] {
-  return (response as YesNoResponse[])[0]?.responseType === "yes/no";
+  return (
+    (response as YesNoResponse[])[0]?.responseType === "yes/no" ||
+    !response.length
+  );
 }
 
 export const createYesNoResponse = (
@@ -34,11 +38,12 @@ const options = [
 ];
 
 export default function QuestionYesNo({
+  question,
   response,
   onAnswered,
   ...props
 }: QuestionYesNoProps) {
-  const responseValue = response[0];
+  const responseValue = response[0] || createYesNoResponse(question);
   return (
     <>
       {options.map((option, i) => {

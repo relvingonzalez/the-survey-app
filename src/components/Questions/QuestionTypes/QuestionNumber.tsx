@@ -7,6 +7,7 @@ import {
 } from "@/lib/types/question_new";
 
 export type QuestionNumberProps = {
+  question: NumberQuestion;
   response: NumberResponse[];
 } & WithQuestionCallback<NumberResponse> &
   NumberInputProps;
@@ -14,12 +15,15 @@ export type QuestionNumberProps = {
 export function isNumberResponse(
   response: QuestionResponse[],
 ): response is NumberResponse[] {
-  return (response as NumberResponse[])[0]?.responseType === "number";
+  return (
+    (response as NumberResponse[])[0]?.responseType === "number" ||
+    !response.length
+  );
 }
 
 export const createNumberResponse = (
   { projectId, id: questionId, responseType }: NumberQuestion,
-  number = 0,
+  number?: number,
 ): NumberResponse => ({
   projectId,
   questionId,
@@ -28,11 +32,12 @@ export const createNumberResponse = (
 });
 
 export default function QuestionNumber({
+  question,
   response,
   onAnswered,
   ...props
 }: QuestionNumberProps) {
-  const responseValue = response[0];
+  const responseValue = response[0] || createNumberResponse(question);
   const handleOnChange = (value: string | number) => {
     onAnswered({ ...responseValue, number: Number(value) });
   };

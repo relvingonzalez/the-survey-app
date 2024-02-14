@@ -38,7 +38,10 @@ export type QuestionPersonProps = {
 export function isPersonResponse(
   response: QuestionResponse[],
 ): response is PersonResponse[] {
-  return (response as PersonResponse[])[0]?.responseType === "person";
+  return (
+    (response as PersonResponse[])[0]?.responseType === "person" ||
+    !response.length
+  );
 }
 
 const salutationLabels = ["Mr", "Ms"];

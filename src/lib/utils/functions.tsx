@@ -111,7 +111,7 @@ export const getDisplayValue = (response?: DexieResponse) => {
     case "checkbox":
       return response.checked ? response.label : "";
     case "datetime":
-      return response.date.toDateString();
+      return response.date?.toDateString();
     case "email":
       return response.email;
     case "geo":

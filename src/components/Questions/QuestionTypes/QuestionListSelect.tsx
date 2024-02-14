@@ -15,7 +15,9 @@ export type QuestionListSelectProps = {
 export function isListResponse(
   response: QuestionResponse[],
 ): response is ListResponse[] {
-  return (response as ListResponse[])[0]?.responseType === "list";
+  return (
+    (response as ListResponse[])[0]?.responseType === "list" || !response.length
+  );
 }
 
 export const createListResponse = (
@@ -34,7 +36,7 @@ export default function QuestionListSelect({
   onAnswered,
   ...props
 }: QuestionListSelectProps) {
-  const responseValue = response[0];
+  const responseValue = response[0] || createListResponse(question);
   const handleOnChange = (value: string | null) => {
     onAnswered({ ...responseValue, text: value });
   };

@@ -119,12 +119,14 @@ export const updateComment = (value: string, localId?: number) => {
 
 export const insertOrModifyResponse = (response: DexieResponse) => {
   if (response.localId) {
+    if (response.flag === "d" && !response.id) {
+      return db.responses.delete(response.localId);
+    }
     return db.responses
       .where({ localId: response.localId })
       .modify({ ...response });
-  } else {
-    return db.responses.add(response);
   }
+  return db.responses.add(response);
 };
 
 export const insertOrModifyResponses = (responses: DexieResponse[]) => {
@@ -139,17 +141,12 @@ export const getComment = (projectId?: number, question?: DexieQuestion) => {
   return undefined;
 };
 
-export const getResponse = async (
-  projectId?: number,
-  question?: DexieQuestion,
-) => {
+export const getResponse = (projectId?: number, question?: DexieQuestion) => {
   // TODO add when flag not equals d?
   if (projectId && question) {
-    const response = await db.responses
+    return db.responses
       .where({ projectId, questionId: question?.id })
       .toArray();
-
-    return response.length ? response : createResponseByQuestion(question);
   }
 
   return [];

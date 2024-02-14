@@ -25,7 +25,10 @@ export const createMultipleResponse = (
 export function isMultipleResponse(
   response: QuestionResponse[],
 ): response is MultipleResponse[] {
-  return (response as MultipleResponse[])[0]?.responseType === "multiple";
+  return (
+    (response as MultipleResponse[])[0]?.responseType === "multiple" ||
+    !response.length
+  );
 }
 
 export default function QuestionListSelect({

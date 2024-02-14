@@ -26,7 +26,6 @@ import QuestionPerson, {
 import QuestionDays, { isDaysResponse } from "./QuestionTypes/QuestionDays";
 import QuestionCollection from "./QuestionTypes/QuestionCollection";
 import { WithQuestionCallback } from "./SurveyItem";
-// import { isCollectionResponse } from "./QuestionTypes/QuestionCollection";
 
 export type QuestionTypeProps<
   T extends Question,
@@ -43,16 +42,32 @@ export default function QuestionByTypeComponent<
   return (
     <>
       {question.responseType === "text" && isTextResponse(response) && (
-        <QuestionText response={response} onAnswered={onAnswered} />
+        <QuestionText
+          question={question}
+          response={response}
+          onAnswered={onAnswered}
+        />
       )}
       {question.responseType === "phone" && isPhoneResponse(response) && (
-        <QuestionPhone response={response} onAnswered={onAnswered} />
+        <QuestionPhone
+          question={question}
+          response={response}
+          onAnswered={onAnswered}
+        />
       )}
       {question.responseType === "email" && isEmailResponse(response) && (
-        <QuestionEmail response={response} onAnswered={onAnswered} />
+        <QuestionEmail
+          question={question}
+          response={response}
+          onAnswered={onAnswered}
+        />
       )}
       {question.responseType === "number" && isNumberResponse(response) && (
-        <QuestionNumber response={response} onAnswered={onAnswered} />
+        <QuestionNumber
+          question={question}
+          response={response}
+          onAnswered={onAnswered}
+        />
       )}
       {question.responseType === "checkbox" && isCheckboxResponse(response) && (
         <QuestionCheckbox
@@ -62,7 +77,11 @@ export default function QuestionByTypeComponent<
         />
       )}
       {question.responseType === "yes/no" && isYesNoResponse(response) && (
-        <QuestionYesNo response={response} onAnswered={onAnswered} />
+        <QuestionYesNo
+          question={question}
+          response={response}
+          onAnswered={onAnswered}
+        />
       )}
       {question.responseType === "list" && isListResponse(response) && (
         <QuestionListSelect
@@ -79,13 +98,25 @@ export default function QuestionByTypeComponent<
         />
       )}
       {question.responseType === "geo" && isGeoResponse(response) && (
-        <QuestionGeo response={response} onAnswered={onAnswered} />
+        <QuestionGeo
+          question={question}
+          response={response}
+          onAnswered={onAnswered}
+        />
       )}
       {question.responseType === "datetime" && isDateTimeResponse(response) && (
-        <QuestionDateTime response={response} onAnswered={onAnswered} />
+        <QuestionDateTime
+          question={question}
+          response={response}
+          onAnswered={onAnswered}
+        />
       )}
       {question.responseType === "time" && isTimeResponse(response) && (
-        <QuestionTime response={response} onAnswered={onAnswered} />
+        <QuestionTime
+          question={question}
+          response={response}
+          onAnswered={onAnswered}
+        />
       )}
       {question.responseType === "days" && isDaysResponse(response) && (
         <QuestionDays

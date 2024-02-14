@@ -7,6 +7,7 @@ import {
 } from "@/lib/types/question_new";
 
 export type QuestionPhoneProps = {
+  question: PhoneQuestion;
   response: PhoneResponse[];
 } & WithQuestionCallback<PhoneResponse> &
   TextInputProps;
@@ -18,7 +19,10 @@ export const phonePatternRegex = new RegExp(phonePattern);
 export function isPhoneResponse(
   response: QuestionResponse[],
 ): response is PhoneResponse[] {
-  return (response as PhoneResponse[])[0]?.responseType === "phone";
+  return (
+    (response as PhoneResponse[])[0]?.responseType === "phone" ||
+    !response.length
+  );
 }
 
 export const createPhoneResponse = (
@@ -32,11 +36,12 @@ export const createPhoneResponse = (
 });
 
 export default function QuestionPhone({
+  question,
   response,
   onAnswered,
   ...props
 }: QuestionPhoneProps) {
-  const responseValue = response[0];
+  const responseValue = response[0] || createPhoneResponse(question);
   const handleOnChange = (value: string) => {
     onAnswered({ ...responseValue, phone: value });
   };

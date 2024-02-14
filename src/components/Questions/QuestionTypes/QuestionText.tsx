@@ -7,6 +7,7 @@ import {
 import { WithQuestionCallback } from "../SurveyItem";
 
 export type QuestionTextProps = {
+  question: TextQuestion;
   response: TextResponse[];
 } & WithQuestionCallback<TextResponse> &
   TextInputProps;
@@ -18,7 +19,9 @@ export declare function isTextQuestion(
 export function isTextResponse(
   response: QuestionResponse[],
 ): response is TextResponse[] {
-  return (response as TextResponse[])[0]?.responseType === "text";
+  return (
+    (response as TextResponse[])[0]?.responseType === "text" || !response.length
+  );
 }
 
 export const createTextResponse = (
@@ -32,11 +35,12 @@ export const createTextResponse = (
 });
 
 export default function QuestionText({
+  question,
   response,
   onAnswered,
   ...props
 }: QuestionTextProps) {
-  const responseValue = response[0];
+  const responseValue = response[0] || createTextResponse(question);
   const handleOnChange = (value: string) => {
     onAnswered({ ...responseValue, text: value });
   };

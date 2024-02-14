@@ -73,7 +73,9 @@ export const createDaysResponse = (
 export function isDaysResponse(
   response: QuestionResponse[],
 ): response is DaysResponse[] {
-  return (response as DaysResponse[])[0]?.responseType === "days";
+  return (
+    (response as DaysResponse[])[0]?.responseType === "days" || !response.length
+  );
 }
 
 export default function QuestionDays({
