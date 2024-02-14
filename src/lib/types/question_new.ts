@@ -241,7 +241,7 @@ export type ResponseType =
 export type QuestionType = "question" | "process" | "rack";
 
 type BaseQuestion = {
-  id?: number;
+  id: number;
   projectId?: number;
   rackId?: number;
   collectionId?: number;

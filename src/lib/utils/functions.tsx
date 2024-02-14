@@ -3,6 +3,7 @@ import { Person } from "../types/question";
 import { NewRoom } from "../types/rooms";
 import * as changeKeys from "change-case/keys";
 import { DexieResponse } from "../types/dexie";
+import { dayOptionsById } from "@/components/Questions/QuestionTypes/QuestionDays";
 
 export const createPerson = (
   salut = 0,
@@ -112,6 +113,8 @@ export const getDisplayValue = (response?: DexieResponse) => {
       return response.checked ? response.label : "";
     case "datetime":
       return response.date?.toDateString();
+    case "days":
+      return dayOptionsById[response.dayId];
     case "email":
       return response.email;
     case "geo":

@@ -135,7 +135,6 @@ export default function QuestionByTypeComponent<
       {question.responseType === "collection" && (
         <QuestionCollection
           question={question}
-          response={response}
           onAnswered={onAnswered}
         />
       )}

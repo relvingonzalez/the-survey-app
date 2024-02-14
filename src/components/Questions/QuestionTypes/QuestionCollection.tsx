@@ -6,7 +6,7 @@ import {
   // Group,
   // Text,
   // Button,
-  ActionIcon,
+  // ActionIcon,
   TableTr,
   TableTd,
   TableTh,
@@ -18,18 +18,19 @@ import {
 } from "@mantine/core";
 import { CollectionQuestion } from "@/lib/types/question_new";
 // import { useState } from "react";
-import { IconTrash } from "@tabler/icons-react";
+// import { IconTrash } from "@tabler/icons-react";
 // import QuestionType from "../QuestionByTypeComponent";
 import { WithQuestionCallback } from "../SurveyItem";
 import { QuestionResponse } from "@/lib/types/question_new";
 import { useLiveQuery } from "dexie-react-hooks";
-import { getCollectionQuestions } from "@/lib/dexie/helper";
-import { DexieQuestion } from "@/lib/types/dexie";
-import { getDisplayValue } from "@/lib/utils/functions";
+import { getCollectionQuestions, getCollectionResponses } from "@/lib/dexie/helper";
+import { DexieQuestion, DexieResponse } from "@/lib/types/dexie";
+import { getDisplayValues } from "@/lib/utils/functions";
+// import { useState } from "react";
+// import QuestionByTypeComponent from "../QuestionByTypeComponent";
 
 export type QuestionCollectionProps = {
   question: CollectionQuestion;
-  response: QuestionResponse[];
 } & WithQuestionCallback<QuestionResponse[]>;
 
 // export function isCollectionResponse(
@@ -76,7 +77,7 @@ export type QuestionCollectionProps = {
 //           {entries.map((e, i) => (
 //             <Stack gap="xs" key={i}>
 //               <Text fw={500}>{e.question}</Text>
-//               <QuestionType
+//               <QuestionByTypeComponent
 //                 question={e}
 //                 onAnswered={(v) => onAnsweredQuestionInEntry(i, v)}
 //               />
@@ -93,24 +94,34 @@ export type QuestionCollectionProps = {
 
 type EntriesProps = Omit<QuestionCollectionProps, "question" | "onAnswered"> & {
   questions: DexieQuestion[];
+  response?: DexieResponse[];
   //onDelete: (i: number) => void;
 };
 // response is probably wrong, need responseGroup, grouped by some ID and iterate via response by each groupID
 // response_group_id ?
 function Entries({ questions, response }: EntriesProps) {
-  const rows = response.map((r, index) => (
+  if(!response) {
+    return null;
+  }
+
+  console.log(response)
+  //instead of response.map, its supposed to be responseGroup.map or something.
+
+  const responseGroup = [''];
+  const rows = responseGroup.map((r, index) => (
     <TableTr key={`${index}`}>
-      {questions.map((q, j) => (
-        <TableTd key={j}>{getDisplayValue(r)}</TableTd>
-      ))}
+      {questions.map((q, j) => {
+        const responsesToQuestion = response.filter(r => r.questionId === q.id);
+        return <TableTd key={j}>{getDisplayValues(responsesToQuestion)}</TableTd>
+      })}
       <TableTd>
-        <ActionIcon
+        {/* <ActionIcon
           variant="subtle"
           color="red"
-          // onClick={() => onDelete(index)}
+          onClick={() => onDelete(index)}
         >
           <IconTrash />
-        </ActionIcon>
+        </ActionIcon> */}
       </TableTd>
     </TableTr>
   ));
@@ -135,15 +146,19 @@ function Entries({ questions, response }: EntriesProps) {
 
 export default function QuestionCollection({
   question,
-  response,
   // onAnswered,
 }: QuestionCollectionProps) {
-  // fetch all questions in th ecollection with collectionID from this question and those are the questions or entries.
+  // fetch all questions in the collection with collectionID from this question and those are the questions or entries.
   const questions = useLiveQuery(
     () => getCollectionQuestions(question.projectId, question.collectionId),
     [question],
   );
-  // const [addNew, setAddNew] = useState(!value.length ? true : false);
+
+  const responses = useLiveQuery(
+    () => getCollectionResponses(questions),
+    [questions],
+  );
+  // const [addNew, setAddNew] = useState(!responses?.length ? true : false);
   // const [newEntriesAnswer, setNewEntriesAnswer] = useState<EntryAnswers>([]);
   // const onAddNewClick = () => {
   //   const newEntriesCopy: EntryAnswers = question.entries.map((q) =>
@@ -170,7 +185,6 @@ export default function QuestionCollection({
   //   onAnswered(newEntriesAnswers);
   // };
 
-  console.log(questions);
   if (!questions) {
     return null;
   }
@@ -181,7 +195,7 @@ export default function QuestionCollection({
 
   return (
     <>
-      <Entries questions={questions} response={response} />
+      <Entries questions={questions} response={responses} />
 
       {/* {addNew ? (
         <NewEntriesAnswer

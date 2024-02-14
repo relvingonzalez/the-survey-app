@@ -36,7 +36,7 @@ const options: DayOption[] = [
   { name: "Sunday", value: 1 },
 ];
 
-const optionsObject: Record<Day, number> = {
+const dayOptionsByDay: Record<Day, number> = {
   Monday: 2,
   Tuesday: 3,
   Wednesday: 4,
@@ -46,7 +46,7 @@ const optionsObject: Record<Day, number> = {
   Sunday: 1,
 };
 
-const optionsObjectInverted: Record<number, Day> = {
+export const dayOptionsById: Record<number, Day> = {
   2: "Monday",
   3: "Tuesday",
   4: "Wednesday",
@@ -83,15 +83,15 @@ export default function QuestionDays({
   response,
   onAnswered,
 }: QuestionDaysProps) {
-  const value = response.map((v) => optionsObjectInverted[v.dayId]);
+  const value = response.map((v) => dayOptionsById[v.dayId]);
   const handleSelected = (selection: string[]) => {
     if (isDayArray(selection)) {
       // Check if exists or add
       // TODO set flag to something other than d
       const result = selection.map((s) => {
         const res =
-          response.find((r) => optionsObjectInverted[r.dayId] === s) ||
-          createDaysResponse(question, optionsObject[s]);
+          response.find((r) => dayOptionsById[r.dayId] === s) ||
+          createDaysResponse(question, dayOptionsByDay[s]);
         return { ...res, flag: "" };
       });
 
@@ -101,7 +101,7 @@ export default function QuestionDays({
       );
       const responsesToRemove = response
         .filter((r) =>
-          selectionsToRemove.includes(optionsObjectInverted[r.dayId]),
+          selectionsToRemove.includes(dayOptionsById[r.dayId]),
         )
         .map((s) => ({ ...s, flag: "d" }));
 

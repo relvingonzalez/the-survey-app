@@ -182,6 +182,20 @@ export const getCollectionQuestions = (
   return [];
 };
 
+export const getCollectionResponses = (questions?: DexieQuestion[]) => {
+  // groupBy groupId or whatever
+  if (questions) {
+    const ids = questions.map(q => q.id);
+    console.log(questions, ids)
+    return db.responses
+      .where('questionId')
+      .anyOf(ids)
+      .toArray();
+  }
+
+  return [];
+};
+
 export const questionResponsesCounts = (
   allQuestions?: DexieQuestion[],
   allResponses?: DexieResponse[],
