@@ -86,8 +86,6 @@ export default function QuestionDays({
   const value = response.map((v) => dayOptionsById[v.dayId]);
   const handleSelected = (selection: string[]) => {
     if (isDayArray(selection)) {
-      // Check if exists or add
-      // TODO set flag to something other than d
       const result = selection.map((s) => {
         const res =
           response.find((r) => dayOptionsById[r.dayId] === s) ||
@@ -100,9 +98,7 @@ export default function QuestionDays({
         (o) => !selection.includes(o),
       );
       const responsesToRemove = response
-        .filter((r) =>
-          selectionsToRemove.includes(dayOptionsById[r.dayId]),
-        )
+        .filter((r) => selectionsToRemove.includes(dayOptionsById[r.dayId]))
         .map((s) => ({ ...s, flag: "d" }));
 
       onAnswered([...result, ...responsesToRemove]);
@@ -113,7 +109,7 @@ export default function QuestionDays({
     <ChipGroup multiple value={value} onChange={handleSelected}>
       <Group justify="left" mt="md">
         {options.map((o, i) => (
-          <Chip key={i} value={o.value}>
+          <Chip key={i} value={o.name}>
             {o.name}
           </Chip>
         ))}

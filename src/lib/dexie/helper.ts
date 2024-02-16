@@ -146,6 +146,7 @@ export const getResponse = (projectId?: number, question?: DexieQuestion) => {
   if (projectId && question) {
     return db.responses
       .where({ projectId, questionId: question?.id })
+      .and((r) => r.flag !== "d")
       .toArray();
   }
 
@@ -182,18 +183,30 @@ export const getCollectionQuestions = (
   return [];
 };
 
-export const getCollectionResponses = (questions?: DexieQuestion[]) => {
+export const getCollectionResponses = async (
+  questions?: DexieQuestion[],
+): Promise<Record<number, DexieResponse[]>> => {
   // groupBy groupId or whatever
+  let result = {};
   if (questions) {
-    const ids = questions.map(q => q.id);
-    console.log(questions, ids)
-    return db.responses
-      .where('questionId')
+    const ids = questions.map((q) => q.id);
+    const responses = await db.responses
+      .where("questionId")
       .anyOf(ids)
+      .and((r) => r.flag !== "d")
       .toArray();
+
+    result = responses.reduce(function (r, a) {
+      if (a.collectionOrder !== undefined) {
+        r[a.collectionOrder] = r[a.collectionOrder] || [];
+        r[a.collectionOrder].push(a);
+      }
+
+      return r;
+    }, Object.create(null));
   }
 
-  return [];
+  return result;
 };
 
 export const questionResponsesCounts = (

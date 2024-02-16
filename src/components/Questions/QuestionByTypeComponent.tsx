@@ -133,10 +133,7 @@ export default function QuestionByTypeComponent<
         />
       )}
       {question.responseType === "collection" && (
-        <QuestionCollection
-          question={question}
-          onAnswered={onAnswered}
-        />
+        <QuestionCollection question={question} onAnswered={onAnswered} />
       )}
     </>
   );

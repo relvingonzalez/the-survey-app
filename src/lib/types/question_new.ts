@@ -257,6 +257,7 @@ type BaseResponse = {
   projectId?: number;
   questionId?: number;
   responseType: ResponseType;
+  collectionOrder?: number;
 };
 
 export type Process = Question;

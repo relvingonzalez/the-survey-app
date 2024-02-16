@@ -16,6 +16,7 @@ export type DexieQuestion = Question & {
 
 export type DexieResponse = QuestionResponse & {
   localId?: number;
+  tempId?: string;
   flag?: ActionFlag;
 };
 

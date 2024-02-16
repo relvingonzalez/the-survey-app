@@ -26,12 +26,13 @@ export type ServerQuestion = Omit<
 
 export type ServerResponse = Omit<
   QuestionResponse,
-  "projectId" | "questionId" | "responseId" | "responseType"
+  "projectId" | "questionId" | "responseId" | "responseType" | "collectionOrder"
 > & {
   project_id?: number;
   question_id?: number;
   response_id?: number;
   response_type: ResponseType;
+  collection_order: number;
 };
 
 export type ServerComment = Omit<Comment, "projectId" | "questionId"> & {
