@@ -22,6 +22,7 @@ export type DexieResponse = QuestionResponse & {
 
 export type DexieComment = Comment & {
   localId?: number;
+  flag?: ActionFlag;
 };
 
 export type DexieRoom = LocalRoom & {

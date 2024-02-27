@@ -85,7 +85,7 @@ export default function Question({ siteCode, order, type }: QuestionProps) {
       />
       <QuestionComment
         mt="10"
-        value={comment.comment || ""}
+        value={comment.comment}
         onChange={handleCommentChange}
       />
       <Files

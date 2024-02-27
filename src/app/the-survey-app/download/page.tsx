@@ -1,19 +1,14 @@
 import { DownloadSites } from "@/components/Sites/Sites";
-import postgres from "postgres";
-import { transformEntriesFromServer } from "@/lib/utils/functions";
-import { ServerSiteProject } from "@/lib/types/server";
+import sql from "@/lib/api//db";
 import { LocalSiteProject } from "@/lib/types/local";
 
 async function getData() {
-  const sql = postgres(process.env.DATABASE_URL, { ssl: "require" });
   const response = await sql<
-    ServerSiteProject[]
+    LocalSiteProject[]
   >`SELECT project.id AS project_id, site.id, site.name, site.site_code, site.street, site.city, site.state, site.phone 
                                                     FROM PROJECT
                                                     JOIN SITE on project.site_id = site.id `;
-  return transformEntriesFromServer<ServerSiteProject, LocalSiteProject>(
-    response,
-  );
+  return response;
 }
 
 export default async function DownloadPage() {

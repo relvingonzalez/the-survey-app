@@ -22,14 +22,14 @@ export class TheSurveyAppDB extends Dexie {
 
   constructor() {
     super("theSurveyApp");
-    this.version(32).stores({
+    this.version(34).stores({
       siteProjects: "++localId, projectId, &id, name, siteCode",
       questions:
         "++localId, &id, projectId, [projectId+order], [projectId+order+questionType], collectionId, questionType, [projectId+questionType], [projectId+collectionId]",
       responses:
         "++localId, responseId, projectId, questionId, [projectId+questionId], collectionOrder",
       comments:
-        "++localId, &id, projectId, [projectId+questionType], [projectId+questionId]",
+        "++localId, &id, projectId, questionId, [projectId+questionType], [projectId+questionId], flag",
       rooms: "++localId, &id, projectId, name",
       racks: "++localId, &id, projectId, roomId, name",
       moreInfos: "++localId, &id, projectId, roomIdy",

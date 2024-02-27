@@ -6,13 +6,21 @@ import {
   IconDatabase,
   IconListCheck,
   IconCheck,
+  Icon,
 } from "@tabler/icons-react";
+
+export type Step = {
+  icon: Icon;
+  label: string;
+  description: string;
+};
 
 export type DownloadModalProps = ProgressModalProps & {
   active: number;
+  steps?: Step[];
 };
 
-const steps = [
+const defaultSteps = [
   { icon: IconListCheck, label: "Step 1", description: "Verifying" },
   { icon: IconDatabase, label: "Step 2", description: "Downloading" },
   { icon: IconDeviceSdCard, label: "Step 3", description: "Saving" },
@@ -21,6 +29,7 @@ const steps = [
 export default function DownloadModal({
   active,
   progressValue,
+  steps = defaultSteps,
   ...props
 }: DownloadModalProps) {
   return (

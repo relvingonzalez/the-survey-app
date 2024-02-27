@@ -65,7 +65,9 @@ export type QuestionValue =
 
 // Response by Question Type
 export type Comment = {
-  responseId: number;
+  id?: number | null;
+  questionId: number;
+  collectionOrder?: number | null;
   comment: string;
 };
 

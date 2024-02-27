@@ -1,73 +1,58 @@
-import { LocalDownloadSiteData, createLocalData } from "@/lib/types/local_new";
 import {
-  ServerComment,
-  ServerHardware,
-  ServerMoreInfo,
-  ServerQuestion,
-  ServerRack,
-  ServerResponse,
-  ServerRoom,
-  ServerSiteProject,
-} from "@/lib/types/server_new";
-import {
-  transformEntriesFromServer,
-  transformEntryFromServer,
-} from "@/lib/utils/functions";
-import postgres from "postgres";
+  LocalDownloadSiteData,
+  LocalHardware,
+  LocalMoreInfo,
+  LocalRack,
+  LocalRoom,
+  LocalSiteProject,
+  createLocalData,
+} from "@/lib/types/local_new";
+import sql from "@/lib/api//db";
+import { Question, QuestionResponse, Comment } from "@/lib/types/question_new";
 
 export async function GET(
   request: Request,
   { params }: { params: { siteId: number } },
 ) {
   const data: LocalDownloadSiteData = createLocalData();
-  const sql = postgres(process.env.DATABASE_URL, { ssl: "require" });
-  const siteProjects = await sql<
-    ServerSiteProject[]
+  const [siteProject] = await sql<
+    LocalSiteProject[]
   >`Select * FROM site_project WHERE id = ${params.siteId}`; // add customer id
 
-  const projectId = siteProjects[0].project_id;
-  // step one download questions
+  const projectId = siteProject.projectId;
+  data["siteProject"] = siteProject;
 
-  const questions = await sql<
-    ServerQuestion[]
+  // step one download questions
+  data["questions"] = await sql<
+    Question[]
   >`SELECT * FROM questions WHERE project_id = ${projectId}`;
 
-  const responses = await sql<
-    ServerResponse[]
+  data["responses"] = await sql<
+    QuestionResponse[]
   >`SELECT * FROM responses WHERE project_id = ${projectId}`;
 
-  const comments = await sql<
-    ServerComment[]
+  data["comments"] = await sql<
+    Comment[]
   >`SELECT * FROM comment WHERE project_id = ${projectId}`;
 
   // step seven download available rooms
-  const rooms = await sql<
-    ServerRoom[]
+  data["rooms"] = await sql<
+    LocalRoom[]
   >`SELECT * FROM room WHERE project_id = ${projectId}`;
 
   // step eight download available racks and more info
-  const racks = await sql<
-    ServerRack[]
+  data["racks"] = await sql<
+    LocalRack[]
   >`SELECT room.project_id, rack.* FROM rack INNER JOIN room USING (id) WHERE project_id = ${projectId}`;
 
-  const moreInfo = await sql<
-    ServerMoreInfo[]
+  data["moreInfos"] = await sql<
+    LocalMoreInfo[]
   >`SELECT room.project_id, more_info.* FROM more_info INNER JOIN room USING (id) WHERE project_id = ${projectId}`;
 
-  const hardware = await sql<
-    ServerHardware[]
+  data["hardwares"] = await sql<
+    LocalHardware[]
   >`SELECT room.project_id, hardware.* FROM hardware INNER JOIN rack USING (id) INNER JOIN room USING (id) WHERE project_id = ${projectId}`;
 
   // step files download files per each
-
-  data["siteProject"] = transformEntryFromServer(siteProjects[0]);
-  data["questions"] = transformEntriesFromServer(questions);
-  data["responses"] = transformEntriesFromServer(responses);
-  data["comments"] = transformEntriesFromServer(comments);
-  data["rooms"] = transformEntriesFromServer(rooms);
-  data["racks"] = transformEntriesFromServer(racks);
-  data["moreInfos"] = transformEntriesFromServer(moreInfo);
-  data["hardwares"] = transformEntriesFromServer(hardware);
-
   return Response.json(data);
 }

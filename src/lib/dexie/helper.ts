@@ -1,7 +1,7 @@
 import { createMultipleResponse } from "@/components/Questions/QuestionTypes/QuestionMultiple";
-import { DexieQuestion, DexieResponse } from "../types/dexie";
+import { DexieComment, DexieQuestion, DexieResponse } from "../types/dexie";
 import { LocalDownloadSiteData } from "../types/local_new";
-import { QuestionType } from "../types/question_new";
+import { Comment, QuestionType } from "../types/question_new";
 import { db } from "./db";
 import { createCheckboxResponse } from "@/components/Questions/QuestionTypes/QuestionCheckbox";
 import { createDateTimeResponse } from "@/components/Questions/QuestionTypes/QuestionDateTime";
@@ -109,13 +109,26 @@ export const getNextQuestion = async (
   return undefined;
 };
 
+export const updateCommentIds = (comments: Comment[]) => {
+  return db.transaction("rw", db.comments, () => {
+    comments.map((c) =>
+      db.comments
+        .where({ questionId: c.questionId })
+        .modify({ id: c.id, flag: "" }),
+    );
+  });
+};
+
 export const updateComment = (value: string, localId?: number) => {
   return db.transaction("rw", db.comments, () => {
     if (localId) {
-      db.comments.where({ localId }).modify({ comment: value });
+      db.comments.where({ localId }).modify({ comment: value, flag: "u" });
     }
   });
 };
+
+export const getUpdatedComments = () =>
+  db.comments.where({ flag: "u" }).toArray();
 
 export const insertOrModifyResponse = (response: DexieResponse) => {
   if (response.localId) {
@@ -133,12 +146,24 @@ export const insertOrModifyResponses = (responses: DexieResponse[]) => {
   return responses.map(insertOrModifyResponse);
 };
 
-export const getComment = (projectId?: number, question?: DexieQuestion) => {
-  if (projectId && question) {
-    return db.comments.get({ projectId, questionId: question?.id });
-  }
+export const createComment = (questionId: number): DexieComment => ({
+  id: null,
+  questionId,
+  comment: "",
+  collectionOrder: null,
+  flag: "u",
+});
 
-  return undefined;
+export const getComment = async (
+  projectId?: number,
+  question?: DexieQuestion,
+) => {
+  if (projectId && question) {
+    return (
+      (await db.comments.get({ projectId, questionId: question?.id })) ||
+      createComment(question?.id)
+    );
+  }
 };
 
 export const getResponse = (projectId?: number, question?: DexieQuestion) => {
