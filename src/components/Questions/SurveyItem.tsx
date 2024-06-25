@@ -1,6 +1,5 @@
 "use client";
 
-import { Question } from "@/lib/types/question";
 import QuestionComment from "../Comment";
 import QuestionByTypeComponent from "./QuestionByTypeComponent";
 import { ChangeEventHandler } from "react";
