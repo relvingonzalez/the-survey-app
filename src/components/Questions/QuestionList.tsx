@@ -119,7 +119,6 @@ export function QuestionList({ siteCode }: QuestionListProps) {
     () => db.responses.where({ projectId: projectId }).toArray(),
     [projectId],
   );
-  console.log(questions, questionResponses);
 
   if (!questions || !questionResponses) {
     return null;
