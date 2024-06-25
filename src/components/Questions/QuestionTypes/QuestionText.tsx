@@ -5,6 +5,7 @@ import {
   TextResponse,
 } from "@/lib/types/question_new";
 import { WithQuestionCallback } from "../SurveyItem";
+import { useState } from "react";
 
 export type QuestionTextProps = {
   question: TextQuestion;
@@ -41,14 +42,17 @@ export default function QuestionText({
   ...props
 }: QuestionTextProps) {
   const responseValue = response[0] || createTextResponse(question);
+  const [value, setValue] = useState(responseValue.text);
+
   const handleOnChange = (value: string) => {
+    setValue(value);
     onAnswered({ ...responseValue, text: value });
   };
 
   return (
     <TextInput
       placeholder="Text"
-      value={responseValue.text}
+      value={value}
       onChange={(e) => {
         handleOnChange(e.target.value);
       }}

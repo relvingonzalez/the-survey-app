@@ -5,6 +5,7 @@ import {
   EmailResponse,
   QuestionResponse,
 } from "@/lib/types/question_new";
+import { useState } from "react";
 
 export type QuestionEmailProps = {
   question: EmailQuestion;
@@ -45,13 +46,15 @@ export default function QuestionEmail({
   ...props
 }: QuestionEmailProps) {
   const responseValue = response[0] || createEmailResponse(question);
+  const [value, setValue] = useState(responseValue.email);
   const handleOnChange = (value: string) => {
+    setValue(value);
     onAnswered({ ...responseValue, email: value });
   };
   return (
     <TextInput
       {...props}
-      value={responseValue.email}
+      value={value}
       label="Email"
       type="email"
       placeholder="email@example.com"
