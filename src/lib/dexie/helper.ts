@@ -193,7 +193,7 @@ export const getMainQuestions = (
   return [];
 };
 
-export const getCollectionQuestions = (
+export const getCollectionQuestions = async (
   projectId?: number,
   collectionId?: number,
 ) => {

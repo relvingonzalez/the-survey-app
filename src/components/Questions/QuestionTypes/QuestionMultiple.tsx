@@ -56,7 +56,6 @@ export default function QuestionListSelect({
       .map((s) => ({ ...s, flag: "d" }));
     onAnswered([...result, ...responsesToRemove]);
   };
-
   return (
     <MultiSelect
       {...props}
@@ -64,7 +63,7 @@ export default function QuestionListSelect({
       label="Select"
       placeholder="--Select One or Many--"
       data={question.options}
-      defaultValue={response.map((r) => r.text)}
+      value={response.map((r) => r.text).filter((v) => v)}
       onChange={handleOnChange}
     />
   );

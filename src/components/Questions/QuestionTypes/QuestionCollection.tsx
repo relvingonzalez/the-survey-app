@@ -95,14 +95,14 @@ function NewResponseGroup({
 type EntriesProps = Omit<QuestionCollectionProps, "question" | "onAnswered"> & {
   questions: DexieQuestion[];
   responseGroups?: Record<number, DexieResponse[]>;
-  onDelete: (collectionOrder: number) => void;
+  onDelete?: (collectionOrder: number) => void;
 };
 
 export const createCollectionResponses = (questions?: DexieQuestion[]) => {
   return questions?.flatMap(createResponseByQuestion);
 };
 
-function Entries({ questions, responseGroups, onDelete }: EntriesProps) {
+export function Entries({ questions, responseGroups, onDelete }: EntriesProps) {
   if (!responseGroups) {
     return null;
   }
@@ -117,15 +117,17 @@ function Entries({ questions, responseGroups, onDelete }: EntriesProps) {
           <TableTd key={j}>{getDisplayValues(responsesToQuestion)}</TableTd>
         );
       })}
-      <TableTd>
-        <ActionIcon
-          variant="subtle"
-          color="red"
-          onClick={() => onDelete(Number(k))}
-        >
-          <IconTrash />
-        </ActionIcon>
-      </TableTd>
+      {onDelete && (
+        <TableTd>
+          <ActionIcon
+            variant="subtle"
+            color="red"
+            onClick={() => onDelete(Number(k))}
+          >
+            <IconTrash />
+          </ActionIcon>
+        </TableTd>
+      )}
     </TableTr>
   ));
 
@@ -134,7 +136,7 @@ function Entries({ questions, responseGroups, onDelete }: EntriesProps) {
       {questions.map((q, i) => (
         <TableTh key={i}>{q.question}</TableTh>
       ))}
-      <TableTh></TableTh>
+      {onDelete && <TableTh></TableTh>}
     </TableTr>
   );
 

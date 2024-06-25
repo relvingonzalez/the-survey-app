@@ -1,7 +1,11 @@
 "use client";
 
 import { db } from "@/lib/dexie/db";
-import { getMainQuestions } from "@/lib/dexie/helper";
+import {
+  getCollectionQuestions,
+  getCollectionResponses,
+  getMainQuestions,
+} from "@/lib/dexie/helper";
 import { DexieQuestion, DexieResponse } from "@/lib/types/dexie";
 import { SiteCode } from "@/lib/types/sites";
 import { getDisplayValues } from "@/lib/utils/functions";
@@ -19,6 +23,7 @@ import {
 import { IconSettings } from "@tabler/icons-react";
 import { useLiveQuery } from "dexie-react-hooks";
 import Link from "next/link";
+import { Entries } from "./QuestionTypes/QuestionCollection";
 
 type ItemListProps = {
   isQuestion?: boolean;
@@ -38,9 +43,13 @@ function ItemList({ items, isQuestion, responses }: ItemListProps) {
             {" "}
             {item.question}
           </Text>
-          <Text size="sm" fw="700">
-            {getDisplayValues(response)}
-          </Text>
+          {item.responseType === "collection" ? (
+            <DisplayCollectionValues question={item} />
+          ) : (
+            <Text size="sm" fw="700">
+              {getDisplayValues(response)}
+            </Text>
+          )}
         </TableTd>
         <TableTd>
           <Button
@@ -73,6 +82,28 @@ function ItemList({ items, isQuestion, responses }: ItemListProps) {
   );
 }
 
+type DisplayCollectionValuesProps = {
+  question: DexieQuestion;
+};
+
+function DisplayCollectionValues({ question }: DisplayCollectionValuesProps) {
+  const questions = useLiveQuery(
+    () => getCollectionQuestions(question.projectId, question.collectionId),
+    [question],
+  );
+
+  const responseGroups = useLiveQuery(
+    () => getCollectionResponses(questions),
+    [questions],
+  );
+
+  if (!questions || !responseGroups) {
+    return null;
+  }
+
+  return <Entries questions={questions} responseGroups={responseGroups} />;
+}
+
 export type QuestionListProps = {
   siteCode: SiteCode;
 };
@@ -88,6 +119,7 @@ export function QuestionList({ siteCode }: QuestionListProps) {
     () => db.responses.where({ projectId: projectId }).toArray(),
     [projectId],
   );
+  console.log(questions, questionResponses);
 
   if (!questions || !questionResponses) {
     return null;

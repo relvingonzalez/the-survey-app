@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "dev:mock-api": "npx nodemon --watch 'src/lib/mock/*.tsx' --exec tsx src/lib/mock/index.tsx"
+    "dev:mock-api": "npx nodemon --watch 'src/lib/mock/*.tsx' --exec tsx src/lib/mock/index.tsx",
+    "format": "prettier 'src/**/*.{tsx,js,ts,mjs,cjs,json}' --write"
   },
   "dependencies": {
     "@mantine/core": "^7.3.2",
