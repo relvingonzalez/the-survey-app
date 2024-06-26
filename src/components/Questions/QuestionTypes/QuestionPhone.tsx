@@ -5,6 +5,7 @@ import {
   PhoneResponse,
   QuestionResponse,
 } from "@/lib/types/question_new";
+import { useEffect, useState } from "react";
 
 export type QuestionPhoneProps = {
   question: PhoneQuestion;
@@ -42,14 +43,21 @@ export default function QuestionPhone({
   ...props
 }: QuestionPhoneProps) {
   const responseValue = response[0] || createPhoneResponse(question);
+  const [value, setValue] = useState(responseValue.phone);
   const handleOnChange = (value: string) => {
+    setValue(value)
     onAnswered({ ...responseValue, phone: value });
   };
+  useEffect(() => {
+    if(!value) {
+      setValue(responseValue.phone);
+    }
+  }, [responseValue, value]);
 
   return (
     <TextInput
       {...props}
-      value={responseValue.phone}
+      value={value}
       type="tel"
       label="Telephone"
       placeholder="+9-(999)999-9999"

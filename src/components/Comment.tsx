@@ -1,4 +1,5 @@
 import { Textarea, TextareaProps } from "@mantine/core";
+import { ChangeEvent, useState } from "react";
 
 type CommentProps = TextareaProps & {
   value: string;
@@ -6,14 +7,24 @@ type CommentProps = TextareaProps & {
 };
 
 export default function Comment({ value, onChange, ...props }: CommentProps) {
+  const [commentValue, setCommentValue] = useState(value || '');
+  const onCommentChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
+    setCommentValue(event.currentTarget.value);
+    onChange(event.currentTarget.value)
+  };
+  // useEffect(() => {
+  //   if(!commentValue) {
+  //     setCommentValue(value);
+  //   }
+  // }, [commentValue, value]);
   return (
     <Textarea
       {...props}
       label="Comments:"
       description=""
       placeholder="Comment"
-      value={value}
-      onChange={(event) => onChange(event.currentTarget.value)}
+      value={commentValue}
+      onChange={onCommentChange}
     />
   );
 }

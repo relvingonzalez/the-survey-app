@@ -146,7 +146,7 @@ export const getDisplayValues = (
   responses?: DexieResponse | DexieResponse[],
 ) => {
   if (responses instanceof Array) {
-    return responses.map(getDisplayValue).join(", ");
+    return responses.map(getDisplayValue).filter(v => v).join(", ");
   } else {
     return getDisplayValue(responses);
   }

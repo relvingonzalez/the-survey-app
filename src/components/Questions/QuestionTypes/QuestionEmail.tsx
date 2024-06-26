@@ -5,7 +5,7 @@ import {
   EmailResponse,
   QuestionResponse,
 } from "@/lib/types/question_new";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export type QuestionEmailProps = {
   question: EmailQuestion;
@@ -47,10 +47,15 @@ export default function QuestionEmail({
 }: QuestionEmailProps) {
   const responseValue = response[0] || createEmailResponse(question);
   const [value, setValue] = useState(responseValue.email);
-  const handleOnChange = (value: string) => {
-    setValue(value);
-    onAnswered({ ...responseValue, email: value });
+  const handleOnChange = (newValue: string) => {
+    setValue(newValue)
+    onAnswered({ ...responseValue, email: newValue });
   };
+  useEffect(() => {
+    if(!value) {
+      setValue(responseValue.email);
+    }
+  }, [responseValue, value]);
   return (
     <TextInput
       {...props}

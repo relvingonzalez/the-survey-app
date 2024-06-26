@@ -5,6 +5,7 @@ import {
   NumberResponse,
   QuestionResponse,
 } from "@/lib/types/question_new";
+import { useEffect, useState } from "react";
 
 export type QuestionNumberProps = {
   question: NumberQuestion;
@@ -38,13 +39,20 @@ export default function QuestionNumber({
   ...props
 }: QuestionNumberProps) {
   const responseValue = response[0] || createNumberResponse(question);
+  const [value, setValue] = useState<string | number | undefined>(responseValue.number);
   const handleOnChange = (value: string | number) => {
+    setValue(value);
     onAnswered({ ...responseValue, number: Number(value) });
   };
+  useEffect(() => {
+    if(!value) {
+      setValue(responseValue.number);
+    }
+  }, [responseValue, value]);
   return (
     <NumberInput
       {...props}
-      value={responseValue.number}
+      value={value}
       label="Number"
       min={0}
       onChange={handleOnChange}
