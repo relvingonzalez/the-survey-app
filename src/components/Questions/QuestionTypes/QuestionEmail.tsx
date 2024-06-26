@@ -31,7 +31,7 @@ export function isEmailResponse(
 
 export const createEmailResponse = (
   { projectId, id: questionId, responseType }: EmailQuestion,
-  email: string = "",
+  email: string = " ",
 ): EmailResponse => ({
   projectId,
   questionId,

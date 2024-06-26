@@ -27,7 +27,7 @@ export function isTextResponse(
 
 export const createTextResponse = (
   { projectId, id: questionId, responseType }: TextQuestion,
-  text = "",
+  text = " ",
 ): TextResponse => ({
   projectId,
   questionId,
