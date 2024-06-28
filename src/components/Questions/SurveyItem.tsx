@@ -61,7 +61,10 @@ export default function Question({ siteCode, order, type }: QuestionProps) {
   ) => {
     const responses = value instanceof Array ? value : [value];
     return db.transaction("rw", db.responses, () => {
-      return insertOrModifyResponses(responses);
+      // Add response id before saving locally
+      return insertOrModifyResponses(
+        responses.map((r) => ({ ...r, questionResponseId: comment?.id })),
+      );
     });
   };
   const handleFileDelete = (i: number) => {

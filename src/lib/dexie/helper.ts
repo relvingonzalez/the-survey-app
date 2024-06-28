@@ -1,8 +1,8 @@
-import { createMultipleResponse } from "@/components/Questions/QuestionTypes/QuestionMultiple";
 import { DexieComment, DexieQuestion, DexieResponse } from "../types/dexie";
 import { LocalDownloadSiteData } from "../types/local_new";
 import { Comment, QuestionType } from "../types/question_new";
 import { db } from "./db";
+import { createMultipleResponse } from "@/components/Questions/QuestionTypes/QuestionMultiple";
 import { createCheckboxResponse } from "@/components/Questions/QuestionTypes/QuestionCheckbox";
 import { createDateTimeResponse } from "@/components/Questions/QuestionTypes/QuestionDateTime";
 import { createEmailResponse } from "@/components/Questions/QuestionTypes/QuestionEmail";
@@ -111,11 +111,15 @@ export const getNextQuestion = async (
 
 export const updateCommentIds = (comments: Comment[]) => {
   return db.transaction("rw", db.comments, () => {
-    comments.map((c) =>
+    comments.map((c) => {
       db.comments
         .where({ questionId: c.questionId })
-        .modify({ id: c.id, flag: "" }),
-    );
+        .modify({ id: c.id, flag: "" });
+
+      db.responses
+        .where({ questionId: c.questionId })
+        .modify({ questionResponseId: c.id });
+    });
   });
 };
 
@@ -130,6 +134,9 @@ export const updateComment = (value: string, localId?: number) => {
 export const getUpdatedComments = () =>
   db.comments.where({ flag: "u" }).toArray();
 
+export const getUpdatedResponses = () =>
+  db.responses.where({ flag: "u" }).toArray();
+
 export const insertOrModifyResponse = (response: DexieResponse) => {
   if (response.localId) {
     if (response.flag === "d" && !response.id) {
@@ -137,9 +144,9 @@ export const insertOrModifyResponse = (response: DexieResponse) => {
     }
     return db.responses
       .where({ localId: response.localId })
-      .modify({ ...response });
+      .modify({ ...response, flag: "u" });
   }
-  return db.responses.add(response);
+  return db.responses.add({ ...response, flag: "u" });
 };
 
 export const insertOrModifyResponses = (responses: DexieResponse[]) => {
@@ -147,7 +154,7 @@ export const insertOrModifyResponses = (responses: DexieResponse[]) => {
 };
 
 export const createComment = (questionId: number): DexieComment => ({
-  id: null,
+  id: undefined,
   questionId,
   comment: "",
   collectionOrder: null,

@@ -45,10 +45,10 @@ export function isPersonResponse(
 }
 
 const salutationLabels = ["Mr", "Ms"];
-const salutationValues = ["0", "1"];
+const salutationValues = ["1", "2"];
 const salutations: Record<number, Salutation> = {
-  0: "Mr",
-  1: "Ms",
+  1: "Mr",
+  2: "Ms",
 };
 export const salutationOptions = salutationLabels.map((_, i) => ({
   label: salutationLabels[i],

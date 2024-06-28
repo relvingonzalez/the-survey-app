@@ -2,8 +2,12 @@
 
 import { ModalProps } from "@mantine/core";
 import { useEffect, useState } from "react";
-import { getUpdatedComments, updateCommentIds } from "@/lib/dexie/helper";
-import { saveComments } from "@/lib/api/actions";
+import {
+  getUpdatedComments,
+  getUpdatedResponses,
+  updateCommentIds,
+} from "@/lib/dexie/helper";
+import { saveComments, saveResponses } from "@/lib/api/actions";
 import DownloadModal from "./DownloadModal";
 import {
   IconListCheck,
@@ -36,10 +40,19 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
     if (comments.length) {
       handleStatusUpdate(1, 15, "Syncing Comments...");
       const commentsResult = await saveComments(comments);
-      updateCommentIds(commentsResult).then(() => {
-        handleStatusUpdate(3, 100, "Syncing Complete!");
-      });
+      await updateCommentIds(commentsResult);
+      handleStatusUpdate(2, 20, "Syncing Comments Complete!");
     }
+
+    const responses = await getUpdatedResponses();
+    if (responses.length) {
+      const savedResponses = await saveResponses(responses);
+      console.log("saved are:", savedResponses);
+      handleStatusUpdate(2, 30, "Syncing Responses Complete!");
+    }
+
+    handleStatusUpdate(3, 100, "Syncing Complete!");
+
     // sync responses
     // sync rooms
     // sync moreInfo

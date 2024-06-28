@@ -4,6 +4,35 @@ import { NewRoom } from "../types/rooms";
 import * as changeKeys from "change-case/keys";
 import { DexieResponse } from "../types/dexie";
 import { dayOptionsById } from "@/components/Questions/QuestionTypes/QuestionDays";
+import {
+  CheckboxResponse,
+  DateTimeResponse,
+  DaysResponse,
+  EmailResponse,
+  GeoResponse,
+  ListResponse,
+  MultipleResponse,
+  NumberResponse,
+  PersonResponse,
+  PhoneResponse,
+  QuestionResponse,
+  TextResponse,
+  TimeResponse,
+  YesNoResponse,
+} from "../types/question_new";
+import {
+  ServerCheckboxResponse,
+  ServerDateTimeResponse,
+  ServerDaysResponse,
+  ServerEmailResponse,
+  ServerGeoResponse,
+  ServerNumberResponse,
+  ServerPersonResponse,
+  ServerPhoneResponse,
+  ServerTextResponse,
+  ServerTimeResponse,
+  ServerYesNoResponse,
+} from "../types/server_new";
 
 export const createPerson = (
   salut = 0,
@@ -146,8 +175,164 @@ export const getDisplayValues = (
   responses?: DexieResponse | DexieResponse[],
 ) => {
   if (responses instanceof Array) {
-    return responses.map(getDisplayValue).filter(v => v).join(", ");
+    return responses
+      .map(getDisplayValue)
+      .filter((v) => v)
+      .join(", ");
   } else {
     return getDisplayValue(responses);
+  }
+};
+
+export const transformEmailResponse = ({
+  id,
+  questionResponseId,
+  email,
+}: EmailResponse): ServerEmailResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  email,
+});
+
+export const transformCheckboxResponse = ({
+  id,
+  questionResponseId,
+  label,
+  checked,
+}: CheckboxResponse): ServerCheckboxResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  label,
+  checked,
+});
+
+export const transformDatetimeResponse = ({
+  id,
+  questionResponseId,
+  date,
+}: DateTimeResponse): ServerDateTimeResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  date,
+});
+
+export const transformDaysResponse = ({
+  id,
+  questionResponseId,
+  dayId,
+}: DaysResponse): ServerDaysResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  dayId,
+});
+
+export const transformGeoResponse = ({
+  id,
+  questionResponseId,
+  long,
+  lat,
+}: GeoResponse): ServerGeoResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  geog: `SRID=4326;POINT(${long} ${lat})`,
+});
+
+export const transformNumbereResponse = ({
+  id,
+  questionResponseId,
+  number,
+}: NumberResponse): ServerNumberResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  number,
+});
+
+export const transformPersonResponse = ({
+  id,
+  questionResponseId,
+  salutationId,
+  firstName,
+  lastName,
+  email,
+  phone,
+}: PersonResponse): ServerPersonResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  salutationId,
+  firstName,
+  lastName,
+  email,
+  phone,
+});
+
+export const transformPhoneResponse = ({
+  id,
+  questionResponseId,
+  phone,
+}: PhoneResponse): ServerPhoneResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  phone,
+});
+
+export const transformTextResponse = ({
+  id,
+  questionResponseId,
+  text,
+}: TextResponse | ListResponse | MultipleResponse): ServerTextResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  text,
+});
+
+export const transformTimeResponse = ({
+  id,
+  questionResponseId,
+  fromTime,
+  toTime,
+}: TimeResponse): ServerTimeResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  fromTime,
+  toTime,
+});
+
+export const transformYesNoResponse = ({
+  id,
+  questionResponseId,
+  yesNo,
+}: YesNoResponse): ServerYesNoResponse => ({
+  ...(id && { id }),
+  questionResponseId,
+  yesNo,
+});
+
+// Prepare local responses for server insert/modify
+export const transformResponseToServerResponse = (
+  response: QuestionResponse,
+) => {
+  switch (response.responseType) {
+    case "checkbox":
+      return transformCheckboxResponse(response);
+    case "datetime":
+      return transformDatetimeResponse(response);
+    case "days":
+      return transformDaysResponse(response);
+    case "email":
+      return transformEmailResponse(response);
+    case "geo":
+      return transformGeoResponse(response);
+    case "number":
+      return transformNumbereResponse(response);
+    case "person":
+      return transformPersonResponse(response);
+    case "phone":
+      return transformPhoneResponse(response);
+    case "time":
+      return transformTimeResponse(response);
+    case "yes/no":
+      return transformYesNoResponse(response);
+    default:
+      transformTextResponse(response);
   }
 };

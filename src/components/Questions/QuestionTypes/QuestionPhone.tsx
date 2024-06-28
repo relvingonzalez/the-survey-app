@@ -45,11 +45,11 @@ export default function QuestionPhone({
   const responseValue = response[0] || createPhoneResponse(question);
   const [value, setValue] = useState(responseValue.phone);
   const handleOnChange = (value: string) => {
-    setValue(value)
+    setValue(value);
     onAnswered({ ...responseValue, phone: value });
   };
   useEffect(() => {
-    if(!value) {
+    if (!value) {
       setValue(responseValue.phone);
     }
   }, [responseValue, value]);

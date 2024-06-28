@@ -3,7 +3,9 @@ import { DexieComment } from "../types/dexie";
 
 const sql = postgres(process.env.DATABASE_URL, {
   ssl: "require",
-  transform: postgres.camel,
+  transform: {
+    ...postgres.camel,
+  },
   types: {
     responseComment: {
       // The pg_types oid to pass to the db along with the serialized value.

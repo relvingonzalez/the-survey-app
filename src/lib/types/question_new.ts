@@ -34,19 +34,19 @@ export type YesNo = boolean | null;
 // export type Entries = Exclude<Question, "CollectionQuestion">[];
 
 // Question Response Value types
-type TextValue = { text: string };
-type NumberValue = { number?: number };
-type ListValue = { text: string | null };
-type EmailValue = { email: string };
-type CheckboxValue = { label: string; checked?: boolean };
-type DateTimeValue = { date: Date | null };
-type DaysValue = { dayId: number };
-type MultipleValue = { text: string };
-type PersonValue = Person;
-type TimeValue = Time;
-type YesNoValue = { yesNo: YesNo };
-type GeoValue = { lat: number | null; long: number | null };
-type PhoneValue = { phone: string };
+export type TextValue = { text: string | null };
+export type NumberValue = { number?: number };
+export type ListValue = { text: string | null };
+export type EmailValue = { email: string };
+export type CheckboxValue = { label: string; checked?: boolean };
+export type DateTimeValue = { date: Date | null };
+export type DaysValue = { dayId: number };
+export type MultipleValue = { text: string };
+export type PersonValue = Person;
+export type TimeValue = Time;
+export type YesNoValue = { yesNo: YesNo };
+export type GeoValue = { lat: number | null; long: number | null };
+export type PhoneValue = { phone: string };
 
 export type QuestionValue =
   | ListValue
@@ -65,7 +65,7 @@ export type QuestionValue =
 
 // Response by Question Type
 export type Comment = {
-  id?: number | null;
+  id?: number;
   questionId: number;
   collectionOrder?: number | null;
   comment: string;
@@ -258,6 +258,7 @@ type BaseResponse = {
   id?: number;
   projectId?: number;
   questionId?: number;
+  questionResponseId?: number;
   responseType: ResponseType;
   collectionOrder?: number;
 };

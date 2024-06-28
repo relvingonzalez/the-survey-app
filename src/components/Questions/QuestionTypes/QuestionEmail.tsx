@@ -31,7 +31,7 @@ export function isEmailResponse(
 
 export const createEmailResponse = (
   { projectId, id: questionId, responseType }: EmailQuestion,
-  email: string = " ",
+  email: string = "",
 ): EmailResponse => ({
   projectId,
   questionId,
@@ -48,11 +48,12 @@ export default function QuestionEmail({
   const responseValue = response[0] || createEmailResponse(question);
   const [value, setValue] = useState(responseValue.email);
   const handleOnChange = (newValue: string) => {
-    setValue(newValue)
+    setValue(newValue);
     onAnswered({ ...responseValue, email: newValue });
   };
   useEffect(() => {
-    if(!value) {
+    console.log(value, responseValue);
+    if (!value) {
       setValue(responseValue.email);
     }
   }, [responseValue, value]);

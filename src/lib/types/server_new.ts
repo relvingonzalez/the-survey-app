@@ -1,9 +1,20 @@
 import {
   Question,
-  QuestionResponse,
   QuestionType,
   ResponseType,
   Comment,
+  CheckboxValue,
+  DateTimeValue,
+  DaysValue,
+  EmailValue,
+  ListValue,
+  MultipleValue,
+  NumberValue,
+  PersonValue,
+  PhoneValue,
+  TextValue,
+  TimeValue,
+  YesNoValue,
 } from "./question_new";
 import { Coordinate } from "./rooms";
 import { Site, SiteCode } from "./sites";
@@ -24,16 +35,38 @@ export type ServerQuestion = Omit<
   response_type: ResponseType;
 };
 
-export type ServerResponse = Omit<
-  QuestionResponse,
-  "projectId" | "questionId" | "responseId" | "responseType" | "collectionOrder"
-> & {
-  project_id?: number;
-  question_id?: number;
-  response_id?: number;
-  response_type: ResponseType;
-  collection_order: number;
+export type ServerResponse = {
+  id?: number;
+  questionResponseId?: number;
 };
+
+export type ServerGeoResponse = ServerResponse & {
+  geog: string;
+};
+
+export type ServerTextResponse = ServerResponse & TextValue;
+
+export type ServerEmailResponse = ServerResponse & EmailValue;
+
+export type ServerCheckboxResponse = ServerResponse & CheckboxValue;
+
+export type ServerDateTimeResponse = ServerResponse & DateTimeValue;
+
+export type ServerDaysResponse = ServerResponse & DaysValue;
+
+export type ServerMultipleResponse = ServerResponse & MultipleValue;
+
+export type ServerPersonResponse = ServerResponse & PersonValue;
+
+export type ServerTimeResponse = ServerResponse & TimeValue;
+
+export type ServerYesNoResponse = ServerResponse & YesNoValue;
+
+export type ServerListResponse = ServerResponse & ListValue;
+
+export type ServerNumberResponse = ServerResponse & NumberValue;
+
+export type ServerPhoneResponse = ServerResponse & PhoneValue;
 
 export type ServerComment = Omit<Comment, "projectId" | "questionId"> & {
   project_id?: number;

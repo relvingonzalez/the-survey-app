@@ -7,10 +7,10 @@ type CommentProps = TextareaProps & {
 };
 
 export default function Comment({ value, onChange, ...props }: CommentProps) {
-  const [commentValue, setCommentValue] = useState(value || '');
+  const [commentValue, setCommentValue] = useState(value || "");
   const onCommentChange = (event: ChangeEvent<HTMLTextAreaElement>) => {
     setCommentValue(event.currentTarget.value);
-    onChange(event.currentTarget.value)
+    onChange(event.currentTarget.value);
   };
   // useEffect(() => {
   //   if(!commentValue) {

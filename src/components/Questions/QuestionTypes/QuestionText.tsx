@@ -27,7 +27,7 @@ export function isTextResponse(
 
 export const createTextResponse = (
   { projectId, id: questionId, responseType }: TextQuestion,
-  text = " ",
+  text = "",
 ): TextResponse => ({
   projectId,
   questionId,
@@ -42,7 +42,7 @@ export default function QuestionText({
   ...props
 }: QuestionTextProps) {
   const responseValue = response[0] || createTextResponse(question);
-  const [value, setValue] = useState(responseValue.text);
+  const [value, setValue] = useState(responseValue.text || "");
 
   const handleOnChange = (value: string) => {
     setValue(value);

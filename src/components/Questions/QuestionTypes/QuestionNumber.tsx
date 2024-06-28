@@ -39,13 +39,15 @@ export default function QuestionNumber({
   ...props
 }: QuestionNumberProps) {
   const responseValue = response[0] || createNumberResponse(question);
-  const [value, setValue] = useState<string | number | undefined>(responseValue.number);
+  const [value, setValue] = useState<string | number | undefined>(
+    responseValue.number,
+  );
   const handleOnChange = (value: string | number) => {
     setValue(value);
     onAnswered({ ...responseValue, number: Number(value) });
   };
   useEffect(() => {
-    if(!value) {
+    if (!value) {
       setValue(responseValue.number);
     }
   }, [responseValue, value]);
