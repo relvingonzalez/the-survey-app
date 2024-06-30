@@ -237,7 +237,7 @@ export const transformGeoResponse = ({
   geog: `SRID=4326;POINT(${long} ${lat})`,
 });
 
-export const transformNumbereResponse = ({
+export const transformNumberResponse = ({
   id,
   questionResponseId,
   number,
@@ -323,7 +323,7 @@ export const transformResponseToServerResponse = (
     case "geo":
       return transformGeoResponse(response);
     case "number":
-      return transformNumbereResponse(response);
+      return transformNumberResponse(response);
     case "person":
       return transformPersonResponse(response);
     case "phone":
@@ -333,6 +333,6 @@ export const transformResponseToServerResponse = (
     case "yes/no":
       return transformYesNoResponse(response);
     default:
-      transformTextResponse(response);
+      return transformTextResponse(response);
   }
 };

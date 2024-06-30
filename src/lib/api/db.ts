@@ -5,6 +5,7 @@ const sql = postgres(process.env.DATABASE_URL, {
   ssl: "require",
   transform: {
     ...postgres.camel,
+    // undefined: "DEFAULT",
   },
   types: {
     responseComment: {

@@ -7,7 +7,7 @@ import {
   TextInput,
   TextInputProps,
 } from "@mantine/core";
-import { MouseEventHandler } from "react";
+import { MouseEventHandler, useEffect, useState } from "react";
 import { WithQuestionCallback } from "../SurveyItem";
 import {
   GeoQuestion,
@@ -58,6 +58,8 @@ export default function QuestionGeo({
   ...props
 }: QuestionGeoProps) {
   const responseValue = response[0] || createGeoResponse(question);
+  const [value, setValue] = useState("");
+
   const pattern =
     "^[-+]?([1-8]?d(.d+)?|90(.0+)?),s*[-+]?(180(.0+)?|((1[0-7]d)|([1-9]?d))(.d+)?)$";
   const getLocation: MouseEventHandler<HTMLButtonElement> = () => {
@@ -65,7 +67,6 @@ export default function QuestionGeo({
       navigator.permissions
         .query({ name: "geolocation" })
         .then(function (result) {
-          console.log(result);
           if (result.state === "granted") {
             //If granted then you can directly call your function here
             navigator.geolocation.getCurrentPosition(success, errors, options);
@@ -83,17 +84,25 @@ export default function QuestionGeo({
 
   const success: PositionCallback = (pos) => {
     const { latitude: lat, longitude: long } = pos.coords;
+    setValue(`${lat}, ${long}`);
     onAnswered({ ...responseValue, lat, long });
   };
 
   const onChange = (value: string) => {
     const coords = value.split(",");
+    setValue(value);
     onAnswered({
       ...responseValue,
       lat: parseFloat(coords[0]),
       long: parseFloat(coords[1]),
     });
   };
+
+  useEffect(() => {
+    if (!value && responseValue.lat) {
+      setValue(`${responseValue.lat}, ${responseValue.long}`);
+    }
+  }, [responseValue, value]);
 
   return (
     <>
@@ -103,7 +112,7 @@ export default function QuestionGeo({
           name="geo"
           placeholder="49.4550734,11.0794632"
           id="oGPS"
-          value={`${responseValue.lat}, ${responseValue.long}`}
+          value={value}
           pattern={pattern}
           onChange={(e) => onChange(e.target.value)}
           {...props}

@@ -206,6 +206,8 @@ export default function QuestionCollection({
     setNewResponseGroup(newResponses);
   };
 
+  console.log(questions, responseGroups);
+
   if (!questions) {
     return null;
   }

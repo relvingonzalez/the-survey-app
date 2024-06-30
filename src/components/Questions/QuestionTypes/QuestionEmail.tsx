@@ -52,7 +52,6 @@ export default function QuestionEmail({
     onAnswered({ ...responseValue, email: newValue });
   };
   useEffect(() => {
-    console.log(value, responseValue);
     if (!value) {
       setValue(responseValue.email);
     }

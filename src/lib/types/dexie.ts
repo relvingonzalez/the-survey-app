@@ -5,7 +5,12 @@ import {
   LocalRoom,
   LocalSiteProject,
 } from "./local_new";
-import { Question, QuestionResponse, Comment } from "./question_new";
+import {
+  Question,
+  QuestionResponse,
+  Comment,
+  ResponseType,
+} from "./question_new";
 
 // delete, update, insert
 export type ActionFlag = "d" | "u" | "i";
@@ -19,6 +24,8 @@ export type DexieResponse = QuestionResponse & {
   tempId?: string;
   flag?: ActionFlag;
 };
+
+export type DexieResponseGroup = Record<ResponseType, DexieResponse[]>;
 
 export type DexieComment = Comment & {
   localId?: number;
