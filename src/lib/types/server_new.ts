@@ -68,6 +68,21 @@ export type ServerNumberResponse = ServerResponse & NumberValue;
 
 export type ServerPhoneResponse = ServerResponse & PhoneValue;
 
+export type ServerResponseTypes =
+  | ServerGeoResponse
+  | ServerTextResponse
+  | ServerEmailResponse
+  | ServerCheckboxResponse
+  | ServerDateTimeResponse
+  | ServerDaysResponse
+  | ServerMultipleResponse
+  | ServerPersonResponse
+  | ServerTimeResponse
+  | ServerYesNoResponse
+  | ServerListResponse
+  | ServerNumberResponse
+  | ServerPhoneResponse;
+
 export type ServerComment = Omit<Comment, "projectId" | "questionId"> & {
   project_id?: number;
   question_id?: number;

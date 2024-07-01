@@ -5,10 +5,11 @@ import {
 } from "@/lib/types/question_new";
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
+import { DexieMultipleResponse } from "@/lib/types/dexie";
 
 export type QuestionMultipleProps = {
   question: MultipleQuestion;
-  response: MultipleResponse[];
+  response: DexieMultipleResponse[];
 } & WithQuestionCallback<MultipleResponse[]> &
   MultiSelectProps;
 
@@ -38,13 +39,11 @@ export default function QuestionListSelect({
   ...props
 }: QuestionMultipleProps) {
   const handleOnChange = (selection: string[]) => {
-    // Check if exists or add
-    // TODO set flag to something other than d
     const result = selection.map((s) => {
       const res =
         response.find((r) => r.text === s) ||
         createMultipleResponse(question, s);
-      return { ...res, flag: "" };
+      return { ...res, flag: "u" };
     });
 
     // Check which ones to remove and add flag
@@ -63,7 +62,9 @@ export default function QuestionListSelect({
       label="Select"
       placeholder="--Select One or Many--"
       data={question.options}
-      value={response.map((r) => r.text).filter((v) => v)}
+      value={response
+        .filter((r) => r.flag !== "d" && r.text)
+        .map((r) => r.text)}
       onChange={handleOnChange}
     />
   );

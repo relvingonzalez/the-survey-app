@@ -144,7 +144,7 @@ export const insertOrModifyResponse = (response: DexieResponse) => {
     }
     return db.responses
       .where({ localId: response.localId })
-      .modify({ ...response, flag: "u" });
+      .modify({ ...response, flag: response.flag || "u" });
   }
   return db.responses.add({ ...response, flag: "u" });
 };

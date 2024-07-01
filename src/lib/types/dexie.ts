@@ -10,6 +10,7 @@ import {
   QuestionResponse,
   Comment,
   ResponseType,
+  MultipleResponse,
 } from "./question_new";
 
 // delete, update, insert
@@ -24,6 +25,8 @@ export type DexieResponse = QuestionResponse & {
   tempId?: string;
   flag?: ActionFlag;
 };
+
+export type DexieMultipleResponse = MultipleResponse & DexieResponse;
 
 export type DexieResponseGroup = Record<ResponseType, DexieResponse[]>;
 

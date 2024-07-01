@@ -175,6 +175,7 @@ export default function QuestionCollection({
     setAddNew(false);
   };
 
+  // collection Order save somehow
   const onSaveNewQuestion = () => {
     if (responseGroups && newResponseGroup) {
       onAnswered(
@@ -205,8 +206,6 @@ export default function QuestionCollection({
     });
     setNewResponseGroup(newResponses);
   };
-
-  console.log(questions, responseGroups);
 
   if (!questions) {
     return null;
