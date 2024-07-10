@@ -95,7 +95,7 @@ function NewResponseGroup({
 type EntriesProps = Omit<QuestionCollectionProps, "question" | "onAnswered"> & {
   questions: DexieQuestion[];
   responseGroups?: Record<number, DexieResponse[]>;
-  onDelete?: (collectionOrder: number) => void;
+  onDelete?: (responseGroupId: number) => void;
 };
 
 export const createCollectionResponses = (questions?: DexieQuestion[]) => {
@@ -175,13 +175,13 @@ export default function QuestionCollection({
     setAddNew(false);
   };
 
-  // collection Order save somehow
+  // responseGroupId save somehow
   const onSaveNewQuestion = () => {
     if (responseGroups && newResponseGroup) {
       onAnswered(
         newResponseGroup.map((r) => ({
           ...r,
-          collectionOrder: Object.keys(responseGroups).length + 1,
+          responseGroupId: Object.keys(responseGroups).length + 1,
         })),
       );
       resetAddNew();

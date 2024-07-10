@@ -67,7 +67,7 @@ export type QuestionValue =
 export type Comment = {
   id?: number;
   questionId: number;
-  collectionOrder?: number | null;
+  responseGroupId?: number | null;
   comment: string;
 };
 
@@ -260,7 +260,7 @@ type BaseResponse = {
   questionId?: number;
   questionResponseId?: number;
   responseType: ResponseType;
-  collectionOrder?: number;
+  responseGroupId?: number;
 };
 
 export type Process = Question;

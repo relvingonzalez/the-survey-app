@@ -49,12 +49,11 @@ export async function saveComments(comments: DexieComment[]) {
     comments,
     "questionId",
     "comment",
-    "collectionOrder",
+    "responseGroupId",
   )} 
-  ON CONFLICT (question_id) 
+  ON CONFLICT (question_id, response_group_id) 
   DO UPDATE SET
-    comment = EXCLUDED.comment,
-    collection_order = EXCLUDED.collection_order
+    comment = EXCLUDED.comment
     RETURNING *;`;
 
   return result;

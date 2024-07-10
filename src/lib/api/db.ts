@@ -20,16 +20,16 @@ const sql = postgres(process.env.DATABASE_URL, {
         id,
         questionId,
         comment,
-        collectionOrder,
-      }: DexieComment) => [id, questionId, comment, collectionOrder],
+        responseGroupId,
+      }: DexieComment) => [id, questionId, comment, responseGroupId],
 
       // Function that transforms values coming from the db.
-      parse: ([id, questionId, comment, collectionOrder]: [
+      parse: ([id, questionId, comment, responseGroupId]: [
         id: number,
         questionId: number,
         comment: string,
-        collectionOrder: number,
-      ]) => ({ id, questionId, comment, collectionOrder }),
+        responseGroupId: number,
+      ]) => ({ id, questionId, comment, responseGroupId }),
     },
   },
 });

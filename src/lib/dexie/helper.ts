@@ -157,7 +157,7 @@ export const createComment = (questionId: number): DexieComment => ({
   id: undefined,
   questionId,
   comment: "",
-  collectionOrder: null,
+  responseGroupId: null,
   flag: "u",
 });
 
@@ -226,12 +226,12 @@ export const getCollectionResponses = async (
       .where("questionId")
       .anyOf(ids)
       .and((r) => r.flag !== "d")
-      .toArray();
+      .sortBy('responseGroupId');
 
     result = responses.reduce(function (r, a) {
-      if (a.collectionOrder !== undefined) {
-        r[a.collectionOrder] = r[a.collectionOrder] || [];
-        r[a.collectionOrder].push(a);
+      if (a.responseGroupId !== undefined) {
+        r[a.responseGroupId] = r[a.responseGroupId] || [];
+        r[a.responseGroupId].push(a);
       }
 
       return r;
