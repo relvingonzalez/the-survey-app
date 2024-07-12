@@ -11,7 +11,7 @@ import {
   TableThead,
   TableTr,
   TextInput,
-  // Text,
+  Text,
   rem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -20,24 +20,36 @@ import Files from "@/components/files/Files.";
 import { useListState } from "@mantine/hooks";
 import {
   IconDeviceFloppy,
-  // IconPencil,
-  // IconTrash,
+  IconPencil,
+  IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import { createHardware } from "@/lib/data/rooms";
+import { useLiveQuery } from "dexie-react-hooks";
+import { getHardwareListByRackId } from "@/lib/dexie/helper";
+import { DexieHardware, DexieRack } from "@/lib/types/dexie";
+import { createHardware } from "@/lib/utils/functions";
+import { useEffect } from "react";
+
+type RackFormValues = {
+  rack: DexieRack;
+  hardwareList?: DexieHardware[];
+};
 
 export type RackModalProps = ModalProps & {
-  rack: Rack;
+  rack: DexieRack;
   existingFiles: File[];
   onSave: (rack: Rack, files: File[]) => void;
+  onSaveHardware: (hardwareList: DexieHardware[]) => void;
 };
 export default function RackModal({
   rack,
   existingFiles = [],
   onSave,
+  onSaveHardware,
   onClose,
   ...modalProps
 }: RackModalProps) {
+  const hardwareList = useLiveQuery(() => getHardwareListByRackId(rack.id));
   const [files, handlers] = useListState<File>(existingFiles);
   const [edit, handlersEdit] = useListState<{ index: number; value: Hardware }>(
     [],
@@ -51,28 +63,32 @@ export default function RackModal({
 
   const form = useForm({
     initialValues: {
-      name: rack.name || "",
-      // TODO get hardware list
-      hardwareList: [],
-      comment: rack.comment || "",
-      x: rack.x,
-      y: rack.y,
+      rack,
+      hardwareList: hardwareList,
     },
 
     validate: {
-      name: (value) => (value ? null : "Invalid comment"),
-      // TODO add validation
-      // hardwareList: {
-      //   name: (value) => (value ? null : "Invalid name"),
-      //   from: (value) => (value ? null : "Invalid from"),
-      //   to: (value) => (value ? null : "Invalid to"),
-      //   details: (value) => (value ? null : "Invalid details"),
-      // },
+      rack: {
+        name: (value) => (value ? null : "Invalid comment"),
+      },
+      hardwareList: {
+        name: (value) => (value ? null : "Invalid name"),
+        fromSlot: (value) => (value ? null : "Invalid from"),
+        toSlot: (value) => (value ? null : "Invalid to"),
+        details: (value) => (value ? null : "Invalid details"),
+      },
     },
   });
 
-  const handleSubmit = (values: Rack) => {
-    onSave(values, files);
+  useEffect(() => {
+    if (hardwareList && !form.values.hardwareList) {
+      form.setFieldValue("hardwareList", hardwareList);
+    }
+  }, [form, hardwareList]);
+
+  const handleSubmit = (values: RackFormValues) => {
+    onSave(values.rack, files);
+    values.hardwareList && onSaveHardware(values.hardwareList);
     form.reset();
     onClose();
   };
@@ -96,12 +112,16 @@ export default function RackModal({
   };
 
   const handleInsertNewHardware = () => {
-    const hardware = createHardware();
+    const hardware = createHardware(rack.id);
     form.insertListItem("hardwareList", hardware);
-    handleEditing(form.values.hardwareList.length, hardware);
+    handleEditing(form.values.hardwareList?.length || 0, hardware);
   };
 
-  const rows = form.values.hardwareList.map((h, i) => {
+  if (!rack || !hardwareList) {
+    return null;
+  }
+
+  const rows = form.values.hardwareList?.map((h, i) => {
     const editMode = edit.find((v) => v.index === i);
     return (
       <TableTr key={i}>
@@ -113,14 +133,14 @@ export default function RackModal({
                   withAsterisk
                   label="From"
                   placeholder="From"
-                  {...form.getInputProps(`hardwareList.${i}.from`)}
+                  {...form.getInputProps(`hardwareList.${i}.fromSlot`)}
                 />
                 -
                 <TextInput
                   withAsterisk
                   label="To"
                   placeholder="To"
-                  {...form.getInputProps(`hardwareList.${i}.to`)}
+                  {...form.getInputProps(`hardwareList.${i}.toSlot`)}
                 />
               </Group>
             </TableTd>
@@ -159,10 +179,10 @@ export default function RackModal({
           </>
         )}
 
-        {/* {!editMode && (
+        {!editMode && (
           <>
             <TableTd>
-              {h.from} - {h.to}
+              {h.fromSlot} - {h.toSlot}
             </TableTd>
             <TableTd>
               <Text>{h.name}</Text>
@@ -186,7 +206,7 @@ export default function RackModal({
               </ActionIcon>
             </TableTd>
           </>
-        )} */}
+        )}
       </TableTr>
     );
   });
@@ -199,9 +219,9 @@ export default function RackModal({
           mb="md"
           placeholder="ID / Name of Rack"
           withAsterisk
-          {...form.getInputProps("rackName")}
+          {...form.getInputProps("rack.name")}
         />
-        <Comment mb="md" withAsterisk {...form.getInputProps("rackComment")} />
+        <Comment mb="md" withAsterisk {...form.getInputProps("rack.comment")} />
         <Files
           mt="10"
           files={files}

@@ -1,7 +1,15 @@
 import { RefObject } from "react";
 import { Person } from "../types/question";
 import * as changeKeys from "change-case/keys";
-import { ActionFlag, DexieComment, DexieResponse, DexieRoom } from "../types/dexie";
+import {
+  ActionFlag,
+  DexieComment,
+  DexieHardware,
+  DexieMoreInfo,
+  DexieRack,
+  DexieResponse,
+  DexieRoom,
+} from "../types/dexie";
 import { dayOptionsById } from "@/components/Questions/QuestionTypes/QuestionDays";
 import {
   CheckboxResponse,
@@ -54,14 +62,63 @@ export const createPerson = (
 export const createRoom = (
   id: number,
   projectId: number,
-  name = '',
-  comment = ''
+  name = "",
+  comment = "",
 ): DexieRoom => ({
   id,
   name,
   comment,
   projectId,
-  flag: 'i'
+  flag: "i",
+});
+
+export const createMoreInfo = (
+  roomId: number,
+  x: number,
+  y: number,
+  id: number = uniqueId(),
+  info = "",
+): DexieMoreInfo => ({
+  id,
+  roomId,
+  info,
+  x,
+  y,
+  flag: "i",
+});
+
+export const createRack = (
+  roomId: number,
+  x: number,
+  y: number,
+  id: number = uniqueId(),
+  name = "",
+  comment = "",
+): DexieRack => ({
+  id,
+  roomId,
+  x,
+  y,
+  name,
+  comment,
+  flag: "i",
+});
+
+export const createHardware = (
+  rackId: number,
+  id: number = uniqueId(),
+  name = "",
+  fromSlot = "",
+  toSlot = "",
+  details = "",
+): DexieHardware => ({
+  id,
+  rackId,
+  name,
+  fromSlot,
+  toSlot,
+  details,
+  flag: "i",
 });
 
 export const getMousePosition = (
@@ -186,7 +243,8 @@ export const getDisplayValues = (
   }
 };
 
-const shouldIncludeId = (id?: number, flag?: ActionFlag) => (id && flag !== 'i' && { id });
+const shouldIncludeId = (id?: number, flag?: ActionFlag) =>
+  id && flag !== "i" && { id };
 
 export const transformEmailResponse = ({
   id,
@@ -368,5 +426,5 @@ export const transformRoom = ({
   ...shouldIncludeId(id, flag),
   projectId,
   name,
-  comment
+  comment,
 });

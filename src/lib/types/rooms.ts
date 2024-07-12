@@ -1,19 +1,25 @@
 export type Coordinate = number;
 
 export type MoreInfo = {
+  id: number;
+  roomId: number;
   x: Coordinate;
   y: Coordinate;
   info: string;
 };
 
 export type Hardware = {
+  id: number;
+  rackId: number;
   name: string;
-  from: string;
-  to: string;
+  fromSlot: string;
+  toSlot: string;
   details: string;
 };
 
 export type Rack = {
+  id: number;
+  roomId: number;
   x: Coordinate;
   y: Coordinate;
   comment: string;

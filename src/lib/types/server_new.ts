@@ -85,7 +85,7 @@ export type ServerResponseTypes =
 
 export type ServerComment = Omit<Comment, "projectId">;
 
-export type ServerRoom = Omit<Room, 'id'> & {
+export type ServerRoom = Omit<Room, "id"> & {
   id?: number;
 };
 

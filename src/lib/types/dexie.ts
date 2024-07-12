@@ -1,16 +1,11 @@
-import {
-  LocalHardware,
-  LocalMoreInfo,
-  LocalRack,
-  LocalSiteProject,
-} from "./local_new";
+import { LocalSiteProject } from "./local_new";
 import {
   Question,
   QuestionResponse,
   Comment,
   MultipleResponse,
 } from "./question_new";
-import { Room } from "./rooms";
+import { Hardware, MoreInfo, Rack, Room } from "./rooms";
 import { ServerResponseGroup } from "./server_new";
 
 type DefaultDexieUtilityType = {
@@ -37,19 +32,13 @@ export type DexieResponseGroupedByResponseType = Record<
 
 export type DexieComment = Comment & DefaultDexieUtilityType;
 
-export type DexieRoom = Room &  DefaultDexieUtilityType;
+export type DexieRoom = Room & DefaultDexieUtilityType;
 
-export type DexieRack = LocalRack & {
-  localId?: number;
-};
+export type DexieRack = DefaultDexieUtilityType & Rack;
 
-export type DexieHardware = LocalHardware & {
-  localId?: number;
-};
+export type DexieHardware = Hardware & DefaultDexieUtilityType;
 
-export type DexieMoreInfo = LocalMoreInfo & {
-  localId?: number;
-};
+export type DexieMoreInfo = DefaultDexieUtilityType & MoreInfo;
 
 export type DexieSiteProject = LocalSiteProject & {
   localId?: number;

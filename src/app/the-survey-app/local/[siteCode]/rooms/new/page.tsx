@@ -7,5 +7,5 @@ export default async function NewRoomPage({
 }: {
   params: { siteCode: SiteCode };
 }) {
-  return <RoomPage siteCode={siteCode}/>;
+  return <RoomPage siteCode={siteCode} />;
 }

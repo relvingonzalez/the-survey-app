@@ -1,4 +1,10 @@
-import { DexieComment, DexieQuestion, DexieResponse, DexieRoom } from "../types/dexie";
+import {
+  DexieComment,
+  DexieHardware,
+  DexieQuestion,
+  DexieResponse,
+  DexieRoom,
+} from "../types/dexie";
 import { LocalDownloadSiteData } from "../types/local_new";
 import { QuestionType } from "../types/question_new";
 import { db } from "./db";
@@ -16,6 +22,7 @@ import { createTimeResponse } from "@/components/Questions/QuestionTypes/Questio
 import { createYesNoResponse } from "@/components/Questions/QuestionTypes/QuestionYesNo";
 import { ServerComment } from "../types/server_new";
 import { createRoom, uniqueId } from "../utils/functions";
+import { MoreInfo, Rack } from "../types/rooms";
 
 export async function populate(data: LocalDownloadSiteData) {
   return db.transaction(
@@ -368,31 +375,84 @@ export const createResponseByQuestion = (
   return response;
 };
 
-export const getRoomById = async (projectId: number, id?: number) => id ? await db.rooms.get({ id }) : createRoom(uniqueId(), projectId, "");
+export const getRoomById = async (projectId: number, id?: number) =>
+  id ? await db.rooms.get({ id }) : createRoom(uniqueId(), projectId, "");
 
-export const updateRoom = async ({id, name, comment, flag}: DexieRoom) => await db.rooms.where({ id }).modify({ name, comment, flag: flag !== 'i' ? 'u' : 'i' });
+export const updateRoom = async ({ id, name, comment, flag }: DexieRoom) =>
+  await db.rooms
+    .where({ id })
+    .modify({ name, comment, flag: flag !== "i" ? "u" : "i" });
 
-export const deleteRoom = ({id, flag}: DexieRoom) => {
+export const deleteRoom = ({ id, flag }: DexieRoom) => {
   return db.transaction(
     "rw",
     [db.rooms, db.racks, db.moreInfos, db.hardwares],
     async () => {
-      if (flag === 'i') {
+      if (flag === "i") {
         // only local, delete everything
         db.rooms.where({ id }).delete();
       } else {
         // exists in server, set for deletion, and delete its accompanying data
-        db.rooms.where({ id }).modify({ flag: 'd'});
+        db.rooms.where({ id }).modify({ flag: "d" });
       }
-      const racks = await db.racks.where({ roomId: id }).toArray();
-      db.hardwares.where('rackId').anyOf(racks.map(r => r.id)).delete();
-      db.racks.where({ roomId: id }).delete();
-      db.moreInfos.where({ roomId: id }).delete();
+      clearRoomTools(id);
     },
   );
 };
 
-export const getMoreInfosByRoomId = async (roomId: number) => await db.moreInfos.where({ roomId }).toArray();
+export const getMoreInfosByRoomId = async (roomId: number) =>
+  await db.moreInfos
+    .where({ roomId })
+    .and((mI) => mI.flag !== "d")
+    .toArray();
 
-export const getRacksByRoomId = async (roomId: number) => await db.racks.where({ roomId }).toArray();
+export const getRacksByRoomId = async (roomId: number) =>
+  await db.racks
+    .where({ roomId })
+    .and((r) => r.flag !== "d")
+    .toArray();
 
+export const saveRack = async (rack: Rack) => await db.racks.put(rack);
+
+export const saveMoreInfo = async (moreInfo: MoreInfo) =>
+  await db.moreInfos.put(moreInfo);
+
+export const updateRack = async (rack: Rack) =>
+  await db.racks.where({ id: rack.id }).modify(rack);
+
+export const updateMoreInfo = async (moreInfo: MoreInfo) =>
+  await db.moreInfos.where({ id: moreInfo.id }).modify(moreInfo);
+
+export const clearRoomTools = async (id: number) => {
+  const racks = await db.racks.where({ roomId: id }).toArray();
+  db.hardwares
+    .where("rackId")
+    .anyOf(racks.map((r) => r.id))
+    .delete();
+  db.racks.where({ roomId: id }).delete();
+  db.moreInfos.where({ roomId: id }).delete();
+};
+
+export const getHardwareListByRackId = async (rackId: number) =>
+  await db.hardwares
+    .where({ rackId })
+    .and((h) => h.flag !== "d")
+    .toArray();
+
+export const updateHardwareList = (hardwareList: DexieHardware[]) => {
+  return db.transaction("rw", db.hardwares, async () => {
+    // If new list does not have one that existed, either edit the flag to d if old, or delete it if new
+    db.hardwares
+      .where("id")
+      .noneOf(hardwareList.map((h) => h.id))
+      .and((h) => h.flag === "i")
+      .delete();
+    db.hardwares
+      .where("id")
+      .noneOf(hardwareList.map((h) => h.id))
+      .and((h) => h.flag !== "i")
+      .modify({ flag: "d" });
+    // If new list has one that didn't exist, put
+    db.hardwares.bulkPut(hardwareList);
+  });
+};

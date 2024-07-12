@@ -20,6 +20,7 @@ export type LocalHardware = Omit<
   ServerHardware,
   "project_id" | "rack_id" | "from_slot" | "to_slot"
 > & {
+  id: number;
   projectId: number;
   rackId: number;
   fromSlot: string;
