@@ -4,10 +4,16 @@ import { ModalProps } from "@mantine/core";
 import { useEffect, useState } from "react";
 import {
   getUpdatedComments,
+  getUpdatedResponseGroups,
   getUpdatedResponses,
   updateCommentIds,
+  updateResponseGroupIds,
 } from "@/lib/dexie/helper";
-import { saveComments, saveResponses } from "@/lib/api/actions";
+import {
+  saveComments,
+  saveResponseGroup,
+  saveResponses,
+} from "@/lib/api/actions";
 import DownloadModal from "./DownloadModal";
 import {
   IconListCheck,
@@ -33,22 +39,44 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
   const handleStatusUpdate = (step: number, progress: number, text: string) => {
     setActive(step);
     setStatusText(text);
-    setProgressValue(progress);
+    setProgressValue(progress <= 100 ? progress : 100);
   };
   const sync = async () => {
+    const responseGroups = await getUpdatedResponseGroups();
+    if (responseGroups.length) {
+      handleStatusUpdate(
+        2,
+        progressValue + 5,
+        "Syncing Collection Response Groups...",
+      );
+
+      await Promise.all(
+        responseGroups.map(async (r) => {
+          const [savedResponseGroup] = await saveResponseGroup(r);
+          return updateResponseGroupIds(r.id, savedResponseGroup.id);
+        }),
+      );
+
+      handleStatusUpdate(
+        2,
+        progressValue + 10,
+        "Syncing Response Groups Complete!",
+      );
+    }
+
     const comments = await getUpdatedComments();
     if (comments.length) {
-      handleStatusUpdate(1, 15, "Syncing Comments...");
-      const commentsResult = await saveComments(comments);
+      handleStatusUpdate(1, progressValue + 5, "Syncing Comments...");
+      const [commentsResult] = await saveComments(comments);
       await updateCommentIds(commentsResult);
-      handleStatusUpdate(2, 20, "Syncing Comments Complete!");
+      handleStatusUpdate(2, progressValue + 10, "Syncing Comments Complete!");
     }
 
     const responses = await getUpdatedResponses();
     if (responses.length) {
       const savedResponses = await saveResponses(responses);
       console.log("saved are:", savedResponses);
-      handleStatusUpdate(2, 30, "Syncing Responses Complete!");
+      handleStatusUpdate(2, progressValue + 10, "Syncing Responses Complete!");
     }
 
     handleStatusUpdate(3, 100, "Syncing Complete!");

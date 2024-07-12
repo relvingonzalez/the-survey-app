@@ -67,6 +67,7 @@ export type QuestionValue =
 export type Comment = {
   id?: number;
   questionId: number;
+  projectId: number;
   responseGroupId?: number | null;
   comment: string;
 };
@@ -244,7 +245,7 @@ export type QuestionType = "question" | "process" | "rack";
 
 type BaseQuestion = {
   id: number;
-  projectId?: number;
+  projectId: number;
   rackId?: number;
   collectionId?: number;
   question: string;

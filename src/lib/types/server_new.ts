@@ -83,10 +83,7 @@ export type ServerResponseTypes =
   | ServerNumberResponse
   | ServerPhoneResponse;
 
-export type ServerComment = Omit<Comment, "projectId" | "questionId"> & {
-  project_id?: number;
-  question_id?: number;
-};
+export type ServerComment = Omit<Comment, "projectId">;
 
 export type ServerRoom = {
   id: number;
@@ -133,6 +130,11 @@ export type DownloadSiteData = {
   moreInfo: ServerMoreInfo[];
   racks: ServerRack[];
   hardware: ServerHardware[];
+};
+
+export type ServerResponseGroup = {
+  id: number;
+  collectionId: number;
 };
 
 export const createServerData = () => ({

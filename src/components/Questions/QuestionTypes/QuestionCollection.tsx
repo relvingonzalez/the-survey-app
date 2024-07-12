@@ -23,14 +23,18 @@ import { WithQuestionCallback } from "../SurveyItem";
 import { QuestionResponse } from "@/lib/types/question_new";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
+  addComments,
+  addNewResponseGroup,
+  createComment,
   createResponseByQuestion,
+  deleteResponseGroup,
   getCollectionQuestions,
   getCollectionResponses,
 } from "@/lib/dexie/helper";
 import { DexieQuestion, DexieResponse } from "@/lib/types/dexie";
-import { getDisplayValues } from "@/lib/utils/functions";
+import { getDisplayValues, uniqueId } from "@/lib/utils/functions";
 import QuestionByTypeComponent from "../QuestionByTypeComponent";
-import { v4 as uuidv4 } from "uuid";
+// import { v4 as uuidv4 } from "uuid";
 
 export type QuestionCollectionProps = {
   question: CollectionQuestion;
@@ -175,13 +179,25 @@ export default function QuestionCollection({
     setAddNew(false);
   };
 
-  // responseGroupId save somehow
-  const onSaveNewQuestion = () => {
+  const handleSaveNewResponseGroup = () => {
     if (responseGroups && newResponseGroup) {
+      const tempResponseGroupId = uniqueId();
+      const comments = questions?.map((q) =>
+        createComment(q.id, q.projectId, uniqueId(), tempResponseGroupId),
+      );
+      addNewResponseGroup(
+        tempResponseGroupId,
+        question.collectionId,
+        question.projectId,
+      );
+      addComments(comments);
       onAnswered(
         newResponseGroup.map((r) => ({
           ...r,
-          responseGroupId: Object.keys(responseGroups).length + 1,
+          questionResponseId: comments?.find(
+            (c) => c.questionId === r.questionId,
+          )?.tempId,
+          responseGroupId: tempResponseGroupId,
         })),
       );
       resetAddNew();
@@ -190,6 +206,7 @@ export default function QuestionCollection({
 
   const onDeleteEntriesAnswer = (i: number) => {
     if (responseGroups) {
+      deleteResponseGroup(i);
       onAnswered(responseGroups[i].map((r) => ({ ...r, flag: "d" })));
     }
   };
@@ -201,7 +218,7 @@ export default function QuestionCollection({
       if (foundIndex > -1) {
         newResponses[foundIndex] = { ...newResponses[foundIndex], ...r };
       } else {
-        newResponses.push({ ...r, tempId: uuidv4() });
+        newResponses.push({ ...r, tempId: uniqueId() });
       }
     });
     setNewResponseGroup(newResponses);
@@ -224,7 +241,7 @@ export default function QuestionCollection({
           questions={questions}
           responses={newResponseGroup}
           onAnswered={handleAnsweredNewResponseGroup}
-          onSave={onSaveNewQuestion}
+          onSave={handleSaveNewResponseGroup}
           onCancel={resetAddNew}
         />
       ) : (

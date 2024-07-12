@@ -1,6 +1,6 @@
 import { DexieComment, DexieQuestion, DexieResponse } from "../types/dexie";
 import { LocalDownloadSiteData } from "../types/local_new";
-import { Comment, QuestionType } from "../types/question_new";
+import { QuestionType } from "../types/question_new";
 import { db } from "./db";
 import { createMultipleResponse } from "@/components/Questions/QuestionTypes/QuestionMultiple";
 import { createCheckboxResponse } from "@/components/Questions/QuestionTypes/QuestionCheckbox";
@@ -14,6 +14,7 @@ import { createPhoneResponse } from "@/components/Questions/QuestionTypes/Questi
 import { createTextResponse } from "@/components/Questions/QuestionTypes/QuestionText";
 import { createTimeResponse } from "@/components/Questions/QuestionTypes/QuestionTime";
 import { createYesNoResponse } from "@/components/Questions/QuestionTypes/QuestionYesNo";
+import { ServerComment } from "../types/server_new";
 
 export async function populate(data: LocalDownloadSiteData) {
   return db.transaction(
@@ -53,6 +54,7 @@ export async function deleteProject(projectId: number) {
       db.moreInfos,
       db.racks,
       db.hardwares,
+      db.responseGroups,
     ],
     () => {
       db.siteProjects.where({ projectId }).delete();
@@ -63,6 +65,7 @@ export async function deleteProject(projectId: number) {
       db.moreInfos.where({ projectId }).delete();
       db.racks.where({ projectId }).delete();
       db.hardwares.where({ projectId }).delete();
+      db.responseGroups.where({ projectId }).delete();
     },
   );
 }
@@ -109,16 +112,16 @@ export const getNextQuestion = async (
   return undefined;
 };
 
-export const updateCommentIds = (comments: Comment[]) => {
-  return db.transaction("rw", db.comments, () => {
-    comments.map((c) => {
+export const updateCommentIds = (comments: ServerComment[]) => {
+  return db.transaction("rw", [db.comments, db.responses], () => {
+    comments.map(({ id, questionId, responseGroupId }) => {
       db.comments
-        .where({ questionId: c.questionId })
-        .modify({ id: c.id, flag: "" });
+        .where({ questionId, responseGroupId })
+        .modify({ id, flag: "" });
 
       db.responses
-        .where({ questionId: c.questionId })
-        .modify({ questionResponseId: c.id });
+        .where({ questionId, responseGroupId })
+        .modify({ questionResponseId: id });
     });
   });
 };
@@ -137,6 +140,30 @@ export const getUpdatedComments = () =>
 export const getUpdatedResponses = () =>
   db.responses.where({ flag: "u" }).toArray();
 
+export const getUpdatedResponseGroups = () =>
+  db.responseGroups.where({ flag: "u" }).toArray();
+
+export const updateResponseGroupIds = (
+  oldResponseGroupId: number,
+  responseGroupId: number,
+) => {
+  return db.transaction(
+    "rw",
+    [db.responseGroups, db.comments, db.responses],
+    () => {
+      db.responseGroups
+        .where({ id: oldResponseGroupId })
+        .modify({ id: responseGroupId, flag: "" });
+      db.comments
+        .where({ responseGroupId: oldResponseGroupId })
+        .modify({ responseGroupId });
+      db.responses
+        .where({ responseGroupId: oldResponseGroupId })
+        .modify({ responseGroupId });
+    },
+  );
+};
+
 export const insertOrModifyResponse = (response: DexieResponse) => {
   if (response.localId) {
     if (response.flag === "d" && !response.id) {
@@ -153,11 +180,17 @@ export const insertOrModifyResponses = (responses: DexieResponse[]) => {
   return responses.map(insertOrModifyResponse);
 };
 
-export const createComment = (questionId: number): DexieComment => ({
-  id: undefined,
+export const createComment = (
+  questionId: number,
+  projectId: number,
+  id?: number,
+  responseGroupId?: number,
+): DexieComment => ({
+  tempId: id,
   questionId,
+  projectId,
   comment: "",
-  responseGroupId: null,
+  responseGroupId,
   flag: "u",
 });
 
@@ -168,9 +201,17 @@ export const getComment = async (
   if (projectId && question) {
     return (
       (await db.comments.get({ projectId, questionId: question?.id })) ||
-      createComment(question?.id)
+      createComment(question?.id, projectId)
     );
   }
+};
+
+export const addComment = async (comment: DexieComment) => {
+  return await db.comments.add(comment);
+};
+
+export const addComments = async (comments?: DexieComment[]) => {
+  return comments ? await db.comments.bulkAdd(comments) : [];
 };
 
 export const getResponse = (projectId?: number, question?: DexieQuestion) => {
@@ -215,6 +256,23 @@ export const getCollectionQuestions = async (
   return [];
 };
 
+export const addNewResponseGroup = async (
+  id?: number,
+  collectionId?: number,
+  projectId?: number,
+) => {
+  return (
+    collectionId &&
+    id &&
+    projectId &&
+    (await db.responseGroups.add({ id, collectionId, projectId, flag: "u" }))
+  );
+};
+
+export const deleteResponseGroup = async (id: number) => {
+  return await db.responseGroups.where({ id }).modify({ flag: "d" });
+};
+
 export const getCollectionResponses = async (
   questions?: DexieQuestion[],
 ): Promise<Record<number, DexieResponse[]>> => {
@@ -226,7 +284,7 @@ export const getCollectionResponses = async (
       .where("questionId")
       .anyOf(ids)
       .and((r) => r.flag !== "d")
-      .sortBy('responseGroupId');
+      .sortBy("responseGroupId");
 
     result = responses.reduce(function (r, a) {
       if (a.responseGroupId !== undefined) {

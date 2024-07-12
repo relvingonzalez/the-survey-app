@@ -60,7 +60,6 @@ export default function Question({ siteCode, order, type }: QuestionProps) {
     value,
   ) => {
     const responses = value instanceof Array ? value : [value];
-    console.log(responses);
     return db.transaction("rw", db.responses, () => {
       // Add response id before saving locally
       return insertOrModifyResponses(

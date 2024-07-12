@@ -6,6 +6,7 @@ import { DexieResponse } from "../types/dexie";
 import { dayOptionsById } from "@/components/Questions/QuestionTypes/QuestionDays";
 import {
   CheckboxResponse,
+  Comment,
   DateTimeResponse,
   DaysResponse,
   EmailResponse,
@@ -22,6 +23,7 @@ import {
 } from "../types/question_new";
 import {
   ServerCheckboxResponse,
+  ServerComment,
   ServerDateTimeResponse,
   ServerDaysResponse,
   ServerEmailResponse,
@@ -336,3 +338,19 @@ export const transformResponseToServerResponse = (
       return transformTextResponse(response);
   }
 };
+
+export const uniqueId = () => {
+  return Math.floor(Math.random() * Math.floor(Math.random() * Date.now()));
+};
+
+export const transformComment = ({
+  id,
+  questionId,
+  comment,
+  responseGroupId,
+}: Comment): ServerComment => ({
+  ...(id && { id }),
+  questionId,
+  comment,
+  responseGroupId: responseGroupId || null,
+});
