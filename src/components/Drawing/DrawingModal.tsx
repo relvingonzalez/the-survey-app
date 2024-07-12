@@ -15,17 +15,17 @@ import {
   useListState,
   useViewportSize,
 } from "@mantine/hooks";
-import { MoreInfo, Rack } from "@/lib/types/rooms";
 import MoreInfoModal from "./CustomTools/MoreInfo/MoreInfoModal";
 import { IconInfoCircleFilled, IconServer2 } from "@tabler/icons-react";
 import RackModal from "./CustomTools/Rack/RackModal";
-import { createHardware } from "@/lib/data/rooms";
+// import { createHardware } from "@/lib/data/rooms";
+import { DexieRack, DexieMoreInfo } from "@/lib/types/dexie";
 
 export type CustomTools =
   | {
       isRoom: true;
-      racks: Rack[];
-      moreInfo: MoreInfo[];
+      racks: DexieRack[];
+      moreInfo: DexieMoreInfo[];
     }
   | {
       isRoom?: false;
@@ -62,12 +62,12 @@ export default function DrawingModal({
     useDisclosure(false);
   const [rackModalOpened, { open: rackOpen, close: rackClose }] =
     useDisclosure(false);
-  const [localRacks, handlersRack] = useListState<Rack>(racks);
-  const [localMoreInfo, handlersMoreInfo] = useListState<MoreInfo>(moreInfo);
-  const [currentMoreInfo, setCurrentMoreInfo] = useState<MoreInfo>(
+  const [localRacks, handlersRack] = useListState<DexieRack>(racks);
+  const [localMoreInfo, handlersMoreInfo] = useListState<DexieMoreInfo>(moreInfo);
+  const [currentMoreInfo, setCurrentMoreInfo] = useState<DexieMoreInfo>(
     localMoreInfo[0],
   );
-  const [currentRack, setCurrentRack] = useState<Rack>(localRacks[0]);
+  const [currentRack, setCurrentRack] = useState<DexieRack>(localRacks[0]);
   const customTools = [
     {
       label: "More Info",
@@ -80,7 +80,8 @@ export default function DrawingModal({
         startY: number,
         x: number,
         y: number,
-      ) => handlersMoreInfo.append({ info: "", x: x - 12, y: y - 12 }),
+        // TODO create with unique id
+      ) => handlersMoreInfo.append({ id: 0, roomId: 1, projectId:3,  info: "", x: x - 12, y: y - 12 }),
     },
     {
       label: "Rack",
@@ -94,35 +95,39 @@ export default function DrawingModal({
         x: number,
         y: number,
       ) =>
+        // Add project id, rom id, and id
         handlersRack.append({
-          rackName: "",
-          hardwareList: [
-            createHardware({
-              name: "test functionality",
-              from: "1",
-              to: "3",
-              details: "details",
-            }),
-            createHardware({
-              name: "test functionality",
-              from: "1",
-              to: "3",
-              details: "details",
-            }),
-            createHardware({
-              name: "test functionality",
-              from: "1",
-              to: "3",
-              details: "details",
-            }),
-            createHardware({
-              name: "test functionality",
-              from: "1",
-              to: "3",
-              details: "details",
-            }),
-          ],
-          rackComment: "",
+          id: 0,
+          projectId: 0,
+          roomId: 1,
+          name: "",
+          // hardwareList: [
+          //   createHardware({
+          //     name: "test functionality",
+          //     from: "1",
+          //     to: "3",
+          //     details: "details",
+          //   }),
+          //   createHardware({
+          //     name: "test functionality",
+          //     from: "1",
+          //     to: "3",
+          //     details: "details",
+          //   }),
+          //   createHardware({
+          //     name: "test functionality",
+          //     from: "1",
+          //     to: "3",
+          //     details: "details",
+          //   }),
+          //   createHardware({
+          //     name: "test functionality",
+          //     from: "1",
+          //     to: "3",
+          //     details: "details",
+          //   }),
+          // ],
+          comment: "",
           x: x - 12,
           y: y - 12,
         }),

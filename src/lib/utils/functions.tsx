@@ -1,12 +1,10 @@
 import { RefObject } from "react";
 import { Person } from "../types/question";
-import { NewRoom } from "../types/rooms";
 import * as changeKeys from "change-case/keys";
-import { DexieResponse } from "../types/dexie";
+import { ActionFlag, DexieComment, DexieResponse, DexieRoom } from "../types/dexie";
 import { dayOptionsById } from "@/components/Questions/QuestionTypes/QuestionDays";
 import {
   CheckboxResponse,
-  Comment,
   DateTimeResponse,
   DaysResponse,
   EmailResponse,
@@ -31,6 +29,7 @@ import {
   ServerNumberResponse,
   ServerPersonResponse,
   ServerPhoneResponse,
+  ServerRoom,
   ServerTextResponse,
   ServerTimeResponse,
   ServerYesNoResponse,
@@ -53,15 +52,16 @@ export const createPerson = (
 };
 
 export const createRoom = (
-  name = "",
-  comment = "",
-  racks = [],
-  moreInfo = [],
-): NewRoom => ({
+  id: number,
+  projectId: number,
+  name = '',
+  comment = ''
+): DexieRoom => ({
+  id,
   name,
   comment,
-  racks,
-  moreInfo,
+  projectId,
+  flag: 'i'
 });
 
 export const getMousePosition = (
@@ -185,6 +185,8 @@ export const getDisplayValues = (
     return getDisplayValue(responses);
   }
 };
+
+const shouldIncludeId = (id?: number, flag?: ActionFlag) => (id && flag !== 'i' && { id });
 
 export const transformEmailResponse = ({
   id,
@@ -348,9 +350,23 @@ export const transformComment = ({
   questionId,
   comment,
   responseGroupId,
-}: Comment): ServerComment => ({
-  ...(id && { id }),
+  flag,
+}: DexieComment): ServerComment => ({
+  ...shouldIncludeId(id, flag),
   questionId,
   comment,
   responseGroupId: responseGroupId || null,
+});
+
+export const transformRoom = ({
+  id,
+  projectId,
+  name,
+  comment,
+  flag,
+}: DexieRoom): ServerRoom => ({
+  ...shouldIncludeId(id, flag),
+  projectId,
+  name,
+  comment
 });

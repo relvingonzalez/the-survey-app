@@ -44,6 +44,7 @@ export type ServerRoom = {
   id: number;
   project_id: number;
   name: string;
+  comment: string;
 };
 
 export type ServerMoreInfo = {
@@ -57,9 +58,9 @@ export type ServerMoreInfo = {
 
 export type ServerRack = {
   id: number;
-  project_id: number;
-  room_id: number;
+  roomId: number;
   name: string;
+  comment: string;
   x: Coordinate;
   y: Coordinate;
 };

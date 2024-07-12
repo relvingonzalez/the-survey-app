@@ -1,5 +1,3 @@
-import { UUID } from "./util";
-
 export type Coordinate = number;
 
 export type MoreInfo = {
@@ -18,19 +16,15 @@ export type Hardware = {
 export type Rack = {
   x: Coordinate;
   y: Coordinate;
-  rackComment: string;
-  rackName: string;
-  hardwareList: Hardware[];
+  comment: string;
+  name: string;
 };
 
 export type Room = {
-  id: UUID;
+  id: number;
+  projectId: number;
   name: string;
   comment: string;
-  racks: Rack[];
-  moreInfo: MoreInfo[];
 };
-
-export type NewRoom = Omit<Room, "id">;
 
 export type Rooms = Room[];

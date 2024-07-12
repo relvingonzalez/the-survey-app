@@ -42,6 +42,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
     setProgressValue(progress <= 100 ? progress : 100);
   };
   const sync = async () => {
+    // sync response groups for collection questions
     const responseGroups = await getUpdatedResponseGroups();
     if (responseGroups.length) {
       handleStatusUpdate(
@@ -64,6 +65,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       );
     }
 
+    // sync main responses with comments
     const comments = await getUpdatedComments();
     if (comments.length) {
       handleStatusUpdate(1, progressValue + 5, "Syncing Comments...");
@@ -72,17 +74,30 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       handleStatusUpdate(2, progressValue + 10, "Syncing Comments Complete!");
     }
 
+    // sync responses types
     const responses = await getUpdatedResponses();
     if (responses.length) {
       const savedResponses = await saveResponses(responses);
-      console.log("saved are:", savedResponses);
+      console.log(savedResponses);
+      // await updateResponseIds(savedResponses);
       handleStatusUpdate(2, progressValue + 10, "Syncing Responses Complete!");
     }
 
-    handleStatusUpdate(3, 100, "Syncing Complete!");
-
-    // sync responses
     // sync rooms
+    // const rooms = await getUpdatedRooms();
+    // if (rooms.length) {
+    //   handleStatusUpdate(1, progressValue + 5, "Syncing Rooms...");
+    //   await Promise.all(
+    //     rooms.map(async (r) => {
+    //       const savedRooms = await saveRooms(rooms);
+    //       await updateRoomsIds(savedRooms);
+    //     }),
+    //   );
+
+    //   handleStatusUpdate(2, progressValue + 10, "Syncing Rooms Complete!");
+    // }
+
+    handleStatusUpdate(3, 100, "Syncing Complete!");
     // sync moreInfo
     // sync racks
     // sync hardware

@@ -2,7 +2,6 @@ import {
   LocalHardware,
   LocalMoreInfo,
   LocalRack,
-  LocalRoom,
   LocalSiteProject,
 } from "./local_new";
 import {
@@ -11,6 +10,7 @@ import {
   Comment,
   MultipleResponse,
 } from "./question_new";
+import { Room } from "./rooms";
 import { ServerResponseGroup } from "./server_new";
 
 type DefaultDexieUtilityType = {
@@ -37,9 +37,7 @@ export type DexieResponseGroupedByResponseType = Record<
 
 export type DexieComment = Comment & DefaultDexieUtilityType;
 
-export type DexieRoom = LocalRoom & {
-  localId?: number;
-};
+export type DexieRoom = Room &  DefaultDexieUtilityType;
 
 export type DexieRack = LocalRack & {
   localId?: number;

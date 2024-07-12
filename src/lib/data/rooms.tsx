@@ -10,9 +10,8 @@ export const dummyHardware = {
 export const dummyRack: Rack = {
   x: 201.23,
   y: 134,
-  rackName: "Dummy Rack",
-  rackComment: "Comment",
-  hardwareList: [dummyHardware, dummyHardware],
+  name: "Dummy Rack",
+  comment: "Comment",
 };
 
 export const dummyMoreInfo: MoreInfo = {
@@ -22,11 +21,10 @@ export const dummyMoreInfo: MoreInfo = {
 };
 
 export const dummyRoom: Room = {
-  id: "1",
+  id: 1,
+  projectId: 1,
   name: "Dummy Room",
   comment: "",
-  racks: [dummyRack],
-  moreInfo: [dummyMoreInfo],
 };
 
 export const dummyRooms: Room[] = [dummyRoom, dummyRoom, dummyRoom, dummyRoom];

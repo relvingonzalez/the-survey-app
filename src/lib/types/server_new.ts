@@ -16,7 +16,7 @@ import {
   TimeValue,
   YesNoValue,
 } from "./question_new";
-import { Coordinate } from "./rooms";
+import { Coordinate, Room } from "./rooms";
 import { Site, SiteCode } from "./sites";
 
 export type ServerSite = Omit<Site, "siteCode"> & {
@@ -85,10 +85,8 @@ export type ServerResponseTypes =
 
 export type ServerComment = Omit<Comment, "projectId">;
 
-export type ServerRoom = {
-  id: number;
-  project_id: number;
-  name: string;
+export type ServerRoom = Omit<Room, 'id'> & {
+  id?: number;
 };
 
 export type ServerMoreInfo = {

@@ -2,25 +2,23 @@
 
 import { TextInput, Button, Group, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { NewRoom, Room } from "@/lib/types/rooms";
+import { Room } from "@/lib/types/rooms";
 import Comment from "../Comment";
 import Files, { FileCallbacks } from "../files/Files.";
 import ClickableDrawing, {
   ClickableDrawingProps,
 } from "../Drawing/ClickableDrawing";
+import { useLiveQuery } from "dexie-react-hooks";
+import { getMoreInfosByRoomId, getRacksByRoomId } from "@/lib/dexie/helper";
 
 export type RoomProps = FileCallbacks &
   Pick<ClickableDrawingProps, "onSaveDrawing"> & {
-    room: Room | NewRoom;
+    room: Room;
     files: File[];
     plan?: File;
-    onSave: (room: Partial<Room>) => void;
+    onSave: (room: Room) => void;
     onDelete: (room: Room) => void;
   };
-
-export function isExistingRoom(room: Room | NewRoom): room is Room {
-  return (room as Room).id !== undefined;
-}
 
 export default function RoomComponent({
   room,
@@ -30,12 +28,15 @@ export default function RoomComponent({
   onSaveDrawing,
   ...filesProps
 }: RoomProps) {
+  // Get moreInfos and Racks from room
+  const moreInfos = useLiveQuery(() => getMoreInfosByRoomId(room.id), [room]);
+  const racks = useLiveQuery(() => getRacksByRoomId(room.id), [room]);
   const form = useForm({
     initialValues: {
       name: room?.name || "",
       comment: room?.comment || "",
-      racks: room?.racks || [],
-      moreInfo: room?.moreInfo || [],
+      racks: racks || [],
+      moreInfo: moreInfos || []
     },
     validateInputOnChange: true,
     clearInputErrorOnChange: true,
@@ -45,7 +46,7 @@ export default function RoomComponent({
   });
   return (
     <>
-      <form onSubmit={form.onSubmit((values) => onSave(values))}>
+      <form onSubmit={form.onSubmit((values) => onSave({...room, name: values.name, comment: values.comment}))}>
         <Stack justify="flex-start">
           <TextInput
             label="Room Name"
@@ -66,16 +67,15 @@ export default function RoomComponent({
             <Button mt="10" disabled={!form.isValid} type="submit">
               Save
             </Button>
-            {isExistingRoom(room) && (
-              <Button
-                variant="danger"
-                mt="10"
-                disabled={!form.isValid}
-                onClick={() => onDelete(room)}
-              >
-                Delete
-              </Button>
-            )}
+
+            <Button
+              variant="danger"
+              mt="10"
+              disabled={!form.isValid}
+              onClick={() => onDelete(room)}
+            >
+              Delete
+            </Button>
           </Group>
         </Stack>
       </form>

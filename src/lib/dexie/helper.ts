@@ -1,4 +1,4 @@
-import { DexieComment, DexieQuestion, DexieResponse } from "../types/dexie";
+import { DexieComment, DexieQuestion, DexieResponse, DexieRoom } from "../types/dexie";
 import { LocalDownloadSiteData } from "../types/local_new";
 import { QuestionType } from "../types/question_new";
 import { db } from "./db";
@@ -15,6 +15,7 @@ import { createTextResponse } from "@/components/Questions/QuestionTypes/Questio
 import { createTimeResponse } from "@/components/Questions/QuestionTypes/QuestionTime";
 import { createYesNoResponse } from "@/components/Questions/QuestionTypes/QuestionYesNo";
 import { ServerComment } from "../types/server_new";
+import { createRoom, uniqueId } from "../utils/functions";
 
 export async function populate(data: LocalDownloadSiteData) {
   return db.transaction(
@@ -186,12 +187,12 @@ export const createComment = (
   id?: number,
   responseGroupId?: number,
 ): DexieComment => ({
-  tempId: id,
+  id,
   questionId,
   projectId,
   comment: "",
   responseGroupId,
-  flag: "u",
+  flag: "i",
 });
 
 export const getComment = async (
@@ -366,3 +367,32 @@ export const createResponseByQuestion = (
   }
   return response;
 };
+
+export const getRoomById = async (projectId: number, id?: number) => id ? await db.rooms.get({ id }) : createRoom(uniqueId(), projectId, "");
+
+export const updateRoom = async ({id, name, comment, flag}: DexieRoom) => await db.rooms.where({ id }).modify({ name, comment, flag: flag !== 'i' ? 'u' : 'i' });
+
+export const deleteRoom = ({id, flag}: DexieRoom) => {
+  return db.transaction(
+    "rw",
+    [db.rooms, db.racks, db.moreInfos, db.hardwares],
+    async () => {
+      if (flag === 'i') {
+        // only local, delete everything
+        db.rooms.where({ id }).delete();
+      } else {
+        // exists in server, set for deletion, and delete its accompanying data
+        db.rooms.where({ id }).modify({ flag: 'd'});
+      }
+      const racks = await db.racks.where({ roomId: id }).toArray();
+      db.hardwares.where('rackId').anyOf(racks.map(r => r.id)).delete();
+      db.racks.where({ roomId: id }).delete();
+      db.moreInfos.where({ roomId: id }).delete();
+    },
+  );
+};
+
+export const getMoreInfosByRoomId = async (roomId: number) => await db.moreInfos.where({ roomId }).toArray();
+
+export const getRacksByRoomId = async (roomId: number) => await db.racks.where({ roomId }).toArray();
+

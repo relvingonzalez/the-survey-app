@@ -11,7 +11,7 @@ import {
   TableThead,
   TableTr,
   TextInput,
-  Text,
+  // Text,
   rem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -20,8 +20,8 @@ import Files from "@/components/files/Files.";
 import { useListState } from "@mantine/hooks";
 import {
   IconDeviceFloppy,
-  IconPencil,
-  IconTrash,
+  // IconPencil,
+  // IconTrash,
   IconX,
 } from "@tabler/icons-react";
 import { createHardware } from "@/lib/data/rooms";
@@ -51,21 +51,23 @@ export default function RackModal({
 
   const form = useForm({
     initialValues: {
-      rackName: rack.rackName || "",
-      hardwareList: rack.hardwareList || [],
-      rackComment: rack.rackComment || "",
+      name: rack.name || "",
+      // TODO get hardware list
+      hardwareList: [],
+      comment: rack.comment || "",
       x: rack.x,
       y: rack.y,
     },
 
     validate: {
-      rackName: (value) => (value ? null : "Invalid comment"),
-      hardwareList: {
-        name: (value) => (value ? null : "Invalid name"),
-        from: (value) => (value ? null : "Invalid from"),
-        to: (value) => (value ? null : "Invalid to"),
-        details: (value) => (value ? null : "Invalid details"),
-      },
+      name: (value) => (value ? null : "Invalid comment"),
+      // TODO add validation
+      // hardwareList: {
+      //   name: (value) => (value ? null : "Invalid name"),
+      //   from: (value) => (value ? null : "Invalid from"),
+      //   to: (value) => (value ? null : "Invalid to"),
+      //   details: (value) => (value ? null : "Invalid details"),
+      // },
     },
   });
 
@@ -157,7 +159,7 @@ export default function RackModal({
           </>
         )}
 
-        {!editMode && (
+        {/* {!editMode && (
           <>
             <TableTd>
               {h.from} - {h.to}
@@ -184,7 +186,7 @@ export default function RackModal({
               </ActionIcon>
             </TableTd>
           </>
-        )}
+        )} */}
       </TableTr>
     );
   });
