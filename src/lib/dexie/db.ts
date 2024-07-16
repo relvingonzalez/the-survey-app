@@ -24,7 +24,7 @@ export class TheSurveyAppDB extends Dexie {
 
   constructor() {
     super("theSurveyApp");
-    this.version(50).stores({
+    this.version(51).stores({
       siteProjects: "++localId, projectId, &id, name, siteCode",
       questions:
         "++localId, &id, projectId, [projectId+order], [projectId+order+questionType], collectionId, questionType, [projectId+questionType], [projectId+collectionId]",
@@ -33,10 +33,10 @@ export class TheSurveyAppDB extends Dexie {
       responseGroups: "++localId, &id, projectId, collectionId, flag",
       comments:
         "++localId, &id, projectId, questionId, responseGroupId, [projectId+questionType], [projectId+questionId], flag, [flag+responseGroupId], [questionId+responseGroupId]",
-      rooms: "++localId, &id, projectId, name",
-      racks: "++localId, &id, projectId, roomId, name",
-      moreInfos: "++localId, &id, projectId, roomId",
-      hardwares: "++localId, &id, projectId, rackId",
+      rooms: "++localId, &id, projectId, name, flag",
+      racks: "++localId, &id, projectId, roomId, name, flag",
+      moreInfos: "++localId, &id, projectId, roomId, flag",
+      hardwares: "++localId, &id, projectId, rackId, flag",
     });
   }
 }

@@ -4,6 +4,8 @@ import {
   DexieQuestion,
   DexieResponse,
   DexieRoom,
+  DexieStructure,
+  DexieTable,
 } from "../types/dexie";
 import { LocalDownloadSiteData } from "../types/local_new";
 import { QuestionType } from "../types/question_new";
@@ -20,7 +22,7 @@ import { createPhoneResponse } from "@/components/Questions/QuestionTypes/Questi
 import { createTextResponse } from "@/components/Questions/QuestionTypes/QuestionText";
 import { createTimeResponse } from "@/components/Questions/QuestionTypes/QuestionTime";
 import { createYesNoResponse } from "@/components/Questions/QuestionTypes/QuestionYesNo";
-import { ServerComment } from "../types/server_new";
+import { ServerComment, ServerRoom } from "../types/server_new";
 import { createRoom, uniqueId } from "../utils/functions";
 import { MoreInfo, Rack } from "../types/rooms";
 
@@ -129,7 +131,7 @@ export const updateCommentIds = (comments: ServerComment[]) => {
 
       db.responses
         .where({ questionId, responseGroupId })
-        .modify({ questionResponseId: id });
+        .modify({ questionResponseId: id, responseGroupId });
     });
   });
 };
@@ -141,15 +143,6 @@ export const updateComment = (value: string, localId?: number) => {
     }
   });
 };
-
-export const getUpdatedComments = () =>
-  db.comments.where({ flag: "u" }).toArray();
-
-export const getUpdatedResponses = () =>
-  db.responses.where({ flag: "u" }).toArray();
-
-export const getUpdatedResponseGroups = () =>
-  db.responseGroups.where({ flag: "u" }).toArray();
 
 export const updateResponseGroupIds = (
   oldResponseGroupId: number,
@@ -172,6 +165,7 @@ export const updateResponseGroupIds = (
   );
 };
 
+// TODO replace with put instead of modify and add
 export const insertOrModifyResponse = (response: DexieResponse) => {
   if (response.localId) {
     if (response.flag === "d" && !response.id) {
@@ -454,5 +448,26 @@ export const updateHardwareList = (hardwareList: DexieHardware[]) => {
       .modify({ flag: "d" });
     // If new list has one that didn't exist, put
     db.hardwares.bulkPut(hardwareList);
+  });
+};
+
+// Get Updated items which means either insert or update
+const getUpdatedItemsByTable = <K extends DexieStructure>(
+  table: DexieTable<K>,
+) => table.where("flag").anyOf(["i", "u"]).toArray();
+
+export const getUpdatedRooms = async () => getUpdatedItemsByTable(db.rooms);
+
+export const getUpdatedComments = async () => getUpdatedItemsByTable(db.comments);
+
+export const getUpdatedResponses = async () => getUpdatedItemsByTable(db.responses);
+
+export const getUpdatedResponseGroups = async () => getUpdatedItemsByTable(db.responseGroups);
+
+export const updateRoomIds = ({ id }: DexieRoom, { id: newId }: ServerRoom) => {
+  return db.transaction("rw", [db.rooms, db.racks, db.moreInfos], () => {
+    db.rooms.where({ id }).modify({ id: newId, flag: "" });
+    db.racks.where({ roomId: id }).modify({ roomId: newId });
+    db.moreInfos.where({ roomId: id }).modify({ roomId: newId });
   });
 };

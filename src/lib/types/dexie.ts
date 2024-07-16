@@ -1,3 +1,4 @@
+import { IndexableType, Table } from "dexie";
 import { LocalSiteProject } from "./local_new";
 import {
   Question,
@@ -48,3 +49,16 @@ export type DexieResponseGroup = DefaultDexieUtilityType &
   ServerResponseGroup & {
     projectId?: number;
   };
+
+export type DexieStructure =
+  | DexieSiteProject
+  | DexieQuestion
+  | DexieResponse
+  | DexieComment
+  | DexieRoom
+  | DexieRack
+  | DexieMoreInfo
+  | DexieHardware
+  | DexieResponseGroup;
+
+export type DexieTable<K extends DexieStructure> = Table<K, IndexableType>;

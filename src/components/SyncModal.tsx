@@ -6,13 +6,16 @@ import {
   getUpdatedComments,
   getUpdatedResponseGroups,
   getUpdatedResponses,
+  getUpdatedRooms,
   updateCommentIds,
   updateResponseGroupIds,
+  updateRoomIds,
 } from "@/lib/dexie/helper";
 import {
   saveComments,
   saveResponseGroup,
   saveResponses,
+  saveRoom,
 } from "@/lib/api/actions";
 import DownloadModal from "./DownloadModal";
 import {
@@ -84,18 +87,18 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
     }
 
     // sync rooms
-    // const rooms = await getUpdatedRooms();
-    // if (rooms.length) {
-    //   handleStatusUpdate(1, progressValue + 5, "Syncing Rooms...");
-    //   await Promise.all(
-    //     rooms.map(async (r) => {
-    //       const savedRooms = await saveRooms(rooms);
-    //       await updateRoomsIds(savedRooms);
-    //     }),
-    //   );
+    const rooms = await getUpdatedRooms();
+    if (rooms.length) {
+      handleStatusUpdate(1, progressValue + 5, "Syncing Rooms...");
+      await Promise.all(
+        rooms.map(async (r) => {
+          const savedRoom = await saveRoom(r);
+          await updateRoomIds(r, savedRoom);
+        }),
+      );
 
-    //   handleStatusUpdate(2, progressValue + 10, "Syncing Rooms Complete!");
-    // }
+      handleStatusUpdate(2, progressValue + 10, "Syncing Rooms Complete!");
+    }
 
     handleStatusUpdate(3, 100, "Syncing Complete!");
     // sync moreInfo

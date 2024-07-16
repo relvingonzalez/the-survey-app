@@ -6,23 +6,26 @@ import {
   DexieResponse,
   DexieResponseGroup,
   DexieResponseGroupedByResponseType,
+  DexieRoom,
 } from "../types/dexie";
 import { ResponseType } from "../types/question_new";
 import {
   transformComment,
   transformResponseToServerResponse,
+  transformRoom,
 } from "../utils/functions";
 import {
   ServerResponseTypes,
   ServerResponseGroup,
   ServerComment,
+  ServerRoom,
 } from "../types/server_new";
 import postgres from "postgres";
 
 type ServerTableIndex = Exclude<ResponseType, "collection">;
 
 export type TableByQuestionType = Record<ServerTableIndex, string>;
-type ArrayTypesRelvin = ServerComment;
+type ServerArray = ServerComment | ServerRoom | ServerResponseTypes;
 
 const tableByType: TableByQuestionType = {
   geo: "geo_question_response",
@@ -40,27 +43,12 @@ const tableByType: TableByQuestionType = {
   multiple: "text_question_response",
 };
 
-const insertOrUpdate = async (
-  sql: postgres.TransactionSql,
-  serverTableIndex: ServerTableIndex,
-  serverResponses: ServerResponseTypes[],
-) => {
-  return await sql`
-    INSERT INTO ${sql(tableByType[serverTableIndex])} ${sql(serverResponses)}
-    ON CONFLICT (id) 
-    DO UPDATE SET
-    ${Object.keys(serverResponses[0]).map(
-      (x, i) => sql`${i ? sql`,` : sql``}${sql(x)} = excluded.${sql(x)}`,
-    )}
-    RETURNING *`;
-};
-
-const insertOrUpdateByTableName = async <K extends ArrayTypesRelvin>(
+const insertOrUpdateByTableName = async <K extends ServerArray>(
   sql: postgres.TransactionSql,
   serverTableName: string,
-  serverResponses: ArrayTypesRelvin[],
+  serverResponses: ServerArray[],
 ) => {
-  const result: K[] = await sql`
+  const result: K[] = await sql<K[]>`
     INSERT INTO ${sql(serverTableName)} ${sql(serverResponses)}
     ON CONFLICT (id) 
     DO UPDATE SET
@@ -72,20 +60,16 @@ const insertOrUpdateByTableName = async <K extends ArrayTypesRelvin>(
   return result;
 };
 
-// export async function saveComments(comments: DexieComment[]) {
-//   const result: Comment[] = await sql`INSERT INTO question_response ${sql(
-//     comments,
-//     "questionId",
-//     "comment",
-//     "responseGroupId",
-//   )}
-//   ON CONFLICT (question_id, response_group_id)
-//   DO UPDATE SET
-//     comment = EXCLUDED.comment
-//     RETURNING *;`;
-
-//   return result;
-// }
+const insertOrUpdateByTableIndex = async <K extends ServerArray>(
+  sql: postgres.TransactionSql,
+  serverTableIndex: ServerTableIndex,
+  serverResponses: ServerArray[],
+) =>
+  insertOrUpdateByTableName<K>(
+    sql,
+    tableByType[serverTableIndex],
+    serverResponses,
+  );
 
 export async function saveComments(comments: DexieComment[]) {
   const [commentsInserted, commentsUpdated] = await sql.begin(async (sql) => {
@@ -93,14 +77,14 @@ export async function saveComments(comments: DexieComment[]) {
     const insertResponses = serverComments.filter((c) => !c.id);
     const updateResponses = serverComments.filter((c) => c.id);
     const inserted = insertResponses.length
-      ? await insertOrUpdateByTableName(
+      ? await insertOrUpdateByTableName<ServerComment>(
           sql,
           "question_response",
           insertResponses,
         )
       : [];
     const updated = updateResponses.length
-      ? await insertOrUpdateByTableName(
+      ? await insertOrUpdateByTableName<ServerComment>(
           sql,
           "question_response",
           updateResponses,
@@ -111,6 +95,16 @@ export async function saveComments(comments: DexieComment[]) {
   });
 
   return [commentsInserted, commentsUpdated];
+}
+
+export async function saveRoom(room: DexieRoom) {
+  const [serverRoom] = await sql.begin(async (sql) => {
+    return await insertOrUpdateByTableName<ServerRoom>(sql, "room", [
+      transformRoom(room),
+    ]);
+  });
+
+  return serverRoom;
 }
 
 export async function saveResponseGroup(responseGroup: DexieResponseGroup) {
@@ -141,18 +135,26 @@ export async function saveResponses(responses: DexieResponse[]) {
    * SQL Transaction all statements should run in one trip to db
    */
   return await sql.begin(async (sql) => {
-    const requests: Promise<postgres.RowList<postgres.Row[]>>[] = [];
+    const requests: Promise<ServerArray[]>[] = [];
     Object.entries(groupedResponses).forEach(([k, responses]) => {
       const serverResponses = responses.map(transformResponseToServerResponse);
       const insertResponses = serverResponses.filter((r) => !r.id);
       const updateResponses = serverResponses.filter((r) => r.id);
       insertResponses.length &&
         requests.push(
-          insertOrUpdate(sql, k as ServerTableIndex, insertResponses),
+          insertOrUpdateByTableIndex(
+            sql,
+            k as ServerTableIndex,
+            insertResponses,
+          ),
         );
       updateResponses.length &&
         requests.push(
-          insertOrUpdate(sql, k as ServerTableIndex, updateResponses),
+          insertOrUpdateByTableIndex(
+            sql,
+            k as ServerTableIndex,
+            updateResponses,
+          ),
         );
     });
 
