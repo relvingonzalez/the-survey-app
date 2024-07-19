@@ -7,7 +7,7 @@ import {
   MultipleResponse,
 } from "./question_new";
 import { Hardware, MoreInfo, Rack, Room } from "./rooms";
-import { ServerResponseGroup } from "./server_new";
+import { ServerArray, ServerResponseGroup } from "./server_new";
 
 type DefaultDexieUtilityType = {
   localId?: number;
@@ -49,6 +49,11 @@ export type DexieResponseGroup = DefaultDexieUtilityType &
   ServerResponseGroup & {
     projectId?: number;
   };
+
+export type DexieTransformToServer<
+  T extends DexieStructure,
+  K extends ServerArray,
+> = (item: T) => K;
 
 export type DexieStructure =
   | DexieSiteProject

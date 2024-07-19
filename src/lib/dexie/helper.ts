@@ -1,7 +1,9 @@
 import {
   DexieComment,
   DexieHardware,
+  DexieMoreInfo,
   DexieQuestion,
+  DexieRack,
   DexieResponse,
   DexieRoom,
   DexieStructure,
@@ -22,7 +24,13 @@ import { createPhoneResponse } from "@/components/Questions/QuestionTypes/Questi
 import { createTextResponse } from "@/components/Questions/QuestionTypes/QuestionText";
 import { createTimeResponse } from "@/components/Questions/QuestionTypes/QuestionTime";
 import { createYesNoResponse } from "@/components/Questions/QuestionTypes/QuestionYesNo";
-import { ServerComment, ServerRoom } from "../types/server_new";
+import {
+  ServerComment,
+  ServerHardware,
+  ServerMoreInfo,
+  ServerRack,
+  ServerRoom,
+} from "../types/server_new";
 import { createRoom, uniqueId } from "../utils/functions";
 import { MoreInfo, Rack } from "../types/rooms";
 
@@ -417,6 +425,7 @@ export const updateRack = async (rack: Rack) =>
 export const updateMoreInfo = async (moreInfo: MoreInfo) =>
   await db.moreInfos.where({ id: moreInfo.id }).modify(moreInfo);
 
+// TODO: if deleting tools that have already been saved, don't delete instead mark with d flag
 export const clearRoomTools = async (id: number) => {
   const racks = await db.racks.where({ roomId: id }).toArray();
   db.hardwares
@@ -458,16 +467,52 @@ const getUpdatedItemsByTable = <K extends DexieStructure>(
 
 export const getUpdatedRooms = async () => getUpdatedItemsByTable(db.rooms);
 
-export const getUpdatedComments = async () => getUpdatedItemsByTable(db.comments);
+export const getUpdatedComments = async () =>
+  getUpdatedItemsByTable(db.comments);
 
-export const getUpdatedResponses = async () => getUpdatedItemsByTable(db.responses);
+export const getUpdatedResponses = async () =>
+  getUpdatedItemsByTable(db.responses);
 
-export const getUpdatedResponseGroups = async () => getUpdatedItemsByTable(db.responseGroups);
+export const getUpdatedResponseGroups = async () =>
+  getUpdatedItemsByTable(db.responseGroups);
+
+export const getUpdatedRacks = async () => getUpdatedItemsByTable(db.racks);
+
+export const getUpdatedMoreInfos = async () =>
+  getUpdatedItemsByTable(db.moreInfos);
+
+export const getUpdatedHardwares = async () =>
+  getUpdatedItemsByTable(db.hardwares);
 
 export const updateRoomIds = ({ id }: DexieRoom, { id: newId }: ServerRoom) => {
   return db.transaction("rw", [db.rooms, db.racks, db.moreInfos], () => {
     db.rooms.where({ id }).modify({ id: newId, flag: "" });
     db.racks.where({ roomId: id }).modify({ roomId: newId });
     db.moreInfos.where({ roomId: id }).modify({ roomId: newId });
+  });
+};
+
+export const updateRackIds = ({ id }: DexieRack, { id: newId }: ServerRack) => {
+  return db.transaction("rw", [db.racks, db.hardwares], () => {
+    db.racks.where({ id }).modify({ id: newId, flag: "" });
+    db.hardwares.where({ rackId: id }).modify({ rackId: newId });
+  });
+};
+
+export const updateHardwareIds = (
+  { id }: DexieHardware,
+  { id: newId }: ServerHardware,
+) => {
+  return db.transaction("rw", [db.hardwares], () => {
+    db.hardwares.where({ id }).modify({ id: newId, flag: "" });
+  });
+};
+
+export const updateMoreInfoIds = (
+  { id }: DexieMoreInfo,
+  { id: newId }: ServerMoreInfo,
+) => {
+  return db.transaction("rw", [db.moreInfos], () => {
+    db.moreInfos.where({ id }).modify({ id: newId, flag: "" });
   });
 };

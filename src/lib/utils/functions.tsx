@@ -34,9 +34,12 @@ import {
   ServerDaysResponse,
   ServerEmailResponse,
   ServerGeoResponse,
+  ServerHardware,
+  ServerMoreInfo,
   ServerNumberResponse,
   ServerPersonResponse,
   ServerPhoneResponse,
+  ServerRack,
   ServerRoom,
   ServerTextResponse,
   ServerTimeResponse,
@@ -427,4 +430,51 @@ export const transformRoom = ({
   projectId,
   name,
   comment,
+});
+
+export const transformRack = ({
+  id,
+  roomId,
+  name,
+  x,
+  y,
+  flag,
+}: DexieRack): ServerRack => ({
+  ...shouldIncludeId(id, flag),
+  name,
+  roomId,
+  x,
+  y,
+});
+
+export const transformMoreInfo = ({
+  id,
+  roomId,
+  info,
+  x,
+  y,
+  flag,
+}: DexieMoreInfo): ServerMoreInfo => ({
+  ...shouldIncludeId(id, flag),
+  roomId,
+  info,
+  x,
+  y,
+});
+
+export const transformHardware = ({
+  id,
+  rackId,
+  name,
+  fromSlot,
+  toSlot,
+  details,
+  flag,
+}: DexieHardware): ServerHardware => ({
+  ...shouldIncludeId(id, flag),
+  rackId,
+  name,
+  fromSlot,
+  toSlot,
+  details,
 });

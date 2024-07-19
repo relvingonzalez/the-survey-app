@@ -4,10 +4,16 @@ import { ModalProps } from "@mantine/core";
 import { useEffect, useState } from "react";
 import {
   getUpdatedComments,
+  getUpdatedHardwares,
+  getUpdatedMoreInfos,
+  getUpdatedRacks,
   getUpdatedResponseGroups,
   getUpdatedResponses,
   getUpdatedRooms,
   updateCommentIds,
+  updateHardwareIds,
+  updateMoreInfoIds,
+  updateRackIds,
   updateResponseGroupIds,
   updateRoomIds,
 } from "@/lib/dexie/helper";
@@ -16,6 +22,9 @@ import {
   saveResponseGroup,
   saveResponses,
   saveRoom,
+  saveRack,
+  saveHardware,
+  saveMoreInfo,
 } from "@/lib/api/actions";
 import DownloadModal from "./DownloadModal";
 import {
@@ -100,10 +109,46 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       handleStatusUpdate(2, progressValue + 10, "Syncing Rooms Complete!");
     }
 
-    handleStatusUpdate(3, 100, "Syncing Complete!");
-    // sync moreInfo
     // sync racks
+    const racks = await getUpdatedRacks();
+    if (racks.length) {
+      handleStatusUpdate(1, progressValue + 5, "Syncing Racks...");
+      await Promise.all(
+        racks.map(async (r) => {
+          const savedRack = await saveRack(r);
+          await updateRackIds(r, savedRack);
+        }),
+      );
+
+      handleStatusUpdate(2, progressValue + 10, "Syncing Rooms Complete!");
+    }
     // sync hardware
+    const hardwares = await getUpdatedHardwares();
+    if (hardwares.length) {
+      handleStatusUpdate(1, progressValue + 5, "Syncing Hardware...");
+      await Promise.all(
+        hardwares.map(async (r) => {
+          const savedHardware = await saveHardware(r);
+          await updateHardwareIds(r, savedHardware);
+        }),
+      );
+      handleStatusUpdate(2, progressValue + 10, "Syncing Hardwares Complete!");
+    }
+
+    // sync moreInfo
+    const moreInfos = await getUpdatedMoreInfos();
+    if (moreInfos.length) {
+      handleStatusUpdate(1, progressValue + 5, "Syncing More Infos...");
+      await Promise.all(
+        moreInfos.map(async (m) => {
+          const savedMoreInfo = await saveMoreInfo(m);
+          await updateMoreInfoIds(m, savedMoreInfo);
+        }),
+      );
+      handleStatusUpdate(2, progressValue + 10, "Syncing Hardwares Complete!");
+    }
+
+    handleStatusUpdate(3, 100, "Syncing Complete!");
   };
   const handleOnContinue = () => {
     handleStatusUpdate(1, 1, "Syncing...");

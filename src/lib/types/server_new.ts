@@ -90,30 +90,27 @@ export type ServerRoom = Omit<Room, "id"> & {
 };
 
 export type ServerMoreInfo = {
-  id: number;
-  project_id: number;
-  room_id: number;
+  id?: number;
+  roomId: number;
   info: string;
   x: Coordinate;
   y: Coordinate;
 };
 
 export type ServerRack = {
-  id: number;
-  project_id: number;
-  room_id: number;
+  id?: number;
+  roomId: number;
   name: string;
   x: Coordinate;
   y: Coordinate;
 };
 
 export type ServerHardware = {
-  id: number;
-  project_id: number;
-  rack_id: number;
+  id?: number;
+  rackId: number;
   name: string;
-  from_slot: string;
-  to_slot: string;
+  fromSlot: string;
+  toSlot: string;
   details: string;
 };
 
@@ -143,3 +140,8 @@ export const createServerData = () => ({
   racks: [],
   hardware: [],
 });
+
+export type ServerTableIndex = Exclude<ResponseType, "collection">;
+
+export type TableByQuestionType = Record<ServerTableIndex, string>;
+export type ServerArray = ServerComment | ServerRoom | ServerResponseTypes;

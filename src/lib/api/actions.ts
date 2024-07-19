@@ -3,29 +3,33 @@
 import sql from "./db";
 import {
   DexieComment,
+  DexieHardware,
+  DexieMoreInfo,
+  DexieRack,
   DexieResponse,
   DexieResponseGroup,
   DexieResponseGroupedByResponseType,
   DexieRoom,
+  DexieStructure,
+  DexieTransformToServer,
 } from "../types/dexie";
-import { ResponseType } from "../types/question_new";
 import {
   transformComment,
+  transformHardware,
+  transformMoreInfo,
+  transformRack,
   transformResponseToServerResponse,
   transformRoom,
 } from "../utils/functions";
 import {
-  ServerResponseTypes,
   ServerResponseGroup,
   ServerComment,
-  ServerRoom,
+  ServerArray,
+  ServerTableIndex,
+  TableByQuestionType,
+  ServerHardware,
 } from "../types/server_new";
 import postgres from "postgres";
-
-type ServerTableIndex = Exclude<ResponseType, "collection">;
-
-export type TableByQuestionType = Record<ServerTableIndex, string>;
-type ServerArray = ServerComment | ServerRoom | ServerResponseTypes;
 
 const tableByType: TableByQuestionType = {
   geo: "geo_question_response",
@@ -44,7 +48,7 @@ const tableByType: TableByQuestionType = {
 };
 
 const insertOrUpdateByTableName = async <K extends ServerArray>(
-  sql: postgres.TransactionSql,
+  sql: postgres.Sql,
   serverTableName: string,
   serverResponses: ServerArray[],
 ) => {
@@ -61,7 +65,7 @@ const insertOrUpdateByTableName = async <K extends ServerArray>(
 };
 
 const insertOrUpdateByTableIndex = async <K extends ServerArray>(
-  sql: postgres.TransactionSql,
+  sql: postgres.Sql,
   serverTableIndex: ServerTableIndex,
   serverResponses: ServerArray[],
 ) =>
@@ -70,6 +74,21 @@ const insertOrUpdateByTableIndex = async <K extends ServerArray>(
     tableByType[serverTableIndex],
     serverResponses,
   );
+
+const insertOrUpdateItem = async <
+  T extends DexieStructure,
+  K extends ServerArray,
+>(
+  item: T,
+  tableName: string,
+  transformFunction: DexieTransformToServer<T, K>,
+): Promise<K> => {
+  const [serverRoom] = await insertOrUpdateByTableName<K>(sql, tableName, [
+    transformFunction(item),
+  ]);
+
+  return serverRoom;
+};
 
 export async function saveComments(comments: DexieComment[]) {
   const [commentsInserted, commentsUpdated] = await sql.begin(async (sql) => {
@@ -98,13 +117,26 @@ export async function saveComments(comments: DexieComment[]) {
 }
 
 export async function saveRoom(room: DexieRoom) {
-  const [serverRoom] = await sql.begin(async (sql) => {
-    return await insertOrUpdateByTableName<ServerRoom>(sql, "room", [
-      transformRoom(room),
-    ]);
-  });
+  return insertOrUpdateItem(room, "room", transformRoom);
+  // const [serverRoom] = await sql.begin(async (sql) => {
+  //   return await insertOrUpdateByTableName<ServerRoom>(sql, "room", [
+  //     transformRoom(room),
+  //   ]);
+  // });
 
-  return serverRoom;
+  // return serverRoom;
+}
+
+export async function saveRack(rack: DexieRack) {
+  return insertOrUpdateItem(rack, "rack", transformRack);
+}
+
+export async function saveHardware(hardware: DexieHardware) {
+  return insertOrUpdateItem(hardware, "hardware", transformHardware);
+}
+
+export async function saveMoreInfo(moreInfo: DexieMoreInfo) {
+  return insertOrUpdateItem(moreInfo, "more_info", transformMoreInfo);
 }
 
 export async function saveResponseGroup(responseGroup: DexieResponseGroup) {
@@ -131,33 +163,62 @@ export async function saveResponses(responses: DexieResponse[]) {
     Object.create(null),
   );
 
-  /**
-   * SQL Transaction all statements should run in one trip to db
-   */
-  return await sql.begin(async (sql) => {
-    const requests: Promise<ServerArray[]>[] = [];
-    Object.entries(groupedResponses).forEach(([k, responses]) => {
+  const [responsesInserted, responsesUpdated] = await sql.begin(async (sql) => {
+    const inserted: ServerArray[] = [];
+    const updated: ServerArray[] = [];
+    Object.entries(groupedResponses).forEach(async ([k, responses]) => {
       const serverResponses = responses.map(transformResponseToServerResponse);
       const insertResponses = serverResponses.filter((r) => !r.id);
       const updateResponses = serverResponses.filter((r) => r.id);
-      insertResponses.length &&
-        requests.push(
-          insertOrUpdateByTableIndex(
+
+      const insertedPromises = insertResponses.length
+        ? await insertOrUpdateByTableIndex(
             sql,
             k as ServerTableIndex,
             insertResponses,
-          ),
-        );
-      updateResponses.length &&
-        requests.push(
-          insertOrUpdateByTableIndex(
+          )
+        : [];
+
+      const updatedPromises = updateResponses.length
+        ? await insertOrUpdateByTableIndex(
             sql,
             k as ServerTableIndex,
             updateResponses,
-          ),
-        );
+          )
+        : [];
+
+      inserted.push(...insertedPromises);
+      updated.push(...updatedPromises);
     });
 
-    return requests;
+    return [inserted, updated];
   });
+
+  return [responsesInserted, responsesUpdated];
+}
+
+export async function saveHardwares(hardwares: DexieHardware[]) {
+  const [hardwaresInserted, hardwaresUpdated] = await sql.begin(async (sql) => {
+    const serverHardwares = hardwares.map(transformHardware);
+    const insertResponses = serverHardwares.filter((h) => !h.id);
+    const updateResponses = serverHardwares.filter((h) => h.id);
+    const inserted = insertResponses.length
+      ? await insertOrUpdateByTableName<ServerHardware>(
+          sql,
+          "hardware",
+          insertResponses,
+        )
+      : [];
+    const updated = updateResponses.length
+      ? await insertOrUpdateByTableName<ServerHardware>(
+          sql,
+          "hardware",
+          updateResponses,
+        )
+      : [];
+
+    return [inserted, updated];
+  });
+
+  return [hardwaresInserted, hardwaresUpdated];
 }
