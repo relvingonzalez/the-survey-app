@@ -1,17 +1,19 @@
 import Comment from "@/components/Comment";
 import { Button, Group, Modal, ModalProps } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { MoreInfo } from "@/lib/types/rooms";
 import Files from "@/components/files/Files.";
 import { useListState } from "@mantine/hooks";
+import { DexieMoreInfo } from "@/lib/types/dexie";
+
+export type MoreInfoFormValues = {
+  moreInfo: DexieMoreInfo;
+};
 
 export type MoreInfoProps = ModalProps & {
-  moreInfo: MoreInfo;
   existingFiles: File[];
-  onSave: (info: string, files: File[]) => void;
+  onSave: (moreInfo: DexieMoreInfo, files: File[]) => void;
 };
 export default function MoreInfoModal({
-  moreInfo,
   existingFiles = [],
   onSave,
   onClose,
@@ -25,22 +27,18 @@ export default function MoreInfoModal({
     handlers.append(...newFiles);
   };
 
-  const form = useForm({
-    initialValues: {
-      id: moreInfo?.id,
-      roomId: moreInfo?.roomId,
-      info: moreInfo?.info || "",
-      x: moreInfo?.x,
-      y: moreInfo?.y,
-    },
-
+  const form = useForm<MoreInfoFormValues>({
+    mode: "uncontrolled",
+    name: "more-info-form",
     validate: {
-      info: (value) => (value ? null : "Invalid comment"),
+      moreInfo: {
+        info: (value) => (value ? null : "Invalid comment"),
+      },
     },
   });
 
-  const handleSubmit = (values: MoreInfo) => {
-    onSave(values.info, files);
+  const handleSubmit = (values: MoreInfoFormValues) => {
+    onSave(values.moreInfo, files);
     onClose();
   };
 
@@ -50,7 +48,8 @@ export default function MoreInfoModal({
         <Comment
           className="mb-4"
           withAsterisk
-          {...form.getInputProps("info")}
+          {...form.getInputProps("moreInfo.info")}
+          key={form.key("moreInfo.info")}
         />
         <Files
           mt="10"

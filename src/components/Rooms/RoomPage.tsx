@@ -42,7 +42,7 @@ export default function RoomPage({ id, siteCode }: RoomPageProps) {
     handlers.remove(i);
   };
   const handleSaveDrawing = (file: File) => {
-    // TODO save to indexedDB
+    // TODO: save to indexedDB
     setRoomPlan(file);
   };
 

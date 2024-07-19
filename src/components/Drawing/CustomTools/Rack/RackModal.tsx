@@ -24,32 +24,26 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import { useLiveQuery } from "dexie-react-hooks";
-import { getHardwareListByRackId } from "@/lib/dexie/helper";
 import { DexieHardware, DexieRack } from "@/lib/types/dexie";
 import { createHardware } from "@/lib/utils/functions";
-import { useEffect } from "react";
 
-type RackFormValues = {
+export type RackFormValues = {
   rack: DexieRack;
-  hardwareList?: DexieHardware[];
+  hardwareList: DexieHardware[];
 };
 
 export type RackModalProps = ModalProps & {
-  rack: DexieRack;
   existingFiles: File[];
   onSave: (rack: Rack, files: File[]) => void;
   onSaveHardware: (hardwareList: DexieHardware[]) => void;
 };
 export default function RackModal({
-  rack,
   existingFiles = [],
   onSave,
   onSaveHardware,
   onClose,
   ...modalProps
 }: RackModalProps) {
-  const hardwareList = useLiveQuery(() => getHardwareListByRackId(rack.id));
   const [files, handlers] = useListState<File>(existingFiles);
   const [edit, handlersEdit] = useListState<{ index: number; value: Hardware }>(
     [],
@@ -61,15 +55,12 @@ export default function RackModal({
     handlers.append(...newFiles);
   };
 
-  const form = useForm({
-    initialValues: {
-      rack,
-      hardwareList: hardwareList,
-    },
-
+  const form = useForm<RackFormValues>({
+    mode: "uncontrolled",
+    name: "rack-form",
     validate: {
       rack: {
-        name: (value) => (value ? null : "Invalid comment"),
+        name: (value) => (value ? null : "Invalid name"),
       },
       hardwareList: {
         name: (value) => (value ? null : "Invalid name"),
@@ -79,12 +70,6 @@ export default function RackModal({
       },
     },
   });
-
-  useEffect(() => {
-    if (hardwareList && !form.values.hardwareList) {
-      form.setFieldValue("hardwareList", hardwareList);
-    }
-  }, [form, hardwareList]);
 
   const handleSubmit = (values: RackFormValues) => {
     onSave(values.rack, files);
@@ -112,16 +97,13 @@ export default function RackModal({
   };
 
   const handleInsertNewHardware = () => {
+    const { rack, hardwareList } = form.getValues();
     const hardware = createHardware(rack.id);
     form.insertListItem("hardwareList", hardware);
-    handleEditing(form.values.hardwareList?.length || 0, hardware);
+    handleEditing(hardwareList?.length || 0, hardware);
   };
 
-  if (!rack || !hardwareList) {
-    return null;
-  }
-
-  const rows = form.values.hardwareList?.map((h, i) => {
+  const rows = form.getValues().hardwareList?.map((h, i) => {
     const editMode = edit.find((v) => v.index === i);
     return (
       <TableTr key={i}>
@@ -133,6 +115,7 @@ export default function RackModal({
                   withAsterisk
                   label="From"
                   placeholder="From"
+                  key={form.key(`hardwareList.${i}.fromSlot`)}
                   {...form.getInputProps(`hardwareList.${i}.fromSlot`)}
                 />
                 -
@@ -140,6 +123,7 @@ export default function RackModal({
                   withAsterisk
                   label="To"
                   placeholder="To"
+                  key={form.key(`hardwareList.${i}.toSlot`)}
                   {...form.getInputProps(`hardwareList.${i}.toSlot`)}
                 />
               </Group>
@@ -150,12 +134,14 @@ export default function RackModal({
                   withAsterisk
                   label="Name"
                   placeholder="Name"
+                  key={form.key(`hardwareList.${i}.name`)}
                   {...form.getInputProps(`hardwareList.${i}.name`)}
                 />
                 <TextInput
                   withAsterisk
                   label="Details"
                   placeholder="Details"
+                  key={form.key(`hardwareList.${i}.details`)}
                   {...form.getInputProps(`hardwareList.${i}.details`)}
                 />
               </Group>
@@ -220,8 +206,14 @@ export default function RackModal({
           placeholder="ID / Name of Rack"
           withAsterisk
           {...form.getInputProps("rack.name")}
+          key={form.key("rack.name")}
         />
-        <Comment mb="md" withAsterisk {...form.getInputProps("rack.comment")} />
+        <Comment
+          mb="md"
+          withAsterisk
+          {...form.getInputProps("rack.comment")}
+          key={form.key("rack.comment")}
+        />
         <Files
           mt="10"
           files={files}

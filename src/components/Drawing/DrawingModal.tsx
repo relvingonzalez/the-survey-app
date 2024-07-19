@@ -10,13 +10,23 @@ import Drawing, { BackgroundImage } from "./Drawing";
 import { useRef, useState } from "react";
 import DrawingToolBox, { defaultTools } from "./DrawingToolBox";
 import { useDisclosure, useElementSize, useViewportSize } from "@mantine/hooks";
-import MoreInfoModal from "./CustomTools/MoreInfo/MoreInfoModal";
+import MoreInfoModal, {
+  MoreInfoFormValues,
+} from "./CustomTools/MoreInfo/MoreInfoModal";
 import { IconInfoCircleFilled, IconServer2 } from "@tabler/icons-react";
-import RackModal from "./CustomTools/Rack/RackModal";
+import RackModal, { RackFormValues } from "./CustomTools/Rack/RackModal";
 import { DexieRack, DexieMoreInfo, DexieHardware } from "@/lib/types/dexie";
-import { Rack, Room } from "@/lib/types/rooms";
+import { Room } from "@/lib/types/rooms";
 import { createMoreInfo, createRack } from "@/lib/utils/functions";
-import { updateHardwareList } from "@/lib/dexie/helper";
+import {
+  getHardwareListByRackId,
+  updateHardwareList,
+} from "@/lib/dexie/helper";
+import { createFormActions } from "@mantine/form";
+
+const rackFormActions = createFormActions<RackFormValues>("rack-form");
+const moreInfoFormActions =
+  createFormActions<MoreInfoFormValues>("more-info-form");
 
 export type CustomTools =
   | {
@@ -73,12 +83,6 @@ export default function DrawingModal({
   const [rackModalOpened, { open: rackOpen, close: rackClose }] =
     useDisclosure(false);
 
-  // Selected Custom Tool
-  const [currentMoreInfo, setCurrentMoreInfo] = useState<DexieMoreInfo>(
-    moreInfos[0],
-  );
-  const [currentRack, setCurrentRack] = useState<DexieRack>(racks[0]);
-
   // Custom Tool Definition
   const customTools = [
     {
@@ -114,28 +118,30 @@ export default function DrawingModal({
       ? defaultTools.filter((v) => v.value === "freeHand")
       : defaultTools;
 
-  const handleMoreInfoOpen = (i: number) => {
-    setCurrentMoreInfo(moreInfos[i]);
+  const handleMoreInfoOpen = (moreInfo: DexieMoreInfo) => {
+    moreInfoFormActions.setFieldValue("moreInfo", moreInfo);
     moreInfoOpen();
   };
-  const handleRackOpen = (i: number) => {
-    setCurrentRack(racks[i]);
+  const handleRackOpen = async (rack: DexieRack) => {
+    rackFormActions.setFieldValue("rack", rack);
+    rackFormActions.setFieldValue(
+      "hardwareList",
+      await getHardwareListByRackId(rack.id),
+    );
     rackOpen();
   };
-  const handleSaveMoreInfo = (info: string) => {
+  const handleSaveMoreInfo = (moreInfo: DexieMoreInfo) => {
     moreInfoClose();
     onSaveMoreInfo?.({
-      ...currentMoreInfo,
-      info,
-      flag: currentMoreInfo.flag === "i" ? "i" : "u",
+      ...moreInfo,
+      flag: moreInfo.flag === "i" ? "i" : "u",
     });
   };
-  const handleSaveRack = (rack: Rack) => {
+  const handleSaveRack = (rack: DexieRack) => {
     rackClose();
     onSaveRack?.({
-      ...currentRack,
       ...rack,
-      flag: currentRack.flag === "i" ? "i" : "u",
+      flag: rack.flag === "i" ? "i" : "u",
     });
   };
   const handleSaveHardware = (hardwareList: DexieHardware[]) => {
@@ -148,22 +154,18 @@ export default function DrawingModal({
         onClose={moreInfoClose}
         onSave={handleSaveMoreInfo}
         opened={moreInfoModalOpened}
-        moreInfo={currentMoreInfo}
+        existingFiles={[]}
+        zIndex={300}
+      />
+      <RackModal
+        onClose={rackClose}
+        onSave={handleSaveRack}
+        onSaveHardware={handleSaveHardware}
+        opened={rackModalOpened}
         existingFiles={[]}
         zIndex={300}
       />
 
-      {racks[0] && (
-        <RackModal
-          onClose={rackClose}
-          onSave={handleSaveRack}
-          onSaveHardware={handleSaveHardware}
-          opened={rackModalOpened}
-          rack={currentRack}
-          existingFiles={[]}
-          zIndex={300}
-        />
-      )}
       <ModalRoot {...props} onClose={onClose} fullScreen>
         <ModalOverlay backgroundOpacity={0.55} blur={3} />
         <ModalContent>
@@ -194,7 +196,7 @@ export default function DrawingModal({
                 <IconInfoCircleFilled
                   key={i}
                   style={{ position: "absolute", left: mI.x, top: mI.y }}
-                  onClick={() => handleMoreInfoOpen(i)}
+                  onClick={() => handleMoreInfoOpen(mI)}
                 />
               ))}
 
@@ -202,7 +204,7 @@ export default function DrawingModal({
                 <IconServer2
                   key={i}
                   style={{ position: "absolute", left: r.x, top: r.y }}
-                  onClick={() => handleRackOpen(i)}
+                  onClick={() => handleRackOpen(r)}
                 />
               ))}
             </Drawing>
