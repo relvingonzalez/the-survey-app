@@ -1,34 +1,22 @@
 import { Select, SelectProps } from "@mantine/core";
-import {
-  ListQuestion,
-  ListResponse,
-  QuestionResponse,
-} from "@/lib/types/question_new";
+import { ListQuestion } from "@/lib/types/question";
 import { WithQuestionCallback } from "../SurveyItem";
+import Response from "@/lib/dexie/Response";
 
 export type QuestionListSelectProps = {
   question: ListQuestion;
-  response: ListResponse[];
-} & WithQuestionCallback<ListResponse> &
+  response: Response[];
+} & WithQuestionCallback &
   SelectProps;
 
-export function isListResponse(
-  response: QuestionResponse[],
-): response is ListResponse[] {
-  return (
-    (response as ListResponse[])[0]?.responseType === "list" || !response.length
-  );
-}
-
 export const createListResponse = (
-  { projectId, id: questionId, responseType }: ListQuestion,
+  question: ListQuestion,
   text = "",
-): ListResponse => ({
-  projectId,
-  questionId,
-  responseType,
-  text,
-});
+): Response => {
+  const response = Response.fromQuestion(question);
+  response.text = text;
+  return response;
+};
 
 export default function QuestionListSelect({
   question,
@@ -38,7 +26,8 @@ export default function QuestionListSelect({
 }: QuestionListSelectProps) {
   const responseValue = response[0] || createListResponse(question);
   const handleOnChange = (value: string | null) => {
-    onAnswered({ ...responseValue, text: value });
+    responseValue.text = value;
+    onAnswered(responseValue);
   };
   return (
     <Select

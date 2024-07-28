@@ -3,19 +3,19 @@
 import { ModalProps } from "@mantine/core";
 import { useEffect, useState } from "react";
 import {
+  getGroupedUpdatedAndSerializedResponses,
   getUpdatedComments,
   getUpdatedHardwares,
   getUpdatedMoreInfos,
   getUpdatedRacks,
-  getUpdatedResponseGroups,
-  getUpdatedResponses,
   getUpdatedRooms,
-  updateCommentIds,
   updateHardwareIds,
   updateMoreInfoIds,
   updateRackIds,
-  updateResponseGroupIds,
   updateRoomIds,
+  getUpdatedResponseGroups,
+  updateCommentIds,
+  updateResponseGroupIds,
 } from "@/lib/dexie/helper";
 import {
   saveComments,
@@ -65,7 +65,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
 
       await Promise.all(
         responseGroups.map(async (r) => {
-          const [savedResponseGroup] = await saveResponseGroup(r);
+          const [savedResponseGroup] = await saveResponseGroup(r.serialize());
           return updateResponseGroupIds(r.id, savedResponseGroup.id);
         }),
       );
@@ -81,27 +81,28 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
     const comments = await getUpdatedComments();
     if (comments.length) {
       handleStatusUpdate(1, progressValue + 5, "Syncing Comments...");
-      const [commentsResult] = await saveComments(comments);
+      const [commentsResult] = await saveComments(
+        comments.map((c) => c.serialize()),
+      );
       await updateCommentIds(commentsResult);
       handleStatusUpdate(2, progressValue + 10, "Syncing Comments Complete!");
     }
 
     // sync responses types
-    const responses = await getUpdatedResponses();
-    if (responses.length) {
-      const savedResponses = await saveResponses(responses);
-      console.log(savedResponses);
-      // await updateResponseIds(savedResponses);
-      handleStatusUpdate(2, progressValue + 10, "Syncing Responses Complete!");
-    }
+    const responsesGroupedByType =
+      await getGroupedUpdatedAndSerializedResponses();
+    const savedResponses = await saveResponses(responsesGroupedByType);
+    console.log(savedResponses);
+    // await updateResponseIds(savedResponses);
+    handleStatusUpdate(2, progressValue + 10, "Syncing Responses Complete!");
 
-    // sync rooms
+    // // sync rooms
     const rooms = await getUpdatedRooms();
     if (rooms.length) {
       handleStatusUpdate(1, progressValue + 5, "Syncing Rooms...");
       await Promise.all(
         rooms.map(async (r) => {
-          const savedRoom = await saveRoom(r);
+          const savedRoom = await saveRoom(r.serialize());
           await updateRoomIds(r, savedRoom);
         }),
       );
@@ -115,7 +116,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       handleStatusUpdate(1, progressValue + 5, "Syncing Racks...");
       await Promise.all(
         racks.map(async (r) => {
-          const savedRack = await saveRack(r);
+          const savedRack = await saveRack(r.serialize());
           await updateRackIds(r, savedRack);
         }),
       );
@@ -128,7 +129,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       handleStatusUpdate(1, progressValue + 5, "Syncing Hardware...");
       await Promise.all(
         hardwares.map(async (r) => {
-          const savedHardware = await saveHardware(r);
+          const savedHardware = await saveHardware(r.serialize());
           await updateHardwareIds(r, savedHardware);
         }),
       );
@@ -141,7 +142,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       handleStatusUpdate(1, progressValue + 5, "Syncing More Infos...");
       await Promise.all(
         moreInfos.map(async (m) => {
-          const savedMoreInfo = await saveMoreInfo(m);
+          const savedMoreInfo = await saveMoreInfo(m.serialize());
           await updateMoreInfoIds(m, savedMoreInfo);
         }),
       );

@@ -1,26 +1,8 @@
 "use server";
 
 import sql from "./db";
-import {
-  DexieComment,
-  DexieHardware,
-  DexieMoreInfo,
-  DexieRack,
-  DexieResponse,
-  DexieResponseGroup,
-  DexieResponseGroupedByResponseType,
-  DexieRoom,
-  DexieStructure,
-  DexieTransformToServer,
-} from "../types/dexie";
-import {
-  transformComment,
-  transformHardware,
-  transformMoreInfo,
-  transformRack,
-  transformResponseToServerResponse,
-  transformRoom,
-} from "../utils/functions";
+import { DexieResponseGroupedByResponseType } from "../types/dexie";
+
 import {
   ServerResponseGroup,
   ServerComment,
@@ -28,7 +10,10 @@ import {
   ServerTableIndex,
   TableByQuestionType,
   ServerHardware,
-} from "../types/server_new";
+  ServerRoom,
+  ServerRack,
+  ServerMoreInfo,
+} from "../types/server";
 import postgres from "postgres";
 
 const tableByType: TableByQuestionType = {
@@ -75,26 +60,19 @@ const insertOrUpdateByTableIndex = async <K extends ServerArray>(
     serverResponses,
   );
 
-const insertOrUpdateItem = async <
-  T extends DexieStructure,
-  K extends ServerArray,
->(
-  item: T,
+const insertOrUpdateItem = async <K extends ServerArray>(
+  item: K,
   tableName: string,
-  transformFunction: DexieTransformToServer<T, K>,
 ): Promise<K> => {
-  const [serverRoom] = await insertOrUpdateByTableName<K>(sql, tableName, [
-    transformFunction(item),
-  ]);
+  const [inserted] = await insertOrUpdateByTableName<K>(sql, tableName, [item]);
 
-  return serverRoom;
+  return inserted;
 };
 
-export async function saveComments(comments: DexieComment[]) {
+export async function saveComments(comments: ServerComment[]) {
   const [commentsInserted, commentsUpdated] = await sql.begin(async (sql) => {
-    const serverComments = comments.map(transformComment);
-    const insertResponses = serverComments.filter((c) => !c.id);
-    const updateResponses = serverComments.filter((c) => c.id);
+    const insertResponses = comments.filter((c) => !c.id);
+    const updateResponses = comments.filter((c) => c.id);
     const inserted = insertResponses.length
       ? await insertOrUpdateByTableName<ServerComment>(
           sql,
@@ -116,30 +94,23 @@ export async function saveComments(comments: DexieComment[]) {
   return [commentsInserted, commentsUpdated];
 }
 
-export async function saveRoom(room: DexieRoom) {
-  return insertOrUpdateItem(room, "room", transformRoom);
-  // const [serverRoom] = await sql.begin(async (sql) => {
-  //   return await insertOrUpdateByTableName<ServerRoom>(sql, "room", [
-  //     transformRoom(room),
-  //   ]);
-  // });
-
-  // return serverRoom;
+export async function saveRoom(room: ServerRoom) {
+  return insertOrUpdateItem(room, "room");
 }
 
-export async function saveRack(rack: DexieRack) {
-  return insertOrUpdateItem(rack, "rack", transformRack);
+export async function saveRack(rack: ServerRack) {
+  return insertOrUpdateItem(rack, "rack");
 }
 
-export async function saveHardware(hardware: DexieHardware) {
-  return insertOrUpdateItem(hardware, "hardware", transformHardware);
+export async function saveHardware(hardware: ServerHardware) {
+  return insertOrUpdateItem(hardware, "hardware");
 }
 
-export async function saveMoreInfo(moreInfo: DexieMoreInfo) {
-  return insertOrUpdateItem(moreInfo, "more_info", transformMoreInfo);
+export async function saveMoreInfo(moreInfo: ServerMoreInfo) {
+  return insertOrUpdateItem(moreInfo, "more_info");
 }
 
-export async function saveResponseGroup(responseGroup: DexieResponseGroup) {
+export async function saveResponseGroup(responseGroup: ServerResponseGroup) {
   const result: ServerResponseGroup[] =
     await sql`INSERT INTO response_group ${sql(responseGroup, "collectionId")} 
     RETURNING *;`;
@@ -152,24 +123,15 @@ export async function saveResponseGroup(responseGroup: DexieResponseGroup) {
  * @param responses responses that need updating DexieResponse[]
  * @returns Array of sql statements to resolve with inserts and modifies separated
  **/
-export async function saveResponses(responses: DexieResponse[]) {
-  const groupedResponses: DexieResponseGroupedByResponseType = responses.reduce(
-    function (r, a) {
-      r[a.responseType] = r[a.responseType] || [];
-      r[a.responseType].push(a);
-
-      return r;
-    },
-    Object.create(null),
-  );
-
+export async function saveResponses(
+  groupedResponses: DexieResponseGroupedByResponseType,
+) {
   const [responsesInserted, responsesUpdated] = await sql.begin(async (sql) => {
     const inserted: ServerArray[] = [];
     const updated: ServerArray[] = [];
     Object.entries(groupedResponses).forEach(async ([k, responses]) => {
-      const serverResponses = responses.map(transformResponseToServerResponse);
-      const insertResponses = serverResponses.filter((r) => !r.id);
-      const updateResponses = serverResponses.filter((r) => r.id);
+      const insertResponses = responses.filter((r) => !r.id);
+      const updateResponses = responses.filter((r) => r.id);
 
       const insertedPromises = insertResponses.length
         ? await insertOrUpdateByTableIndex(
@@ -197,11 +159,10 @@ export async function saveResponses(responses: DexieResponse[]) {
   return [responsesInserted, responsesUpdated];
 }
 
-export async function saveHardwares(hardwares: DexieHardware[]) {
+export async function saveHardwares(hardwares: ServerHardware[]) {
   const [hardwaresInserted, hardwaresUpdated] = await sql.begin(async (sql) => {
-    const serverHardwares = hardwares.map(transformHardware);
-    const insertResponses = serverHardwares.filter((h) => !h.id);
-    const updateResponses = serverHardwares.filter((h) => h.id);
+    const insertResponses = hardwares.filter((h) => !h.id);
+    const updateResponses = hardwares.filter((h) => h.id);
     const inserted = insertResponses.length
       ? await insertOrUpdateByTableName<ServerHardware>(
           sql,

@@ -8,23 +8,19 @@ import { useListState } from "@mantine/hooks";
 import { SiteCode } from "@/lib/types/sites";
 import { db } from "@/lib/dexie/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { DexieQuestion, DexieResponse } from "@/lib/types/dexie";
-import { QuestionType } from "@/lib/types/question_new";
-import {
-  getComment,
-  getResponse,
-  insertOrModifyResponses,
-  updateComment,
-} from "@/lib/dexie/helper";
+import { DexieQuestion } from "@/lib/types/dexie";
+import { QuestionType } from "@/lib/types/question";
+import { getComment, getResponse } from "@/lib/dexie/helper";
+import Response from "@/lib/dexie/Response";
 
 export type BaseQuestionProps = {
   item: DexieQuestion;
 };
 
-type OnAnsweredCallback<V> = (value: V) => void;
+type OnAnsweredCallback = (response: Response | Response[]) => void;
 
-export type WithQuestionCallback<V> = {
-  onAnswered: OnAnsweredCallback<V>;
+export type WithQuestionCallback = {
+  onAnswered: OnAnsweredCallback;
 };
 
 export type QuestionProps = {
@@ -49,26 +45,18 @@ export default function Question({ siteCode, order, type }: QuestionProps) {
     [projectId, question],
   );
   const [files, handlers] = useListState<File>([]);
-
   const handleCommentChange: ChangeEventHandler<HTMLTextAreaElement> &
     ((value: string) => void) = (value) => {
     if (typeof value === "string") {
-      return updateComment(value, comment?.localId);
+      comment?.update(value);
     }
   };
-  const handleAnswered: OnAnsweredCallback<DexieResponse | DexieResponse[]> = (
-    value,
-  ) => {
+  const handleAnswered: OnAnsweredCallback = (value) => {
+    if (!comment) {
+      return;
+    }
     const responses = value instanceof Array ? value : [value];
-    return db.transaction("rw", db.responses, () => {
-      // Add response id before saving locally
-      return insertOrModifyResponses(
-        responses.map((r) => ({
-          ...r,
-          questionResponseId: r.questionResponseId || comment?.id,
-        })),
-      );
-    });
+    responses.forEach((r) => r.save(r.questionResponseId || comment?.id));
   };
   const handleFileDelete = (i: number) => {
     handlers.remove(i);

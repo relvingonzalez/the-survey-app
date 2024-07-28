@@ -1,40 +1,28 @@
 import {
-  DexieComment,
-  DexieHardware,
-  DexieMoreInfo,
   DexieQuestion,
-  DexieRack,
   DexieResponse,
-  DexieRoom,
+  DexieResponseGroupedByResponseType,
   DexieStructure,
-  DexieTable,
 } from "../types/dexie";
-import { LocalDownloadSiteData } from "../types/local_new";
-import { QuestionType } from "../types/question_new";
+import { QuestionType } from "../types/question";
 import { db } from "./db";
-import { createMultipleResponse } from "@/components/Questions/QuestionTypes/QuestionMultiple";
-import { createCheckboxResponse } from "@/components/Questions/QuestionTypes/QuestionCheckbox";
-import { createDateTimeResponse } from "@/components/Questions/QuestionTypes/QuestionDateTime";
-import { createEmailResponse } from "@/components/Questions/QuestionTypes/QuestionEmail";
-import { createGeoResponse } from "@/components/Questions/QuestionTypes/QuestionGeo";
-import { createListResponse } from "@/components/Questions/QuestionTypes/QuestionListSelect";
-import { createNumberResponse } from "@/components/Questions/QuestionTypes/QuestionNumber";
-import { createPersonResponse } from "@/components/Questions/QuestionTypes/QuestionPerson";
-import { createPhoneResponse } from "@/components/Questions/QuestionTypes/QuestionPhone";
-import { createTextResponse } from "@/components/Questions/QuestionTypes/QuestionText";
-import { createTimeResponse } from "@/components/Questions/QuestionTypes/QuestionTime";
-import { createYesNoResponse } from "@/components/Questions/QuestionTypes/QuestionYesNo";
 import {
   ServerComment,
+  ServerDownloadSiteData,
   ServerHardware,
   ServerMoreInfo,
   ServerRack,
   ServerRoom,
-} from "../types/server_new";
-import { createRoom, uniqueId } from "../utils/functions";
-import { MoreInfo, Rack } from "../types/rooms";
+} from "../types/server";
+import Hardware from "./Hardware";
+import MoreInfo from "./MoreInfo";
+import Response from "./Response";
+import Comment from "./Comment";
+import Rack from "./Rack";
+import Room from "./Room";
+import { EntityTable } from "dexie";
 
-export async function populate(data: LocalDownloadSiteData) {
+export async function populate(data: ServerDownloadSiteData) {
   return db.transaction(
     "rw",
     [
@@ -50,12 +38,14 @@ export async function populate(data: LocalDownloadSiteData) {
     () => {
       db.siteProjects.add(data.siteProject);
       db.questions.bulkAdd(data.questions);
-      db.responses.bulkAdd(data.responses);
-      db.comments.bulkAdd(data.comments);
-      db.rooms.bulkAdd(data.rooms);
-      db.moreInfos.bulkAdd(data.moreInfos);
-      db.racks.bulkAdd(data.racks);
-      db.hardwares.bulkAdd(data.hardwares);
+      db.responses.bulkAdd(data.responses.map((r) => Response.deserialize(r)));
+      db.comments.bulkAdd(data.comments.map((c) => Comment.deserialize(c)));
+      db.rooms.bulkAdd(data.rooms.map((r) => Room.deserialize(r)));
+      db.moreInfos.bulkAdd(
+        data.moreInfos.map((mI) => MoreInfo.deserialize(mI)),
+      );
+      db.racks.bulkAdd(data.racks.map((r) => Rack.deserialize(r)));
+      db.hardwares.bulkAdd(data.hardwares.map((h) => Hardware.deserialize(h)));
     },
   );
 }
@@ -90,7 +80,7 @@ export async function deleteProject(projectId: number) {
 
 export function getNextUnansweredQuestion(
   questions?: DexieQuestion[],
-  responses?: DexieResponse[],
+  responses?: Response[],
 ) {
   return (
     questions?.find((q) => !responses?.find((r) => r.questionId === q.id)) ||
@@ -135,26 +125,18 @@ export const updateCommentIds = (comments: ServerComment[]) => {
     comments.map(({ id, questionId, responseGroupId }) => {
       db.comments
         .where({ questionId, responseGroupId })
-        .modify({ id, flag: "" });
+        .modify({ id, flag: null });
 
       db.responses
         .where({ questionId, responseGroupId })
-        .modify({ questionResponseId: id, responseGroupId });
+        .modify({ questionResponseId: id });
     });
-  });
-};
-
-export const updateComment = (value: string, localId?: number) => {
-  return db.transaction("rw", db.comments, () => {
-    if (localId) {
-      db.comments.where({ localId }).modify({ comment: value, flag: "u" });
-    }
   });
 };
 
 export const updateResponseGroupIds = (
   oldResponseGroupId: number,
-  responseGroupId: number,
+  responseGroupId?: number,
 ) => {
   return db.transaction(
     "rw",
@@ -162,7 +144,7 @@ export const updateResponseGroupIds = (
     () => {
       db.responseGroups
         .where({ id: oldResponseGroupId })
-        .modify({ id: responseGroupId, flag: "" });
+        .modify({ id: responseGroupId, flag: null });
       db.comments
         .where({ responseGroupId: oldResponseGroupId })
         .modify({ responseGroupId });
@@ -173,37 +155,6 @@ export const updateResponseGroupIds = (
   );
 };
 
-// TODO replace with put instead of modify and add
-export const insertOrModifyResponse = (response: DexieResponse) => {
-  if (response.localId) {
-    if (response.flag === "d" && !response.id) {
-      return db.responses.delete(response.localId);
-    }
-    return db.responses
-      .where({ localId: response.localId })
-      .modify({ ...response, flag: response.flag || "u" });
-  }
-  return db.responses.add({ ...response, flag: "u" });
-};
-
-export const insertOrModifyResponses = (responses: DexieResponse[]) => {
-  return responses.map(insertOrModifyResponse);
-};
-
-export const createComment = (
-  questionId: number,
-  projectId: number,
-  id?: number,
-  responseGroupId?: number,
-): DexieComment => ({
-  id,
-  questionId,
-  projectId,
-  comment: "",
-  responseGroupId,
-  flag: "i",
-});
-
 export const getComment = async (
   projectId?: number,
   question?: DexieQuestion,
@@ -211,16 +162,12 @@ export const getComment = async (
   if (projectId && question) {
     return (
       (await db.comments.get({ projectId, questionId: question?.id })) ||
-      createComment(question?.id, projectId)
+      Comment.fromQuestion(question)
     );
   }
 };
 
-export const addComment = async (comment: DexieComment) => {
-  return await db.comments.add(comment);
-};
-
-export const addComments = async (comments?: DexieComment[]) => {
+export const addComments = async (comments?: Comment[]) => {
   return comments ? await db.comments.bulkAdd(comments) : [];
 };
 
@@ -266,19 +213,6 @@ export const getCollectionQuestions = async (
   return [];
 };
 
-export const addNewResponseGroup = async (
-  id?: number,
-  collectionId?: number,
-  projectId?: number,
-) => {
-  return (
-    collectionId &&
-    id &&
-    projectId &&
-    (await db.responseGroups.add({ id, collectionId, projectId, flag: "u" }))
-  );
-};
-
 export const deleteResponseGroup = async (id: number) => {
   return await db.responseGroups.where({ id }).modify({ flag: "d" });
 };
@@ -311,7 +245,7 @@ export const getCollectionResponses = async (
 
 export const questionResponsesCounts = (
   allQuestions?: DexieQuestion[],
-  allResponses?: DexieResponse[],
+  allResponses?: Response[],
 ) => {
   const questions = allQuestions?.filter((q) => q.questionType === "question");
   const processes = allQuestions?.filter((q) => q.questionType === "process");
@@ -335,72 +269,11 @@ export const questionResponsesCounts = (
 export const createResponseByQuestion = (
   question: DexieQuestion,
 ): DexieResponse[] => {
-  const response: DexieResponse[] = [];
-  switch (question.responseType) {
-    case "checkbox":
-      response.push(createCheckboxResponse(question, ""));
-      break;
-    case "datetime":
-      response.push(createDateTimeResponse(question));
-      break;
-    case "email":
-      response.push(createEmailResponse(question));
-      break;
-    case "geo":
-      response.push(createGeoResponse(question));
-      break;
-    case "list":
-      response.push(createListResponse(question));
-      break;
-    case "multiple":
-      response.push(createMultipleResponse(question, ""));
-      break;
-    case "number":
-      response.push(createNumberResponse(question));
-      break;
-    case "person":
-      response.push(createPersonResponse(question));
-      break;
-    case "phone":
-      response.push(createPhoneResponse(question));
-      break;
-    case "text":
-      response.push(createTextResponse(question));
-      break;
-    case "time":
-      response.push(createTimeResponse(question));
-      break;
-    case "yes/no":
-      response.push(createYesNoResponse(question));
-      break;
-  }
-  return response;
+  return [Response.fromQuestion(question)];
 };
 
 export const getRoomById = async (projectId: number, id?: number) =>
-  id ? await db.rooms.get({ id }) : createRoom(uniqueId(), projectId, "");
-
-export const updateRoom = async ({ id, name, comment, flag }: DexieRoom) =>
-  await db.rooms
-    .where({ id })
-    .modify({ name, comment, flag: flag !== "i" ? "u" : "i" });
-
-export const deleteRoom = ({ id, flag }: DexieRoom) => {
-  return db.transaction(
-    "rw",
-    [db.rooms, db.racks, db.moreInfos, db.hardwares],
-    async () => {
-      if (flag === "i") {
-        // only local, delete everything
-        db.rooms.where({ id }).delete();
-      } else {
-        // exists in server, set for deletion, and delete its accompanying data
-        db.rooms.where({ id }).modify({ flag: "d" });
-      }
-      clearRoomTools(id);
-    },
-  );
-};
+  id ? await db.rooms.get({ id }) : Room.fromProject(projectId);
 
 export const getMoreInfosByRoomId = async (roomId: number) =>
   await db.moreInfos
@@ -414,35 +287,13 @@ export const getRacksByRoomId = async (roomId: number) =>
     .and((r) => r.flag !== "d")
     .toArray();
 
-export const saveRack = async (rack: Rack) => await db.racks.put(rack);
-
-export const saveMoreInfo = async (moreInfo: MoreInfo) =>
-  await db.moreInfos.put(moreInfo);
-
-export const updateRack = async (rack: Rack) =>
-  await db.racks.where({ id: rack.id }).modify(rack);
-
-export const updateMoreInfo = async (moreInfo: MoreInfo) =>
-  await db.moreInfos.where({ id: moreInfo.id }).modify(moreInfo);
-
-// TODO: if deleting tools that have already been saved, don't delete instead mark with d flag
-export const clearRoomTools = async (id: number) => {
-  const racks = await db.racks.where({ roomId: id }).toArray();
-  db.hardwares
-    .where("rackId")
-    .anyOf(racks.map((r) => r.id))
-    .delete();
-  db.racks.where({ roomId: id }).delete();
-  db.moreInfos.where({ roomId: id }).delete();
-};
-
 export const getHardwareListByRackId = async (rackId: number) =>
   await db.hardwares
     .where({ rackId })
     .and((h) => h.flag !== "d")
     .toArray();
 
-export const updateHardwareList = (hardwareList: DexieHardware[]) => {
+export const updateHardwareList = (hardwareList: Hardware[]) => {
   return db.transaction("rw", db.hardwares, async () => {
     // If new list does not have one that existed, either edit the flag to d if old, or delete it if new
     db.hardwares
@@ -462,7 +313,7 @@ export const updateHardwareList = (hardwareList: DexieHardware[]) => {
 
 // Get Updated items which means either insert or update
 const getUpdatedItemsByTable = <K extends DexieStructure>(
-  table: DexieTable<K>,
+  table: EntityTable<K, "localId">,
 ) => table.where("flag").anyOf(["i", "u"]).toArray();
 
 export const getUpdatedRooms = async () => getUpdatedItemsByTable(db.rooms);
@@ -484,35 +335,68 @@ export const getUpdatedMoreInfos = async () =>
 export const getUpdatedHardwares = async () =>
   getUpdatedItemsByTable(db.hardwares);
 
-export const updateRoomIds = ({ id }: DexieRoom, { id: newId }: ServerRoom) => {
+//TODO: investigate error
+export const getGroupedUpdatedAndSerializedResponses = async () => {
+  const responses = await getUpdatedResponses();
+  const groupedResponses = responses.reduce<DexieResponseGroupedByResponseType>(
+    function (r, a) {
+      r[a.responseType] = r[a.responseType] || [];
+      r[a.responseType].push(a.serialize());
+
+      return r;
+    },
+    {},
+  );
+  return groupedResponses;
+};
+
+export const updateRoomIds = ({ id }: Room, { id: newId }: ServerRoom) => {
   return db.transaction("rw", [db.rooms, db.racks, db.moreInfos], () => {
-    db.rooms.where({ id }).modify({ id: newId, flag: "" });
+    db.rooms.where({ id }).modify({ id: newId, flag: null });
     db.racks.where({ roomId: id }).modify({ roomId: newId });
     db.moreInfos.where({ roomId: id }).modify({ roomId: newId });
   });
 };
 
-export const updateRackIds = ({ id }: DexieRack, { id: newId }: ServerRack) => {
+export const updateRackIds = ({ id }: Rack, { id: newId }: ServerRack) => {
   return db.transaction("rw", [db.racks, db.hardwares], () => {
-    db.racks.where({ id }).modify({ id: newId, flag: "" });
+    db.racks.where({ id }).modify({ id: newId, flag: null });
     db.hardwares.where({ rackId: id }).modify({ rackId: newId });
   });
 };
 
 export const updateHardwareIds = (
-  { id }: DexieHardware,
+  { id }: Hardware,
   { id: newId }: ServerHardware,
 ) => {
   return db.transaction("rw", [db.hardwares], () => {
-    db.hardwares.where({ id }).modify({ id: newId, flag: "" });
+    db.hardwares.where({ id }).modify({ id: newId, flag: null });
   });
 };
 
 export const updateMoreInfoIds = (
-  { id }: DexieMoreInfo,
+  { id }: MoreInfo,
   { id: newId }: ServerMoreInfo,
 ) => {
   return db.transaction("rw", [db.moreInfos], () => {
-    db.moreInfos.where({ id }).modify({ id: newId, flag: "" });
+    db.moreInfos.where({ id }).modify({ id: newId, flag: null });
   });
 };
+
+// Delete
+const getDeletedItemsByTable = <K extends DexieStructure>(
+  table: EntityTable<K, "localId">,
+) => table.where({ flag: "d" }).toArray();
+
+export const getDeletedResponseGroups = async () =>
+  getDeletedItemsByTable(db.responseGroups);
+
+export const getDeletedRacks = async () => getDeletedItemsByTable(db.racks);
+
+export const getDeletedMoreInfos = async () =>
+  getDeletedItemsByTable(db.moreInfos);
+
+export const getDeletedHardwares = async () =>
+  getDeletedItemsByTable(db.hardwares);
+
+export const getDeletedRooms = async () => getDeletedItemsByTable(db.rooms);

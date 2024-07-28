@@ -3,39 +3,27 @@
 import { ActionIcon, Group, rem } from "@mantine/core";
 import { TimeInput, TimeInputProps } from "@mantine/dates";
 import { IconClock } from "@tabler/icons-react";
-import { useRef } from "react";
+import { ChangeEvent, useRef } from "react";
 import { WithQuestionCallback } from "../SurveyItem";
-import {
-  QuestionResponse,
-  TimeQuestion,
-  TimeResponse,
-} from "@/lib/types/question_new";
+import { TimeQuestion } from "@/lib/types/question";
+import Response from "@/lib/dexie/Response";
 
 export type QuestionTimeProps = {
   question: TimeQuestion;
-  response: TimeResponse[];
-} & WithQuestionCallback<TimeResponse> &
+  response: Response[];
+} & WithQuestionCallback &
   TimeInputProps;
 
-export function isTimeResponse(
-  response: QuestionResponse[],
-): response is TimeResponse[] {
-  return (
-    (response as TimeResponse[])[0]?.responseType === "time" || !response.length
-  );
-}
-
 export const createTimeResponse = (
-  { projectId, id: questionId, responseType }: TimeQuestion,
-  fromTime?: string,
-  toTime?: string,
-): TimeResponse => ({
-  projectId,
-  questionId,
-  responseType,
-  fromTime,
-  toTime,
-});
+  question: TimeQuestion,
+  fromTime: string = "",
+  toTime: string = "",
+): Response => {
+  const response = Response.fromQuestion(question);
+  response.fromTime = fromTime;
+  response.toTime = toTime;
+  return response;
+};
 
 export default function QuestionTime({
   question,
@@ -67,6 +55,16 @@ export default function QuestionTime({
     </ActionIcon>
   );
 
+  const handleFromTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    responseValue.fromTime = e.target.value;
+    onAnswered(responseValue);
+  };
+
+  const handleToTimeChange = (e: ChangeEvent<HTMLInputElement>) => {
+    responseValue.toTime = e.target.value;
+    onAnswered(responseValue);
+  };
+
   return (
     <Group>
       <TimeInput
@@ -75,9 +73,7 @@ export default function QuestionTime({
         ref={refFrom}
         rightSection={pickerControlFrom}
         defaultValue={responseValue.fromTime}
-        onChange={(e) =>
-          onAnswered({ ...responseValue, fromTime: e.target.value })
-        }
+        onChange={handleFromTimeChange}
       />
       <TimeInput
         {...props}
@@ -85,9 +81,7 @@ export default function QuestionTime({
         ref={refTo}
         rightSection={pickerControlTo}
         defaultValue={responseValue.toTime}
-        onChange={(e) =>
-          onAnswered({ ...responseValue, toTime: e.target.value })
-        }
+        onChange={handleToTimeChange}
       />
     </Group>
   );

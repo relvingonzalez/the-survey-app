@@ -1,69 +1,55 @@
-import { IndexableType, Table } from "dexie";
-import { LocalSiteProject } from "./local_new";
-import {
-  Question,
-  QuestionResponse,
-  Comment,
-  MultipleResponse,
-} from "./question_new";
-import { Hardware, MoreInfo, Rack, Room } from "./rooms";
-import { ServerArray, ServerResponseGroup } from "./server_new";
-
-type DefaultDexieUtilityType = {
-  localId?: number;
-  tempId?: number;
-  flag?: ActionFlag;
-};
+import { Question, MultipleResponse } from "./question";
+import { ServerQuestionResponse, ServerSiteProject } from "./server";
+import Hardware from "../dexie/Hardware";
+import MoreInfo from "../dexie/MoreInfo";
+import Rack from "../dexie/Rack";
+import ResponseGroup from "../dexie/ResponseGroup";
+import Room from "../dexie/Room";
+import Response from "../dexie/Response";
+import Comment from "../dexie/Comment";
 
 // delete, update, insert
-export type ActionFlag = "d" | "u" | "i";
+export type ActionFlag = "d" | "u" | "i" | "o" | null;
 
 export type DexieQuestion = Question & {
   localId?: number;
 };
 
-export type DexieResponse = DefaultDexieUtilityType & QuestionResponse;
+export type DexieResponse = Response;
 
 export type DexieMultipleResponse = MultipleResponse & DexieResponse;
 
-export type DexieResponseGroupedByResponseType = Record<
-  ResponseType,
-  DexieResponse[]
->;
+// export type DexieResponseGroupedByResponseType = Record<
+//   Partial<ResponseType>,
+//   ServerQuestionResponse[]
+// >;
 
-export type DexieComment = Comment & DefaultDexieUtilityType;
+export type DexieResponseGroupedByResponseType = {
+  [Key: string]: ServerQuestionResponse[];
+};
 
-export type DexieRoom = Room & DefaultDexieUtilityType;
+export type DexieComment = Comment;
 
-export type DexieRack = DefaultDexieUtilityType & Rack;
+export type DexieRoom = Room;
 
-export type DexieHardware = Hardware & DefaultDexieUtilityType;
+export type DexieRack = Rack;
 
-export type DexieMoreInfo = DefaultDexieUtilityType & MoreInfo;
+export type DexieHardware = Hardware;
 
-export type DexieSiteProject = LocalSiteProject & {
+export type DexieMoreInfo = MoreInfo;
+
+export type DexieSiteProject = ServerSiteProject & {
   localId?: number;
 };
 
-export type DexieResponseGroup = DefaultDexieUtilityType &
-  ServerResponseGroup & {
-    projectId?: number;
-  };
-
-export type DexieTransformToServer<
-  T extends DexieStructure,
-  K extends ServerArray,
-> = (item: T) => K;
+export type DexieResponseGroup = ResponseGroup;
 
 export type DexieStructure =
-  | DexieSiteProject
-  | DexieQuestion
   | DexieResponse
   | DexieComment
   | DexieRoom
   | DexieRack
   | DexieMoreInfo
   | DexieHardware
-  | DexieResponseGroup;
-
-export type DexieTable<K extends DexieStructure> = Table<K, IndexableType>;
+  | DexieResponseGroup
+  | Hardware;

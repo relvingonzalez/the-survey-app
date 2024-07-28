@@ -4,13 +4,14 @@ import {
   PhoneQuestion,
   PhoneResponse,
   QuestionResponse,
-} from "@/lib/types/question_new";
+} from "@/lib/types/question";
 import { useEffect, useState } from "react";
+import Response from "@/lib/dexie/Response";
 
 export type QuestionPhoneProps = {
   question: PhoneQuestion;
-  response: PhoneResponse[];
-} & WithQuestionCallback<PhoneResponse> &
+  response: Response[];
+} & WithQuestionCallback &
   TextInputProps;
 
 export const phonePattern =
@@ -27,14 +28,13 @@ export function isPhoneResponse(
 }
 
 export const createPhoneResponse = (
-  { projectId, id: questionId, responseType }: PhoneQuestion,
+  question: PhoneQuestion,
   phone = "",
-): PhoneResponse => ({
-  projectId,
-  questionId,
-  responseType,
-  phone,
-});
+): Response => {
+  const response = Response.fromQuestion(question);
+  response.phone = phone;
+  return response;
+};
 
 export default function QuestionPhone({
   question,
@@ -46,7 +46,8 @@ export default function QuestionPhone({
   const [value, setValue] = useState(responseValue.phone);
   const handleOnChange = (value: string) => {
     setValue(value);
-    onAnswered({ ...responseValue, phone: value });
+    responseValue.phone = value;
+    onAnswered(responseValue);
   };
   useEffect(() => {
     if (!value) {

@@ -1,36 +1,22 @@
-import {
-  MultipleQuestion,
-  MultipleResponse,
-  QuestionResponse,
-} from "@/lib/types/question_new";
+import { MultipleQuestion } from "@/lib/types/question";
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import { DexieMultipleResponse } from "@/lib/types/dexie";
+import Response from "@/lib/dexie/Response";
 
 export type QuestionMultipleProps = {
   question: MultipleQuestion;
-  response: DexieMultipleResponse[];
-} & WithQuestionCallback<MultipleResponse[]> &
+  response: Response[];
+} & WithQuestionCallback &
   MultiSelectProps;
 
 export const createMultipleResponse = (
-  { projectId, id: questionId, responseType }: MultipleQuestion,
+  question: MultipleQuestion,
   text = "",
-): MultipleResponse => ({
-  projectId,
-  questionId,
-  responseType,
-  text,
-});
-
-export function isMultipleResponse(
-  response: QuestionResponse[],
-): response is MultipleResponse[] {
-  return (
-    (response as MultipleResponse[])[0]?.responseType === "multiple" ||
-    !response.length
-  );
-}
+): Response => {
+  const response = Response.fromQuestion(question);
+  response.text = text;
+  return response;
+};
 
 export default function QuestionListSelect({
   question,
@@ -43,7 +29,8 @@ export default function QuestionListSelect({
       const res =
         response.find((r) => r.text === s) ||
         createMultipleResponse(question, s);
-      return { ...res, flag: "u" };
+      res.flag = "u";
+      return res;
     });
 
     // Check which ones to remove and add flag
@@ -51,8 +38,11 @@ export default function QuestionListSelect({
       (o) => !selection.includes(o),
     );
     const responsesToRemove = response
-      .filter((r) => selectionsToRemove.includes(r.text))
-      .map((s) => ({ ...s, flag: "d" }));
+      .filter((r) => r.text && selectionsToRemove.includes(r.text))
+      .map((s) => {
+        s.flag = "d";
+        return s;
+      });
     onAnswered([...result, ...responsesToRemove]);
   };
   return (
@@ -64,7 +54,7 @@ export default function QuestionListSelect({
       data={question.options}
       value={response
         .filter((r) => r.flag !== "d" && r.text)
-        .map((r) => r.text)}
+        .map((r) => r.text || "")}
       onChange={handleOnChange}
     />
   );

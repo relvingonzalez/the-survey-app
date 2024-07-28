@@ -1,131 +1,117 @@
-import { Question, QuestionResponse } from "@/lib/types/question_new";
-import QuestionText, { isTextResponse } from "./QuestionTypes/QuestionText";
-import QuestionPhone, { isPhoneResponse } from "./QuestionTypes/QuestionPhone";
-import QuestionEmail, { isEmailResponse } from "./QuestionTypes/QuestionEmail";
-import QuestionNumber, {
-  isNumberResponse,
-} from "./QuestionTypes/QuestionNumber";
-import QuestionCheckbox, {
-  isCheckboxResponse,
-} from "./QuestionTypes/QuestionCheckbox";
-import QuestionYesNo, { isYesNoResponse } from "./QuestionTypes/QuestionYesNo";
-import QuestionListSelect, {
-  isListResponse,
-} from "./QuestionTypes/QuestionListSelect";
-import QuestionMultiple, {
-  isMultipleResponse,
-} from "./QuestionTypes/QuestionMultiple";
-import QuestionGeo, { isGeoResponse } from "./QuestionTypes/QuestionGeo";
-import QuestionDateTime, {
-  isDateTimeResponse,
-} from "./QuestionTypes/QuestionDateTime";
-import QuestionTime, { isTimeResponse } from "./QuestionTypes/QuestionTime";
-import QuestionPerson, {
-  isPersonResponse,
-} from "./QuestionTypes/QuestionPerson";
-import QuestionDays, { isDaysResponse } from "./QuestionTypes/QuestionDays";
+import { Question } from "@/lib/types/question";
+import QuestionText from "./QuestionTypes/QuestionText";
+import QuestionPhone from "./QuestionTypes/QuestionPhone";
+import QuestionEmail from "./QuestionTypes/QuestionEmail";
+import QuestionNumber from "./QuestionTypes/QuestionNumber";
+import QuestionCheckbox from "./QuestionTypes/QuestionCheckbox";
+import QuestionYesNo from "./QuestionTypes/QuestionYesNo";
+import QuestionListSelect from "./QuestionTypes/QuestionListSelect";
+import QuestionMultiple from "./QuestionTypes/QuestionMultiple";
+import QuestionGeo from "./QuestionTypes/QuestionGeo";
+import QuestionDateTime from "./QuestionTypes/QuestionDateTime";
+import QuestionTime from "./QuestionTypes/QuestionTime";
+import QuestionPerson from "./QuestionTypes/QuestionPerson";
+import QuestionDays from "./QuestionTypes/QuestionDays";
 import QuestionCollection from "./QuestionTypes/QuestionCollection";
 import { WithQuestionCallback } from "./SurveyItem";
+import Response from "@/lib/dexie/Response";
 
-export type QuestionTypeProps<
-  T extends Question,
-  K extends QuestionResponse,
-> = {
+export type QuestionTypeProps<T extends Question, K extends Response> = {
   question: T;
   response: K[];
-} & WithQuestionCallback<QuestionResponse | QuestionResponse[]>;
+} & WithQuestionCallback;
 
 export default function QuestionByTypeComponent<
   Q extends Question,
-  R extends QuestionResponse,
+  R extends Response,
 >({ question, response, onAnswered }: QuestionTypeProps<Q, R>) {
   return (
     <>
-      {question.responseType === "text" && isTextResponse(response) && (
+      {question.responseType === "text" && (
         <QuestionText
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "phone" && isPhoneResponse(response) && (
+      {question.responseType === "phone" && (
         <QuestionPhone
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "email" && isEmailResponse(response) && (
+      {question.responseType === "email" && (
         <QuestionEmail
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "number" && isNumberResponse(response) && (
+      {question.responseType === "number" && (
         <QuestionNumber
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "checkbox" && isCheckboxResponse(response) && (
+      {question.responseType === "checkbox" && (
         <QuestionCheckbox
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "yes/no" && isYesNoResponse(response) && (
+      {question.responseType === "yes/no" && (
         <QuestionYesNo
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "list" && isListResponse(response) && (
+      {question.responseType === "list" && (
         <QuestionListSelect
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "multiple" && isMultipleResponse(response) && (
+      {question.responseType === "multiple" && (
         <QuestionMultiple
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "geo" && isGeoResponse(response) && (
+      {question.responseType === "geo" && (
         <QuestionGeo
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "datetime" && isDateTimeResponse(response) && (
+      {question.responseType === "datetime" && (
         <QuestionDateTime
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "time" && isTimeResponse(response) && (
+      {question.responseType === "time" && (
         <QuestionTime
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "days" && isDaysResponse(response) && (
+      {question.responseType === "days" && (
         <QuestionDays
           question={question}
           response={response}
           onAnswered={onAnswered}
         />
       )}
-      {question.responseType === "person" && isPersonResponse(response) && (
+      {question.responseType === "person" && (
         <QuestionPerson
           question={question}
           response={response}

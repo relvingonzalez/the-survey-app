@@ -1,22 +1,24 @@
-import {
-  LocalDownloadSiteData,
-  LocalHardware,
-  LocalMoreInfo,
-  LocalRack,
-  LocalRoom,
-  LocalSiteProject,
-  createLocalData,
-} from "@/lib/types/local_new";
 import sql from "@/lib/api//db";
-import { Question, QuestionResponse, Comment } from "@/lib/types/question_new";
+import { QuestionResponse } from "@/lib/types/question";
+import {
+  ServerSiteProject,
+  ServerQuestion,
+  ServerComment,
+  ServerRoom,
+  ServerRack,
+  ServerMoreInfo,
+  ServerHardware,
+  createServerData,
+  ServerDownloadSiteData,
+} from "@/lib/types/server";
 
 export async function GET(
   request: Request,
   { params }: { params: { siteId: number } },
 ) {
-  const data: LocalDownloadSiteData = createLocalData();
+  const data: ServerDownloadSiteData = createServerData();
   const [siteProject] = await sql<
-    LocalSiteProject[]
+    ServerSiteProject[]
   >`Select * FROM site_project WHERE id = ${params.siteId}`; // add customer id
 
   const projectId = siteProject.projectId;
@@ -24,7 +26,7 @@ export async function GET(
 
   // step one download questions
   data["questions"] = await sql<
-    Question[]
+    ServerQuestion[]
   >`SELECT * FROM questions WHERE project_id = ${projectId}`;
 
   data["responses"] = await sql<
@@ -32,25 +34,25 @@ export async function GET(
   >`SELECT * FROM responses WHERE project_id = ${projectId}`;
 
   data["comments"] = await sql<
-    Comment[]
+    ServerComment[]
   >`SELECT * FROM comment WHERE project_id = ${projectId}`;
 
   // step seven download available rooms
   data["rooms"] = await sql<
-    LocalRoom[]
+    ServerRoom[]
   >`SELECT * FROM room WHERE project_id = ${projectId}`;
 
   // step eight download available racks and more info
   data["racks"] = await sql<
-    LocalRack[]
+    ServerRack[]
   >`SELECT room.project_id, rack.* FROM rack INNER JOIN room USING (id) WHERE project_id = ${projectId}`;
 
   data["moreInfos"] = await sql<
-    LocalMoreInfo[]
+    ServerMoreInfo[]
   >`SELECT room.project_id, more_info.* FROM more_info INNER JOIN room USING (id) WHERE project_id = ${projectId}`;
 
   data["hardwares"] = await sql<
-    LocalHardware[]
+    ServerHardware[]
   >`SELECT room.project_id, hardware.* FROM hardware INNER JOIN rack USING (id) INNER JOIN room USING (id) WHERE project_id = ${projectId}`;
 
   // step files download files per each

@@ -1,36 +1,23 @@
 import { NumberInput, NumberInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import {
-  NumberQuestion,
-  NumberResponse,
-  QuestionResponse,
-} from "@/lib/types/question_new";
+import { NumberQuestion } from "@/lib/types/question";
 import { useEffect, useState } from "react";
+import Response from "@/lib/dexie/Response";
 
 export type QuestionNumberProps = {
   question: NumberQuestion;
-  response: NumberResponse[];
-} & WithQuestionCallback<NumberResponse> &
+  response: Response[];
+} & WithQuestionCallback &
   NumberInputProps;
 
-export function isNumberResponse(
-  response: QuestionResponse[],
-): response is NumberResponse[] {
-  return (
-    (response as NumberResponse[])[0]?.responseType === "number" ||
-    !response.length
-  );
-}
-
 export const createNumberResponse = (
-  { projectId, id: questionId, responseType }: NumberQuestion,
-  number?: number,
-): NumberResponse => ({
-  projectId,
-  questionId,
-  responseType,
-  number,
-});
+  question: NumberQuestion,
+  number: number = 0,
+): Response => {
+  const response = Response.fromQuestion(question);
+  response.number = number;
+  return response;
+};
 
 export default function QuestionNumber({
   question,
@@ -44,7 +31,8 @@ export default function QuestionNumber({
   );
   const handleOnChange = (value: string | number) => {
     setValue(value);
-    onAnswered({ ...responseValue, number: Number(value) });
+    responseValue.number = Number(value);
+    onAnswered(responseValue);
   };
   useEffect(() => {
     if (!value) {

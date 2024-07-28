@@ -1,16 +1,13 @@
 import { TextInput, TextInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import {
-  EmailQuestion,
-  EmailResponse,
-  QuestionResponse,
-} from "@/lib/types/question_new";
+import { EmailQuestion } from "@/lib/types/question";
 import { useEffect, useState } from "react";
+import Response from "@/lib/dexie/Response";
 
 export type QuestionEmailProps = {
   question: EmailQuestion;
-  response: EmailResponse[];
-} & WithQuestionCallback<EmailResponse> &
+  response: Response[];
+} & WithQuestionCallback &
   TextInputProps;
 
 export const emailPattern =
@@ -20,24 +17,14 @@ export const emailPatternRegex = new RegExp(
   /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,})+$/,
 );
 
-export function isEmailResponse(
-  response: QuestionResponse[],
-): response is EmailResponse[] {
-  return (
-    (response as EmailResponse[])[0]?.responseType === "email" ||
-    !response.length
-  );
-}
-
 export const createEmailResponse = (
-  { projectId, id: questionId, responseType }: EmailQuestion,
+  question: EmailQuestion,
   email: string = "",
-): EmailResponse => ({
-  projectId,
-  questionId,
-  responseType,
-  email,
-});
+): Response => {
+  const response = Response.fromQuestion(question);
+  response.email = email;
+  return response;
+};
 
 export default function QuestionEmail({
   question,
@@ -49,7 +36,8 @@ export default function QuestionEmail({
   const [value, setValue] = useState(responseValue.email);
   const handleOnChange = (newValue: string) => {
     setValue(newValue);
-    onAnswered({ ...responseValue, email: newValue });
+    responseValue.email = value;
+    onAnswered(responseValue);
   };
   useEffect(() => {
     if (!value) {

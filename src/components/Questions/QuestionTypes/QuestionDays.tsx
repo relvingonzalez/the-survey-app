@@ -1,16 +1,12 @@
-import {
-  Day,
-  DaysQuestion,
-  QuestionResponse,
-  DaysResponse,
-} from "@/lib/types/question_new";
+import { Day, DaysQuestion } from "@/lib/types/question";
 import { Chip, ChipGroup, Group } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
+import Response from "@/lib/dexie/Response";
 
 export type QuestionDaysProps = {
   question: DaysQuestion;
-  response: DaysResponse[];
-} & WithQuestionCallback<DaysResponse[]>;
+  response: Response[];
+} & WithQuestionCallback;
 
 type DayOption = {
   name: Day;
@@ -61,22 +57,13 @@ export function isDayArray(days: Day[] | string[]): days is Day[] {
 }
 
 export const createDaysResponse = (
-  { projectId, id: questionId, responseType }: DaysQuestion,
+  question: DaysQuestion,
   dayId: number,
-): DaysResponse => ({
-  projectId,
-  questionId,
-  responseType,
-  dayId,
-});
-
-export function isDaysResponse(
-  response: QuestionResponse[],
-): response is DaysResponse[] {
-  return (
-    (response as DaysResponse[])[0]?.responseType === "days" || !response.length
-  );
-}
+): Response => {
+  const response = Response.fromQuestion(question);
+  response.dayId = dayId;
+  return response;
+};
 
 export default function QuestionDays({
   question,
@@ -86,12 +73,11 @@ export default function QuestionDays({
   const value = response.map((v) => dayOptionsById[v.dayId]);
   const handleSelected = (selection: string[]) => {
     if (isDayArray(selection)) {
-      const result = selection.map((s) => {
-        const res =
+      const result = selection.map(
+        (s) =>
           response.find((r) => dayOptionsById[r.dayId] === s) ||
-          createDaysResponse(question, dayOptionsByDay[s]);
-        return { ...res, flag: "" };
-      });
+          createDaysResponse(question, dayOptionsByDay[s]),
+      );
 
       // Check which ones to remove and add flag
       const selectionsToRemove = daysOptions.filter(
@@ -99,7 +85,10 @@ export default function QuestionDays({
       );
       const responsesToRemove = response
         .filter((r) => selectionsToRemove.includes(dayOptionsById[r.dayId]))
-        .map((s) => ({ ...s, flag: "d" }));
+        .map((r) => {
+          r.flag = "d";
+          return r;
+        });
 
       onAnswered([...result, ...responsesToRemove]);
     }

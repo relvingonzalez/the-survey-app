@@ -15,7 +15,6 @@ import {
   rem,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { Hardware, Rack } from "@/lib/types/rooms";
 import Files from "@/components/files/Files.";
 import { useListState } from "@mantine/hooks";
 import {
@@ -25,7 +24,8 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { DexieHardware, DexieRack } from "@/lib/types/dexie";
-import { createHardware } from "@/lib/utils/functions";
+import Hardware from "@/lib/dexie/Hardware";
+import Rack from "@/lib/dexie/Rack";
 
 export type RackFormValues = {
   rack: DexieRack;
@@ -98,7 +98,7 @@ export default function RackModal({
 
   const handleInsertNewHardware = () => {
     const { rack, hardwareList } = form.getValues();
-    const hardware = createHardware(rack.id);
+    const hardware = Hardware.fromRack(rack);
     form.insertListItem("hardwareList", hardware);
     handleEditing(hardwareList?.length || 0, hardware);
   };

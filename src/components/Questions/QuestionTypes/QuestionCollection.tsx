@@ -16,16 +16,13 @@ import {
   TableTfoot,
   Stack,
 } from "@mantine/core";
-import { CollectionQuestion } from "@/lib/types/question_new";
+import { CollectionQuestion } from "@/lib/types/question";
 import { useState } from "react";
 import { IconLayoutGridAdd, IconTrash, IconX } from "@tabler/icons-react";
 import { WithQuestionCallback } from "../SurveyItem";
-import { QuestionResponse } from "@/lib/types/question_new";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
   addComments,
-  addNewResponseGroup,
-  createComment,
   createResponseByQuestion,
   deleteResponseGroup,
   getCollectionQuestions,
@@ -34,11 +31,14 @@ import {
 import { DexieQuestion, DexieResponse } from "@/lib/types/dexie";
 import { getDisplayValues, uniqueId } from "@/lib/utils/functions";
 import QuestionByTypeComponent from "../QuestionByTypeComponent";
+import Response from "@/lib/dexie/Response";
+import Comment from "@/lib/dexie/Comment";
+import ResponseGroup from "@/lib/dexie/ResponseGroup";
 // import { v4 as uuidv4 } from "uuid";
 
 export type QuestionCollectionProps = {
   question: CollectionQuestion;
-} & WithQuestionCallback<QuestionResponse[]>;
+} & WithQuestionCallback;
 
 type NewResponseGroupProps = {
   questions: DexieQuestion[];
@@ -55,9 +55,7 @@ function NewResponseGroup({
   onSave,
   onCancel,
 }: NewResponseGroupProps) {
-  const onAnsweredQuestionInEntry = (
-    value: QuestionResponse | QuestionResponse[],
-  ) => {
+  const onAnsweredQuestionInEntry = (value: Response | Response[]) => {
     onAnswered(value instanceof Array ? value : [value]);
   };
   return (
@@ -183,22 +181,25 @@ export default function QuestionCollection({
     if (responseGroups && newResponseGroup) {
       const tempResponseGroupId = uniqueId();
       const comments = questions?.map((q) =>
-        createComment(q.id, q.projectId, uniqueId(), tempResponseGroupId),
+        Comment.fromQuestion(q, tempResponseGroupId),
       );
-      addNewResponseGroup(
-        tempResponseGroupId,
-        question.collectionId,
-        question.projectId,
-      );
+      const responseGroup = new ResponseGroup({
+        projectId: question.projectId,
+        collectionId: question.collectionId,
+        id: tempResponseGroupId,
+      });
+      responseGroup.save();
       addComments(comments);
       onAnswered(
-        newResponseGroup.map((r) => ({
-          ...r,
-          questionResponseId: comments?.find(
-            (c) => c.questionId === r.questionId,
-          )?.tempId,
-          responseGroupId: tempResponseGroupId,
-        })),
+        newResponseGroup.map((r) => {
+          const commentId = comments?.find((c) => c.questionId === r.questionId)
+            ?.id;
+          if (commentId) {
+            r.questionResponseId = commentId;
+          }
+          r.responseGroupId = tempResponseGroupId;
+          return r;
+        }),
       );
       resetAddNew();
     }
@@ -207,18 +208,24 @@ export default function QuestionCollection({
   const onDeleteEntriesAnswer = (i: number) => {
     if (responseGroups) {
       deleteResponseGroup(i);
-      onAnswered(responseGroups[i].map((r) => ({ ...r, flag: "d" })));
+      onAnswered(
+        responseGroups[i].map((r) => {
+          r.flag = "d";
+          return r;
+        }),
+      );
     }
   };
 
-  const handleAnsweredNewResponseGroup = (responses: DexieResponse[]) => {
-    const newResponses: DexieResponse[] = [...newResponseGroup];
+  const handleAnsweredNewResponseGroup = (responses: Response[]) => {
+    const newResponses: Response[] = [...newResponseGroup];
     responses.forEach((r) => {
-      const foundIndex = newResponses.findIndex((nR) => nR.tempId === r.tempId);
+      const foundIndex = newResponses.findIndex((nR) => nR.id === r.id);
       if (foundIndex > -1) {
-        newResponses[foundIndex] = { ...newResponses[foundIndex], ...r };
+        newResponses[foundIndex].setProps(r);
       } else {
-        newResponses.push({ ...r, tempId: uniqueId() });
+        r.id = uniqueId();
+        newResponses.push(r);
       }
     });
     setNewResponseGroup(newResponses);

@@ -1,3 +1,5 @@
+export type Coordinate = number;
+
 // Value option types
 export type Day =
   | "Monday"
@@ -9,43 +11,49 @@ export type Day =
   | "Sunday";
 export type Salutation = "Mr" | "Ms" | undefined;
 export type Person = {
-  salut: number;
+  salutationId: number | undefined;
   firstName: string;
   lastName: string;
   email: string;
   phone: string;
 };
 type Time = {
-  fromTime: string;
-  toTime: string;
+  fromTime?: string;
+  toTime?: string;
 };
-export type YesNo = "Yes" | "No" | "Unknown";
-// type QuestionCollectionAnswer<T> = Extract<Extract<Question, { type: T }>,  'answer'>;
-// export type EntryAnswer<T> = {
+export type YesNoLabel = "Yes" | "No" | "Unknown";
+export type YesNo = boolean | null;
+// type QuestionCollectionResponse<T> = Extract<Extract<Question, { type: T }>,  'answer'>;
+// export type EntryResponse<T> = {
 //   question: string;
 //   type: T;
-//   answer: QuestionCollectionAnswer<T>
+//   answer: QuestionCollectionResponse<T>
 // };
-// export type EntryAnswers = EntryAnswer<QuestionType>[];
+// export type EntryResponses = EntryResponse<QuestionType>[];
 
-export type EntryAnswers = Question[];
+// export type EntryResponses = Question[];
 
-export type Entries = Exclude<Question, "CollectionQuestion">[];
+// export type Entries = Exclude<Question, "CollectionQuestion">[];
 
-// Question Answer Value types
-type StringValue = { value?: string };
-type StringOrNullValue = { value?: string | null };
-type CheckboxValue = { value?: Record<string, boolean> };
-type DateTimeValue = { value?: Date };
-type DaysValue = { value?: number[] };
-type MultipleValue = { value?: string[] };
-type PersonValue = { value?: Person[] };
-type TimeValue = { value?: Time };
-type YesNoValue = { value?: boolean | null };
-type CollectionValue = { value?: EntryAnswers[] };
+// Question Response Value types
+export type TextValue = { text: string | null };
+export type NumberValue = { number?: number };
+export type ListValue = { text: string | null };
+export type EmailValue = { email: string };
+export type CheckboxValue = { label: string; checked?: boolean };
+export type DateTimeValue = { date: Date | null };
+export type DaysValue = { dayId: number };
+export type MultipleValue = { text: string };
+export type PersonValue = Person;
+export type TimeValue = Time;
+export type YesNoValue = { yesNo: YesNo };
+export type GeoValue = { lat: number | null; long: number | null };
+export type PhoneValue = { phone: string };
 
 export type QuestionValue =
-  | StringValue
+  | ListValue
+  | TextValue
+  | EmailValue
   | CheckboxValue
   | DateTimeValue
   | DaysValue
@@ -53,96 +61,148 @@ export type QuestionValue =
   | PersonValue
   | TimeValue
   | YesNoValue
-  | CollectionValue;
+  | GeoValue;
 
-export type ValueByQuestionType<T extends Question> = T["answer"]["value"];
+//export type ValueByQuestionType<T extends Question> = T["answer"]["value"];
 
-// Answer by Question Type
-type DefaultAnswer = {
+// Response by Question Type
+export type Comment = {
+  id?: number;
+  questionId: number;
+  projectId: number;
+  responseGroupId?: number;
   comment: string;
 };
-type StringAnswer = { answer: DefaultAnswer & StringValue };
-type StringOrNullAnswer = { answer: DefaultAnswer & StringOrNullValue };
-type CheckboxAnswer = { answer: DefaultAnswer & CheckboxValue };
-type DateTimeAnswer = { answer: DefaultAnswer & DateTimeValue };
-type DaysAnswer = { answer: DefaultAnswer & DaysValue };
-type MultipleAnswer = { answer: DefaultAnswer & MultipleValue };
-type PersonAnswer = { answer: DefaultAnswer & PersonValue };
-type TimeAnswer = { answer: DefaultAnswer & TimeValue };
-type YesNoAnswer = { answer: DefaultAnswer & YesNoValue };
-type CollectionAnswer = { answer: DefaultAnswer & CollectionValue };
+
+export type TextResponse = BaseResponse &
+  TextValue & {
+    responseType: "text";
+  };
+export type EmailResponse = BaseResponse &
+  EmailValue & {
+    responseType: "email";
+  };
+export type CheckboxResponse = BaseResponse &
+  CheckboxValue & {
+    responseType: "checkbox";
+  };
+export type DateTimeResponse = BaseResponse &
+  DateTimeValue & {
+    responseType: "datetime";
+  };
+export type DaysResponse = BaseResponse &
+  DaysValue & {
+    responseType: "days";
+  };
+export type MultipleResponse = BaseResponse &
+  MultipleValue & {
+    responseType: "multiple";
+  };
+export type PersonResponse = BaseResponse &
+  PersonValue & {
+    responseType: "person";
+  };
+export type TimeResponse = BaseResponse &
+  TimeValue & {
+    responseType: "time";
+  };
+export type YesNoResponse = BaseResponse &
+  YesNoValue & {
+    responseType: "yes/no";
+  };
+export type GeoResponse = BaseResponse &
+  GeoValue & {
+    responseType: "geo";
+  };
+export type ListResponse = BaseResponse &
+  ListValue & {
+    responseType: "list";
+  };
+export type NumberResponse = BaseResponse &
+  NumberValue & {
+    responseType: "number";
+  };
+export type PhoneResponse = BaseResponse &
+  PhoneValue & {
+    responseType: "phone";
+  };
+
+export type QuestionResponse =
+  | PhoneResponse
+  | NumberResponse
+  | ListResponse
+  | TextResponse
+  | EmailResponse
+  | CheckboxResponse
+  | DateTimeResponse
+  | DaysResponse
+  | MultipleResponse
+  | PersonResponse
+  | TimeResponse
+  | YesNoResponse
+  | GeoResponse;
+export type CollectionResponse = QuestionResponse;
 
 // Question by Type
-export type StringValueQuestion = BaseQuestion & StringAnswer;
-export type StringOrNullValueQuestion = BaseQuestion & StringOrNullAnswer;
 
-export type CheckboxQuestion = BaseQuestion &
-  CheckboxAnswer & {
-    type: "checkbox";
-    listOptions: ListOptions;
-  };
-
-export type EmailQuestion = StringValueQuestion & {
-  type: "email";
+export type CheckboxQuestion = BaseQuestion & {
+  responseType: "checkbox";
+  options: ListOptions;
 };
 
-export type GeoQuestion = StringValueQuestion & {
-  type: "geo";
+export type EmailQuestion = BaseQuestion & {
+  responseType: "email";
 };
 
-export type NumberQuestion = StringValueQuestion & {
-  type: "number";
+export type GeoQuestion = BaseQuestion & {
+  responseType: "geo";
 };
 
-export type PhoneQuestion = StringValueQuestion & {
-  type: "phone";
+export type NumberQuestion = BaseQuestion & {
+  responseType: "number";
 };
 
-export type TextQuestion = StringValueQuestion & {
-  type: "text";
+export type PhoneQuestion = BaseQuestion & {
+  responseType: "phone";
 };
 
-export type ListQuestion = StringOrNullValueQuestion & {
-  type: "list";
-  listOptions: ListOptions;
+export type TextQuestion = BaseQuestion & {
+  responseType: "text";
 };
 
-export type DateTimeQuestion = BaseQuestion &
-  DateTimeAnswer & {
-    type: "datetime";
-  };
+export type ListQuestion = BaseQuestion & {
+  responseType: "list";
+  options: ListOptions;
+};
 
-export type DaysQuestion = BaseQuestion &
-  DaysAnswer & {
-    type: "days";
-  };
+export type DateTimeQuestion = BaseQuestion & {
+  responseType: "datetime";
+};
 
-export type MultipleQuestion = BaseQuestion &
-  MultipleAnswer & {
-    type: "multiple";
-    listOptions: ListOptions;
-  };
+export type DaysQuestion = BaseQuestion & {
+  responseType: "days";
+};
 
-export type PersonQuestion = BaseQuestion &
-  PersonAnswer & {
-    type: "person";
-  };
+export type MultipleQuestion = BaseQuestion & {
+  responseType: "multiple";
+  options: ListOptions;
+};
 
-export type TimeQuestion = BaseQuestion &
-  TimeAnswer & {
-    type: "time";
-  };
+export type PersonQuestion = BaseQuestion & {
+  responseType: "person";
+};
 
-export type YesNoQuestion = BaseQuestion &
-  YesNoAnswer & {
-    type: "yes/no";
-  };
+export type TimeQuestion = BaseQuestion & {
+  responseType: "time";
+};
 
-export type CollectionQuestion = BaseQuestion &
-  CollectionAnswer & {
-    type: "collection";
-    entries: Entries;
-  };
+export type YesNoQuestion = BaseQuestion & {
+  responseType: "yes/no";
+};
+
+export type CollectionQuestion = BaseQuestion & {
+  responseType: "collection";
+};
 
 export type Question =
   | CheckboxQuestion
@@ -160,10 +220,14 @@ export type Question =
   | YesNoQuestion
   | CollectionQuestion;
 
-// Answer types
+export type TextQuestionWithResponse = TextQuestion & TextResponse;
+
+export type QuestionWithResponse = TextQuestionWithResponse;
+
+// Response types
 type ListOptions = string[];
 
-export type QuestionType =
+export type ResponseType =
   | "checkbox"
   | "collection"
   | "datetime"
@@ -179,15 +243,27 @@ export type QuestionType =
   | "time"
   | "yes/no";
 
+export type QuestionType = "question" | "process" | "rack";
+
 type BaseQuestion = {
-  id?: number;
-  hasComment?: boolean;
-  displayValue?: string;
-  hasDrawing?: boolean;
-  hasFile?: boolean;
+  id: number;
+  projectId: number;
+  rackId?: number;
+  collectionId?: number;
   question: string;
-  sub1?: string;
-  type: QuestionType;
+  order: number;
+  subheading?: string;
+  responseType: ResponseType;
+  questionType: QuestionType;
+};
+
+type BaseResponse = {
+  id?: number;
+  projectId?: number;
+  questionId?: number;
+  questionResponseId?: number;
+  responseType: ResponseType;
+  responseGroupId?: number;
 };
 
 export type Process = Question;
@@ -195,8 +271,3 @@ export type Process = Question;
 export type Questions = Question[];
 
 export type Processes = Questions;
-
-export type QuestionByType<T> = Extract<Question, T>;
-export type QuestionValueByType<T> = QuestionByType<T>["answer"]["value"];
-
-export type ProcessByType<T> = QuestionByType<T>;

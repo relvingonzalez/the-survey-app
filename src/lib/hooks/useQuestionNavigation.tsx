@@ -1,6 +1,6 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../dexie/db";
-import { QuestionType } from "../types/question_new";
+import { QuestionType } from "../types/question";
 import { getPrevQuestion, getNextQuestion } from "../dexie/helper";
 
 export const useQuestionNavigation = (

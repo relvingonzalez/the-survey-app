@@ -12,13 +12,7 @@ import {
   Button,
   ActionIcon,
 } from "@mantine/core";
-import {
-  Person,
-  PersonQuestion,
-  PersonResponse,
-  QuestionResponse,
-  Salutation,
-} from "@/lib/types/question_new";
+import { Person, PersonQuestion, Salutation } from "@/lib/types/question";
 import { phonePatternRegex } from "./QuestionPhone";
 import { useState } from "react";
 import {
@@ -29,20 +23,12 @@ import {
 } from "@tabler/icons-react";
 import { UseFormReturnType, isEmail, matches, useForm } from "@mantine/form";
 import { WithQuestionCallback } from "../SurveyItem";
+import Response from "@/lib/dexie/Response";
 
 export type QuestionPersonProps = {
   question: PersonQuestion;
-  response: PersonResponse[];
-} & WithQuestionCallback<PersonResponse | PersonResponse[]>;
-
-export function isPersonResponse(
-  response: QuestionResponse[],
-): response is PersonResponse[] {
-  return (
-    (response as PersonResponse[])[0]?.responseType === "person" ||
-    !response.length
-  );
-}
+  response: Response[];
+} & WithQuestionCallback;
 
 const salutationLabels = ["Mr", "Ms"];
 const salutationValues = ["1", "2"];
@@ -55,27 +41,31 @@ export const salutationOptions = salutationLabels.map((_, i) => ({
   value: salutationValues[i],
 }));
 
-export const createPersonResponse = ({
-  projectId,
-  id: questionId,
-  responseType,
-}: PersonQuestion): PersonResponse => ({
-  projectId,
-  questionId,
-  responseType,
-  salutationId: -1,
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-});
+export const createPersonResponse = (
+  question: PersonQuestion,
+  {
+    salutationId = -1,
+    firstName = "",
+    lastName = "",
+    email = "",
+    phone = "",
+  }: Person,
+): Response => {
+  const response = Response.fromQuestion(question);
+  response.salutationId = salutationId;
+  response.firstName = firstName;
+  response.lastName = lastName;
+  response.email = email;
+  response.phone = phone;
+  return response;
+};
 
 function NewPerson({
   form,
   onSave,
   onCancel,
 }: {
-  form: UseFormReturnType<PersonResponse>;
+  form: UseFormReturnType<Response>;
   onSave: (person: Person) => void;
   onCancel: () => void;
 }) {
@@ -169,7 +159,7 @@ function ExistingPerson({
   );
 }
 
-export default function QuestionText({
+export default function QuestionPerson({
   question,
   response,
   onAnswered,
@@ -185,17 +175,25 @@ export default function QuestionText({
   };
 
   const onSaveNewPerson = (person: Person) => {
-    onAnswered({ ...createPersonResponse(question), ...person });
+    const response = createPersonResponse(question, person);
+    onAnswered(response);
     resetNewPerson();
   };
 
   const onDeletePerson = (i: number) => {
-    const deletedPerson = { ...response[i], flag: "d" };
-    onAnswered(deletedPerson);
+    const personResponse = response[i];
+    personResponse.flag = "d";
+    onAnswered(personResponse);
   };
 
   const form = useForm({
-    initialValues: createPersonResponse(question),
+    initialValues: createPersonResponse(question, {
+      salutationId: -1,
+      firstName: "",
+      lastName: "",
+      email: "",
+      phone: "",
+    }),
     validateInputOnChange: true,
     clearInputErrorOnChange: true,
     validate: {

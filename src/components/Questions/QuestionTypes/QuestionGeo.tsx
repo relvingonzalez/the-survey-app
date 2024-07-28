@@ -9,16 +9,13 @@ import {
 } from "@mantine/core";
 import { MouseEventHandler, useEffect, useState } from "react";
 import { WithQuestionCallback } from "../SurveyItem";
-import {
-  GeoQuestion,
-  GeoResponse,
-  QuestionResponse,
-} from "@/lib/types/question_new";
+import { GeoQuestion } from "@/lib/types/question";
+import Response from "@/lib/dexie/Response";
 
 export type QuestionGeoProps = {
   question: GeoQuestion;
-  response: GeoResponse[];
-} & WithQuestionCallback<GeoResponse> &
+  response: Response[];
+} & WithQuestionCallback &
   TextInputProps;
 
 const options: PositionOptions = {
@@ -27,25 +24,16 @@ const options: PositionOptions = {
   maximumAge: 0,
 };
 
-export function isGeoResponse(
-  response: QuestionResponse[],
-): response is GeoResponse[] {
-  return (
-    (response as GeoResponse[])[0]?.responseType === "geo" || !response.length
-  );
-}
-
 export const createGeoResponse = (
-  { projectId, id: questionId, responseType }: GeoQuestion,
+  question: GeoQuestion,
   lat = null,
   long = null,
-): GeoResponse => ({
-  projectId,
-  questionId,
-  responseType,
-  lat,
-  long,
-});
+): Response => {
+  const response = Response.fromQuestion(question);
+  response.lat = lat;
+  response.long = long;
+  return response;
+};
 
 const errors: PositionErrorCallback = (err) => {
   console.warn(`ERROR(${err.code}): ${err.message}`);
@@ -85,17 +73,17 @@ export default function QuestionGeo({
   const success: PositionCallback = (pos) => {
     const { latitude: lat, longitude: long } = pos.coords;
     setValue(`${lat}, ${long}`);
-    onAnswered({ ...responseValue, lat, long });
+    responseValue.lat = lat;
+    responseValue.long = long;
+    onAnswered(responseValue);
   };
 
   const onChange = (value: string) => {
     const coords = value.split(",");
     setValue(value);
-    onAnswered({
-      ...responseValue,
-      lat: parseFloat(coords[0]),
-      long: parseFloat(coords[1]),
-    });
+    responseValue.lat = parseFloat(coords[0]);
+    responseValue.long = parseFloat(coords[1]);
+    onAnswered(responseValue);
   };
 
   useEffect(() => {

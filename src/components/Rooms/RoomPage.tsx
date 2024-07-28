@@ -3,7 +3,6 @@
 // Extracting Room Page client component code to a separate component so we can use
 // Rooms/id/page component as server component
 import RoomComponent from "@/components/Rooms/Room";
-import { Room } from "@/lib/types/rooms";
 import { Card, Stack, Title } from "@mantine/core";
 import { useListState } from "@mantine/hooks";
 import { useState } from "react";
@@ -11,8 +10,9 @@ import { useRouter } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/dexie/db";
 import { SiteCode } from "@/lib/types/sites";
-import { deleteRoom, getRoomById, updateRoom } from "@/lib/dexie/helper";
+import { getRoomById } from "@/lib/dexie/helper";
 import { DexieRoom } from "@/lib/types/dexie";
+import Room from "@/lib/dexie/Room";
 
 export type RoomPageProps = {
   id?: number;
@@ -28,11 +28,11 @@ export default function RoomPage({ id, siteCode }: RoomPageProps) {
   const router = useRouter();
 
   const handleSave = (room: DexieRoom) => {
-    updateRoom(room);
+    room.save();
     router.push("./");
   };
   const handleDelete = (room: Room) => {
-    deleteRoom(room);
+    room.delete();
     router.push("./");
   };
   const handleSelectFiles = (newFiles: File[]) => {

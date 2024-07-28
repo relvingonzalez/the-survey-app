@@ -17,17 +17,17 @@ import {
 } from "@mantine/core";
 import { IconDownload, IconSettingsFilled } from "@tabler/icons-react";
 import Link from "next/link";
-import { LocalSiteProject } from "@/lib/types/local";
 import { DexieSiteProject } from "@/lib/types/dexie";
 import DownloadModal from "../DownloadModal";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { useQuestionsWithCounts } from "@/lib/hooks/useQuestionsWithCounts";
+import { ServerSiteProject } from "@/lib/types/server";
 
 type SitesProps = {
-  sites: LocalSiteProject[] | DexieSiteProject[];
+  sites: ServerSiteProject[] | DexieSiteProject[];
 } & (
-  | { download: true; onDownload: (site: LocalSiteProject) => Promise<void> }
+  | { download: true; onDownload: (site: ServerSiteProject) => Promise<void> }
   | { download?: false; onDownload?: never }
 );
 
@@ -120,7 +120,7 @@ export function DownloadSites({
   sites,
 }: Omit<SitesProps, "download" | "onDownload">) {
   const [opened, { open, close }] = useDisclosure(false);
-  const [selectedSite, setSelectedSite] = useState<LocalSiteProject>();
+  const [selectedSite, setSelectedSite] = useState<ServerSiteProject>();
   const [active, setActive] = useState(0);
   const [statusText, setStatusText] = useState("");
   const [progressValue, setProgressValue] = useState(0);
@@ -131,7 +131,7 @@ export function DownloadSites({
     setProgressValue(progress);
   };
 
-  const handleDownload = async (site: LocalSiteProject) => {
+  const handleDownload = async (site: ServerSiteProject) => {
     setSelectedSite(site);
     handleStatusUpdate(
       1,
@@ -157,7 +157,7 @@ export function DownloadSites({
     }
   };
 
-  const continueDownload = async (site: LocalSiteProject) => {
+  const continueDownload = async (site: ServerSiteProject) => {
     try {
       handleStatusUpdate(2, 33, "Downloading Data");
       const response = await fetch(`download/${site.id}/api/`, {

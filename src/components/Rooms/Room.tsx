@@ -2,20 +2,14 @@
 
 import { TextInput, Button, Group, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { Room } from "@/lib/types/rooms";
 import Comment from "../Comment";
 import Files, { FileCallbacks } from "../files/Files.";
 import ClickableDrawing, {
   ClickableDrawingProps,
 } from "../Drawing/ClickableDrawing";
 import { useLiveQuery } from "dexie-react-hooks";
-import {
-  saveMoreInfo,
-  saveRack,
-  clearRoomTools,
-  getMoreInfosByRoomId,
-  getRacksByRoomId,
-} from "@/lib/dexie/helper";
+import { getMoreInfosByRoomId, getRacksByRoomId } from "@/lib/dexie/helper";
+import Room from "@/lib/dexie/Room";
 
 export type RoomProps = FileCallbacks &
   Pick<ClickableDrawingProps, "onSaveDrawing"> & {
@@ -45,7 +39,7 @@ export default function RoomComponent({
     validateInputOnChange: true,
     clearInputErrorOnChange: true,
     validate: {
-      name: (value) => (value ? null : "Room name is required"),
+      name: (value: string) => (value ? null : "Room name is required"),
     },
   });
 
@@ -56,9 +50,11 @@ export default function RoomComponent({
   return (
     <>
       <form
-        onSubmit={form.onSubmit((values) =>
-          onSave({ ...room, name: values.name, comment: values.comment }),
-        )}
+        onSubmit={form.onSubmit(({ name, comment }) => {
+          room.name = name;
+          room.comment = comment;
+          onSave(room);
+        })}
       >
         <Stack justify="flex-start">
           <TextInput
@@ -76,9 +72,9 @@ export default function RoomComponent({
             room={room}
             racks={racks}
             moreInfos={moreInfos}
-            onSaveRack={saveRack}
-            onSaveMoreInfo={saveMoreInfo}
-            onClear={() => clearRoomTools(room.id)}
+            onSaveRack={(rack) => rack.save()}
+            onSaveMoreInfo={(moreInfo) => moreInfo.save()}
+            onClear={() => room.clearRoomTools()}
           />
           <Group mb="10" justify="space-between">
             <Button mt="10" disabled={!form.isValid} type="submit">

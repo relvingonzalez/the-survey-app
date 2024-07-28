@@ -16,13 +16,14 @@ import MoreInfoModal, {
 import { IconInfoCircleFilled, IconServer2 } from "@tabler/icons-react";
 import RackModal, { RackFormValues } from "./CustomTools/Rack/RackModal";
 import { DexieRack, DexieMoreInfo, DexieHardware } from "@/lib/types/dexie";
-import { Room } from "@/lib/types/rooms";
-import { createMoreInfo, createRack } from "@/lib/utils/functions";
 import {
   getHardwareListByRackId,
   updateHardwareList,
 } from "@/lib/dexie/helper";
 import { createFormActions } from "@mantine/form";
+import Room from "@/lib/dexie/Room";
+import MoreInfo from "@/lib/dexie/MoreInfo";
+import Rack from "@/lib/dexie/Rack";
 
 const rackFormActions = createFormActions<RackFormValues>("rack-form");
 const moreInfoFormActions =
@@ -96,7 +97,7 @@ export default function DrawingModal({
         startY: number,
         x: number,
         y: number,
-      ) => onSaveMoreInfo?.(createMoreInfo(room.id, x - 12, y - 12)),
+      ) => onSaveMoreInfo?.(MoreInfo.fromRoom(room.id, x - 12, y - 12)),
     },
     {
       label: "Rack",
@@ -109,7 +110,7 @@ export default function DrawingModal({
         startY: number,
         x: number,
         y: number,
-      ) => onSaveRack?.(createRack(room.id, x - 12, y - 12)),
+      ) => onSaveRack?.(Rack.fromRoom(room.id, x - 12, y - 12)),
     },
   ];
   const tools = isRoom
@@ -132,17 +133,13 @@ export default function DrawingModal({
   };
   const handleSaveMoreInfo = (moreInfo: DexieMoreInfo) => {
     moreInfoClose();
-    onSaveMoreInfo?.({
-      ...moreInfo,
-      flag: moreInfo.flag === "i" ? "i" : "u",
-    });
+    moreInfo.flag = moreInfo.flag === "i" ? "i" : "u";
+    onSaveMoreInfo?.(moreInfo);
   };
   const handleSaveRack = (rack: DexieRack) => {
     rackClose();
-    onSaveRack?.({
-      ...rack,
-      flag: rack.flag === "i" ? "i" : "u",
-    });
+    rack.flag = rack.flag === "i" ? "i" : "u";
+    onSaveRack?.(rack);
   };
   const handleSaveHardware = (hardwareList: DexieHardware[]) => {
     updateHardwareList(hardwareList);
