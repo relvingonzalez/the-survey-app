@@ -1,3 +1,4 @@
+import { ActionFlag } from "./dexie";
 import {
   Question,
   ResponseType,
@@ -26,6 +27,7 @@ export type ServerSite = Omit<Site, "siteCode"> & {
 export type ServerQuestion = Question;
 
 export type ServerResponse = {
+  flag?: ActionFlag;
   id?: number;
   questionResponseId?: number;
 };
@@ -76,6 +78,7 @@ export type ServerQuestionResponse =
 export type ServerComment = Omit<Comment, "projectId">;
 
 export type ServerMoreInfo = {
+  flag?: ActionFlag;
   id?: number;
   roomId: number;
   x: Coordinate;
@@ -84,6 +87,7 @@ export type ServerMoreInfo = {
 };
 
 export type ServerHardware = {
+  flag?: ActionFlag;
   id?: number;
   rackId: number;
   name: string;
@@ -93,6 +97,7 @@ export type ServerHardware = {
 };
 
 export type ServerRack = {
+  flag?: ActionFlag;
   id?: number;
   roomId: number;
   x: Coordinate;
@@ -102,6 +107,7 @@ export type ServerRack = {
 };
 
 export type ServerRoom = {
+  flag?: ActionFlag;
   id?: number;
   projectId: number;
   name: string;

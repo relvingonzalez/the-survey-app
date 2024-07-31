@@ -10,13 +10,10 @@ export type QuestionCheckboxProps = {
   CheckboxProps;
 
 export const createCheckboxResponse = (
-  question: CheckboxQuestion,
+  { projectId, id: questionId, responseType }: CheckboxQuestion,
   label: string,
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.label = label;
-  response.checked = false;
-  return response;
+) => {
+  return Response.create({ projectId, questionId, responseType, label, checked: false });
 };
 
 export default function QuestionCheckbox({
@@ -26,25 +23,24 @@ export default function QuestionCheckbox({
   ...props
 }: QuestionCheckboxProps) {
   const checkedOption = (optionResponse: Response, checked: boolean) => {
-    optionResponse.checked = checked;
-    onAnswered(optionResponse);
+      optionResponse.checked = checked;
+      onAnswered(optionResponse);
   };
-  Checkbox;
+  
   return (
     <>
       {question.options.map((option, i) => {
         const optionResponse =
-          response.find((r) => r.label === option) ||
-          createCheckboxResponse(question, option);
+          response.find((r) => r.label === option) ?? createCheckboxResponse(question, option);
         return (
           <Checkbox
             {...props}
             label={option}
             key={i}
             mt="10"
-            checked={optionResponse.checked}
+            checked={optionResponse?.checked}
             onChange={(e) => {
-              checkedOption(optionResponse, e.currentTarget.checked);
+              optionResponse && checkedOption(optionResponse, e.currentTarget.checked);
             }}
           />
         );

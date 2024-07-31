@@ -1,19 +1,25 @@
+import { Entity } from "dexie";
 import { ActionFlag } from "../types/dexie";
 import { shouldIncludeId, uniqueId } from "../utils/functions";
 import { db } from "./db";
+import DexieObject from "./DexieObject";
+import { TheSurveyAppDB } from "./TheSurveyAppDB";
 
-export default class ResponseGroup {
+export default class ResponseGroup extends Entity<TheSurveyAppDB> implements DexieObject<ResponseGroup> {
   localId!: number;
   flag!: ActionFlag;
   id!: number;
   collectionId!: number;
   projectId!: number;
 
-  constructor({ ...props }: Partial<ResponseGroup>) {
-    Object.assign(this, props);
-    this.id = this.id || uniqueId();
-    this.flag = this.flag || "i";
-  }
+  static async add({...props}: Partial<ResponseGroup>) {
+    const responseGroup = Object.create(Comment.prototype);
+    Object.assign(responseGroup, props);
+    responseGroup.id = responseGroup.id || uniqueId();
+    responseGroup.flag = "i";
+    const addedId = await db.responseGroups.add(responseGroup);
+    return db.responseGroups.get(addedId);
+  };
 
   async delete() {
     return db.transaction(
@@ -31,20 +37,21 @@ export default class ResponseGroup {
     );
   }
 
-  async update(responseGroup: Partial<ResponseGroup>) {
+  async update(props: Partial<ResponseGroup>) {
     return await db.responseGroups.update(this.localId, {
-      ...responseGroup,
+      ...props,
     });
   }
 
   async save() {
-    this.flag = this.flag === "i" ? "i" : "u";
+    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
     return await db.responseGroups.put(this);
   }
 
   serialize() {
     return {
       ...shouldIncludeId(this.id, this.flag),
+      flag: this.flag,
       collectionId: this.collectionId,
     };
   }

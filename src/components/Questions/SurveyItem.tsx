@@ -17,7 +17,7 @@ export type BaseQuestionProps = {
   item: DexieQuestion;
 };
 
-type OnAnsweredCallback = (response: Response | Response[]) => void;
+type OnAnsweredCallback = (response?: Response | (Response | undefined)[]) => void;
 
 export type WithQuestionCallback = {
   onAnswered: OnAnsweredCallback;
@@ -37,7 +37,7 @@ export default function Question({ siteCode, order, type }: QuestionProps) {
     [projectId, order, type],
   );
   const response = useLiveQuery(
-    () => getResponse(projectId, question),
+     () => getResponse(projectId, question),
     [projectId, question],
   );
   const comment = useLiveQuery(
@@ -48,15 +48,20 @@ export default function Question({ siteCode, order, type }: QuestionProps) {
   const handleCommentChange: ChangeEventHandler<HTMLTextAreaElement> &
     ((value: string) => void) = (value) => {
     if (typeof value === "string") {
-      comment?.update(value);
+      comment?.update({ comment: value });
     }
   };
   const handleAnswered: OnAnsweredCallback = (value) => {
-    if (!comment) {
+    if (!comment || !value) {
       return;
     }
     const responses = value instanceof Array ? value : [value];
-    responses.forEach((r) => r.save(r.questionResponseId || comment?.id));
+    responses.forEach((r) => {
+      if(r) {
+        r.questionResponseId = r.questionResponseId || comment?.id;
+        r.flag === "d" ? r.delete() : r.save();
+      }
+    });
   };
   const handleFileDelete = (i: number) => {
     handlers.remove(i);
@@ -65,7 +70,7 @@ export default function Question({ siteCode, order, type }: QuestionProps) {
     handlers.append(...newFiles);
   };
 
-  if (!question || !comment || !response) {
+  if (!question || !comment || !response?.length) {
     return null;
   }
 

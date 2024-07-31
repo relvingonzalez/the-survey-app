@@ -1,9 +1,11 @@
+import { Entity } from "dexie";
 import { ActionFlag } from "../types/dexie";
-import { ServerRoom } from "../types/server";
 import { shouldIncludeId, uniqueId } from "../utils/functions";
 import { db } from "./db";
+import DexieObject from "./DexieObject";
+import { TheSurveyAppDB } from "./TheSurveyAppDB";
 
-export default class Room {
+export default class Room extends Entity<TheSurveyAppDB> implements DexieObject<Room>{
   localId!: number;
   tempId!: number;
   flag!: ActionFlag;
@@ -12,27 +14,27 @@ export default class Room {
   name!: string;
   comment!: string;
 
-  constructor({ ...props }: Partial<Room>) {
-    Object.assign(this, props);
-    this.id = this.id || uniqueId();
-    this.flag = this.flag || "i";
-  }
-
-  static deserialize({ ...serverProps }: ServerRoom) {
-    return new Room({ ...serverProps, flag: "o" });
-  }
-
-  static fromProject(projectId: number) {
+  static create({...props}: Partial<Room>) {
     const room = Object.create(Room.prototype);
-    room.projectId = projectId;
-    room.name = "";
-    room.comment = "";
-    room.flag = "i";
+    Object.assign(room, props);
+    room.id = room.id || uniqueId();
+    room.flag = null;
     return room;
   }
 
+
+  static async add({...props}: Partial<Room>) {
+    const room = Room.create(props);
+    const addedId = await db.rooms.add(room);
+    return db.rooms.get(addedId);
+  };
+
+  static async bulkAdd(rooms: Partial<Room>[]) {
+    return rooms.map(this.add);
+  }
+
   async save() {
-    this.flag = this.flag === "i" ? "i" : "u";
+    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
     return await db.rooms.put(this);
   }
 
@@ -48,9 +50,10 @@ export default class Room {
     });
   }
 
-  async update(room: Room) {
-    return await db.rooms.update(this.localId, { ...room });
+  async update({...props}: Partial<Room>) {
+    return this.db.rooms.update(this.localId, { ...props });
   }
+
   async clearRoomTools() {
     return db.transaction(
       "rw",
@@ -76,6 +79,7 @@ export default class Room {
   serialize() {
     return {
       ...shouldIncludeId(this.id, this.flag),
+      flag: this.flag,
       projectId: this.projectId,
       name: this.name,
       comment: this.comment,

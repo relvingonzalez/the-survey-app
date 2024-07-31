@@ -27,22 +27,12 @@ export function isPhoneResponse(
   );
 }
 
-export const createPhoneResponse = (
-  question: PhoneQuestion,
-  phone = "",
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.phone = phone;
-  return response;
-};
-
 export default function QuestionPhone({
-  question,
   response,
   onAnswered,
   ...props
 }: QuestionPhoneProps) {
-  const responseValue = response[0] || createPhoneResponse(question);
+  const responseValue = response[0];
   const [value, setValue] = useState(responseValue.phone);
   const handleOnChange = (value: string) => {
     setValue(value);
@@ -50,7 +40,7 @@ export default function QuestionPhone({
     onAnswered(responseValue);
   };
   useEffect(() => {
-    if (!value) {
+    if (!value && responseValue) {
       setValue(responseValue.phone);
     }
   }, [responseValue, value]);

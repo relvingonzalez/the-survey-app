@@ -1,6 +1,6 @@
 import { DateTimePicker, DateTimePickerProps } from "@mantine/dates";
 import { WithQuestionCallback } from "../SurveyItem";
-import { DateTimeQuestion, DateTimeResponse } from "@/lib/types/question";
+import { DateTimeQuestion } from "@/lib/types/question";
 import Response from "@/lib/dexie/Response";
 
 export type QuestionDateTimeProps = {
@@ -9,23 +9,12 @@ export type QuestionDateTimeProps = {
 } & WithQuestionCallback &
   DateTimePickerProps;
 
-export const createDateTimeResponse = (
-  { projectId, id: questionId, responseType }: DateTimeQuestion,
-  date = null,
-): DateTimeResponse => ({
-  projectId,
-  questionId,
-  responseType,
-  date,
-});
-
 export default function QuestionDateTime({
-  question,
   response,
   onAnswered,
   ...props
 }: QuestionDateTimeProps) {
-  const responseValue = response[0] || Response.fromQuestion(question);
+  const responseValue = response[0];
   const handleChange = (date: Date) => {
     responseValue.date = date;
     onAnswered(responseValue);

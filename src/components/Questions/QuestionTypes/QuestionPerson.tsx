@@ -42,7 +42,7 @@ export const salutationOptions = salutationLabels.map((_, i) => ({
 }));
 
 export const createPersonResponse = (
-  question: PersonQuestion,
+  { projectId, id: questionId, responseType }: PersonQuestion,
   {
     salutationId = -1,
     firstName = "",
@@ -50,22 +50,14 @@ export const createPersonResponse = (
     email = "",
     phone = "",
   }: Person,
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.salutationId = salutationId;
-  response.firstName = firstName;
-  response.lastName = lastName;
-  response.email = email;
-  response.phone = phone;
-  return response;
-};
+) => Response.create({ projectId, questionId, responseType, salutationId, firstName, lastName, email, phone });
 
 function NewPerson({
   form,
   onSave,
   onCancel,
 }: {
-  form: UseFormReturnType<Response>;
+  form: UseFormReturnType<Person>;
   onSave: (person: Person) => void;
   onCancel: () => void;
 }) {
@@ -164,7 +156,7 @@ export default function QuestionPerson({
   response,
   onAnswered,
 }: QuestionPersonProps) {
-  const [addNew, setAddNew] = useState(!response.length ? true : false);
+  const [addNew, setAddNew] = useState(false);
   const onAddNewClick = () => {
     setAddNew(true);
   };
@@ -175,25 +167,23 @@ export default function QuestionPerson({
   };
 
   const onSaveNewPerson = (person: Person) => {
-    const response = createPersonResponse(question, person);
-    onAnswered(response);
+    onAnswered(createPersonResponse(question, person));
     resetNewPerson();
   };
 
-  const onDeletePerson = (i: number) => {
-    const personResponse = response[i];
-    personResponse.flag = "d";
-    onAnswered(personResponse);
+  const onDeletePerson = (r: Response) => {
+    r.flag = "d";
+    onAnswered(r);
   };
 
   const form = useForm({
-    initialValues: createPersonResponse(question, {
+    initialValues: {
       salutationId: -1,
       firstName: "",
       lastName: "",
       email: "",
       phone: "",
-    }),
+    } as Person,
     validateInputOnChange: true,
     clearInputErrorOnChange: true,
     validate: {
@@ -212,7 +202,7 @@ export default function QuestionPerson({
     <Grid>
       {response.map((p, i) => (
         <GridCol key={i} span={4}>
-          <ExistingPerson person={p} onDelete={() => onDeletePerson(i)} />
+          <ExistingPerson person={p} onDelete={() => onDeletePerson(p)} />
         </GridCol>
       ))}
       <GridCol span={4}>

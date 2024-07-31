@@ -96,9 +96,9 @@ export default function RackModal({
     handlersEdit.append({ index: i, value: oldValue });
   };
 
-  const handleInsertNewHardware = () => {
+  const handleInsertNewHardware = async () => {
     const { rack, hardwareList } = form.getValues();
-    const hardware = Hardware.fromRack(rack);
+    const hardware = Hardware.create({ rackId: rack.id });
     form.insertListItem("hardwareList", hardware);
     handleEditing(hardwareList?.length || 0, hardware);
   };

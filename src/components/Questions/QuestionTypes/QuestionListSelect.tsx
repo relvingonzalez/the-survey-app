@@ -9,22 +9,13 @@ export type QuestionListSelectProps = {
 } & WithQuestionCallback &
   SelectProps;
 
-export const createListResponse = (
-  question: ListQuestion,
-  text = "",
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.text = text;
-  return response;
-};
-
 export default function QuestionListSelect({
   question,
   response,
   onAnswered,
   ...props
 }: QuestionListSelectProps) {
-  const responseValue = response[0] || createListResponse(question);
+  const responseValue = response[0];
   const handleOnChange = (value: string | null) => {
     responseValue.text = value;
     onAnswered(responseValue);

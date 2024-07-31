@@ -24,28 +24,16 @@ const options: PositionOptions = {
   maximumAge: 0,
 };
 
-export const createGeoResponse = (
-  question: GeoQuestion,
-  lat = null,
-  long = null,
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.lat = lat;
-  response.long = long;
-  return response;
-};
-
 const errors: PositionErrorCallback = (err) => {
   console.warn(`ERROR(${err.code}): ${err.message}`);
 };
 
 export default function QuestionGeo({
-  question,
   response,
   onAnswered,
   ...props
 }: QuestionGeoProps) {
-  const responseValue = response[0] || createGeoResponse(question);
+  const responseValue = response[0];
   const [value, setValue] = useState("");
 
   const pattern =
@@ -87,10 +75,12 @@ export default function QuestionGeo({
   };
 
   useEffect(() => {
-    if (!value && responseValue.lat) {
+    if (!value && responseValue) {
       setValue(`${responseValue.lat}, ${responseValue.long}`);
     }
   }, [responseValue, value]);
+
+  console.log(responseValue);
 
   return (
     <>

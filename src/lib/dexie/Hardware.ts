@@ -1,10 +1,11 @@
+import { Entity } from "dexie";
 import { ActionFlag } from "../types/dexie";
-import { ServerHardware } from "../types/server";
 import { shouldIncludeId, uniqueId } from "../utils/functions";
-import Rack from "./Rack";
+import DexieObject from "./DexieObject";
+import { TheSurveyAppDB } from "./TheSurveyAppDB";
 import { db } from "./db";
 
-export default class Hardware {
+export default class Hardware extends Entity<TheSurveyAppDB> implements DexieObject<Hardware>{
   localId!: number;
   tempId!: number;
   flag!: ActionFlag;
@@ -15,19 +16,23 @@ export default class Hardware {
   toSlot!: string;
   details!: string;
 
-  constructor({ ...props }: Partial<Hardware>) {
-    Object.assign(this, props);
-    this.id = this.id || uniqueId();
-    this.flag = this.flag || "i";
+  // Create type object without inserting
+  static create({...props}: Partial<Hardware>) {
+    const hardware = Object.create(Hardware.prototype);
+    Object.assign(hardware, props);
+    hardware.id = hardware.id ?? uniqueId();
+    hardware.flag = null;
+    return hardware;
   }
 
-  // Using new instead of Object.create throws exception
-  static deserialize({ ...serverProps }: ServerHardware) {
-    return new Hardware({ ...serverProps, flag: "o" });
-  }
+  static async add({...props}: Partial<Hardware>) {
+    const hardware = Hardware.create(props);
+    const addedId = await db.hardwares.add(hardware);
+    return db.hardwares.get(addedId);
+  };
 
-  static fromRack({ id }: Rack) {
-    return new Hardware({ rackId: id });
+  static async bulkAdd(hardwares: Partial<Hardware>[]) {
+    return hardwares.map(this.add);
   }
 
   async delete() {
@@ -40,13 +45,20 @@ export default class Hardware {
     });
   }
 
-  async update(hardware: Hardware) {
-    return await db.hardwares.update(this.localId, { ...hardware });
+  async save() {
+    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
+    return await this.db.hardwares.put(this);
   }
+
+  async update({...props}: Partial<Hardware>) {
+    return this.db.hardwares.update(this.localId, { ...props });
+  }
+
 
   serialize() {
     return {
       ...shouldIncludeId(this.id, this.flag),
+      flag: this.flag,
       rackId: this.rackId,
       name: this.name,
       fromSlot: this.fromSlot,

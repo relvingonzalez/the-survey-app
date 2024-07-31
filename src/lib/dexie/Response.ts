@@ -1,7 +1,7 @@
+import { Entity } from "dexie";
 import { ActionFlag } from "../types/dexie";
 import {
   Question,
-  QuestionResponse,
   ResponseType,
   YesNo,
 } from "../types/question";
@@ -20,8 +20,10 @@ import {
 } from "../types/server";
 import { shouldIncludeId, uniqueId } from "../utils/functions";
 import { db } from "./db";
+import DexieObject from "./DexieObject";
+import { TheSurveyAppDB } from "./TheSurveyAppDB";
 
-export default class Response {
+export default class Response extends Entity<TheSurveyAppDB> implements DexieObject<Response> {
   localId!: number;
   id!: number;
   tempId!: number;
@@ -47,21 +49,27 @@ export default class Response {
   yesNo!: YesNo;
   lat!: number | null;
   long!: number | null;
-
-  constructor({ ...props }: Partial<Response>) {
-    Object.assign(this, props);
-    this.id = this.id || uniqueId();
-    this.flag = this.flag || "i";
-  }
-
-  static fromQuestion({ projectId, id, responseType }: Question) {
-    const response = new Response({ responseType, projectId, questionId: id });
-    response.flag = "i";
+    
+  static create({...props}: Partial<Response>): Response {
+    const response = Object.create(Response.prototype);
+    Object.assign(response, props);
+    response.id = response.id ?? uniqueId();
+    response.flag = null;
     return response;
   }
+  
+  static async add({...props}: Partial<Response>) {
+    const response = Response.create(props);
+    const addedId = await db.responses.add(response);
+    return db.responses.get(addedId);
+  };
+  
+  static fromQuestion({ projectId, id, responseType }: Question) {
+    return this.add({ responseType, projectId, questionId: id });
+  }
 
-  static deserialize({ ...serverProps }: QuestionResponse) {
-    return new Response({ ...serverProps, flag: "o" });
+  static async bulkAdd(responses: Partial<Response>[]) {
+    return responses.map(this.add);
   }
 
   setProps({ ...props }: Response) {
@@ -71,23 +79,27 @@ export default class Response {
   async delete() {
     return db.transaction("rw", db.responses, () => {
       if (this.flag === "i") {
-        db.responses.where({ id: this.id }).delete();
-      } else {
-        db.responses.where({ id: this.id }).modify({ flag: "d" });
+        db.responses.where({ localId: this.localId }).delete();
+      } else if(this.localId) {
+        db.responses.where({ localId: this.localId }).modify({ flag: "d" });
       }
     });
   }
 
-  async save(questionResponseId: number) {
-    this.questionResponseId = questionResponseId;
-    this.flag = this.flag === "i" ? "i" : "u";
+  async save() {
+    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
     return await db.responses.put(this);
+  }
+
+  async update({...props}: Partial<Response>) {
+    return this.db.responses.update(this.localId, { ...props });
   }
 
   private baseServerProps() {
     return {
       ...shouldIncludeId(this.id, this.flag),
       questionResponseId: this.questionResponseId,
+      flag: this.flag,
     };
   }
 
@@ -116,7 +128,7 @@ export default class Response {
   private serializeDaysResponse(): ServerDaysResponse {
     return {
       ...this.baseServerProps(),
-      dayId: this.dayId,
+      dayId: this.dayId ?? null,
     };
   }
 

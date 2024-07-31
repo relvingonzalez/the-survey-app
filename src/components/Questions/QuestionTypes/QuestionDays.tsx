@@ -53,17 +53,13 @@ export const dayOptionsById: Record<number, Day> = {
 };
 
 export function isDayArray(days: Day[] | string[]): days is Day[] {
-  return (days as Day[]).every((item) => daysOptions.includes(item));
+  return (days as Day[]).every((item) => !item || daysOptions.includes(item));
 }
 
 export const createDaysResponse = (
-  question: DaysQuestion,
+  { projectId, id: questionId, responseType }: DaysQuestion,
   dayId: number,
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.dayId = dayId;
-  return response;
-};
+) => Response.create({ projectId, questionId, responseType, dayId });
 
 export default function QuestionDays({
   question,
@@ -71,20 +67,20 @@ export default function QuestionDays({
   onAnswered,
 }: QuestionDaysProps) {
   const value = response.map((v) => dayOptionsById[v.dayId]);
-  const handleSelected = (selection: string[]) => {
+  const handleSelected = async (selection: string[]) => {
     if (isDayArray(selection)) {
-      const result = selection.map(
+      const result = await Promise.all(selection.map(
         (s) =>
-          response.find((r) => dayOptionsById[r.dayId] === s) ||
+          response.find((r) => dayOptionsById[r.dayId] === s) ??
           createDaysResponse(question, dayOptionsByDay[s]),
-      );
+      ));
 
       // Check which ones to remove and add flag
       const selectionsToRemove = daysOptions.filter(
         (o) => !selection.includes(o),
       );
       const responsesToRemove = response
-        .filter((r) => selectionsToRemove.includes(dayOptionsById[r.dayId]))
+        .filter((r) => selectionsToRemove.includes(dayOptionsById[r.dayId])|| !r.dayId) 
         .map((r) => {
           r.flag = "d";
           return r;

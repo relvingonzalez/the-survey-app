@@ -97,7 +97,7 @@ export default function DrawingModal({
         startY: number,
         x: number,
         y: number,
-      ) => onSaveMoreInfo?.(MoreInfo.fromRoom(room.id, x - 12, y - 12)),
+      ) => MoreInfo.add({ roomId: room?.id, x: x - 12, y: y - 12}),
     },
     {
       label: "Rack",
@@ -110,7 +110,7 @@ export default function DrawingModal({
         startY: number,
         x: number,
         y: number,
-      ) => onSaveRack?.(Rack.fromRoom(room.id, x - 12, y - 12)),
+      ) => Rack.add({ roomId: room?.id, x: x - 12, y: y - 12}),
     },
   ];
   const tools = isRoom

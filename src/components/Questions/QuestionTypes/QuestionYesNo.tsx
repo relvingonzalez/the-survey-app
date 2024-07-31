@@ -10,15 +10,6 @@ export type QuestionYesNoProps = {
 } & WithQuestionCallback &
   RadioProps;
 
-export const createYesNoResponse = (
-  question: YesNoQuestion,
-  yesNo = null,
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.yesNo = yesNo;
-  return response;
-};
-
 const options = [
   { label: "Yes", value: true },
   { label: "No", value: false },
@@ -26,12 +17,11 @@ const options = [
 ];
 
 export default function QuestionYesNo({
-  question,
   response,
   onAnswered,
   ...props
 }: QuestionYesNoProps) {
-  const responseValue = response[0] || createYesNoResponse(question);
+  const responseValue = response[0];
   const handleOnChange = (
     event: ChangeEvent<HTMLInputElement>,
     value: boolean | null,

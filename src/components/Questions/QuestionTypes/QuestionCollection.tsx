@@ -22,7 +22,6 @@ import { IconLayoutGridAdd, IconTrash, IconX } from "@tabler/icons-react";
 import { WithQuestionCallback } from "../SurveyItem";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
-  addComments,
   createResponseByQuestion,
   deleteResponseGroup,
   getCollectionQuestions,
@@ -43,7 +42,7 @@ export type QuestionCollectionProps = {
 type NewResponseGroupProps = {
   questions: DexieQuestion[];
   responses: DexieResponse[];
-  onAnswered: (r: DexieResponse[]) => void;
+  onAnswered: (r: (Response | undefined)[]) => void;
   onSave: () => void;
   onCancel: () => void;
 };
@@ -55,8 +54,10 @@ function NewResponseGroup({
   onSave,
   onCancel,
 }: NewResponseGroupProps) {
-  const onAnsweredQuestionInEntry = (value: Response | Response[]) => {
-    onAnswered(value instanceof Array ? value : [value]);
+  const onAnsweredQuestionInEntry = (value?: Response | (Response | undefined)[]) => {
+    if(value) {
+      onAnswered(value instanceof Array ? value : [value]);
+    }
   };
   return (
     <Card mt="10" withBorder shadow="sm" radius="md">
@@ -73,7 +74,9 @@ function NewResponseGroup({
       <CardSection inheritPadding py="xs">
         <Stack gap="lg">
           {questions.map((q, i) => {
-            const response = responses.filter((r) => r.questionId === q.id);
+            const { projectId, id: questionId, responseType } = q;
+            const filteredResponses = responses.filter((r) => r.questionId === q.id);
+            const response = filteredResponses.length ? filteredResponses : [Response.create({ questionId, projectId, responseType })];
             return (
               <Stack gap="xs" key={i}>
                 <Text fw={500}>{q.question}</Text>
@@ -177,22 +180,20 @@ export default function QuestionCollection({
     setAddNew(false);
   };
 
-  const handleSaveNewResponseGroup = () => {
-    if (responseGroups && newResponseGroup) {
+  const handleSaveNewResponseGroup = async () => {
+    if (responseGroups && newResponseGroup && questions) {
       const tempResponseGroupId = uniqueId();
-      const comments = questions?.map((q) =>
-        Comment.fromQuestion(q, tempResponseGroupId),
-      );
-      const responseGroup = new ResponseGroup({
+      const comments = await Promise.all(questions.map((q) =>
+        Comment.add({ questionId: q.id, projectId: q.projectId, responseGroupId: tempResponseGroupId})
+      ));
+      await ResponseGroup.add({
         projectId: question.projectId,
         collectionId: question.collectionId,
         id: tempResponseGroupId,
       });
-      responseGroup.save();
-      addComments(comments);
       onAnswered(
         newResponseGroup.map((r) => {
-          const commentId = comments?.find((c) => c.questionId === r.questionId)
+          const commentId = comments?.find((c) => c?.questionId === r.questionId)
             ?.id;
           if (commentId) {
             r.questionResponseId = commentId;
@@ -217,15 +218,18 @@ export default function QuestionCollection({
     }
   };
 
-  const handleAnsweredNewResponseGroup = (responses: Response[]) => {
+  const handleAnsweredNewResponseGroup = (responses: ( Response | undefined )[]) => {
+    console.log(responses);
     const newResponses: Response[] = [...newResponseGroup];
     responses.forEach((r) => {
-      const foundIndex = newResponses.findIndex((nR) => nR.id === r.id);
-      if (foundIndex > -1) {
-        newResponses[foundIndex].setProps(r);
-      } else {
-        r.id = uniqueId();
-        newResponses.push(r);
+      if (r) {
+        const foundIndex = newResponses.findIndex((nR) => nR.id === r.id);
+        if (foundIndex > -1) {
+          newResponses[foundIndex].setProps(r);
+        } else {
+          r.id = uniqueId();
+          newResponses.push(r);
+        }
       }
     });
     setNewResponseGroup(newResponses);

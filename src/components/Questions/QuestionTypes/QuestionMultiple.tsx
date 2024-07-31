@@ -10,13 +10,9 @@ export type QuestionMultipleProps = {
   MultiSelectProps;
 
 export const createMultipleResponse = (
-  question: MultipleQuestion,
+  { projectId, id: questionId, responseType }: MultipleQuestion,
   text = "",
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.text = text;
-  return response;
-};
+) => Response.create({ projectId, questionId, responseType, text});
 
 export default function QuestionListSelect({
   question,
@@ -24,14 +20,13 @@ export default function QuestionListSelect({
   onAnswered,
   ...props
 }: QuestionMultipleProps) {
-  const handleOnChange = (selection: string[]) => {
-    const result = selection.map((s) => {
+  const handleOnChange = async (selection: string[]) => {
+    const result = await Promise.all(selection.map((s) => {
       const res =
         response.find((r) => r.text === s) ||
         createMultipleResponse(question, s);
-      res.flag = "u";
       return res;
-    });
+    }));
 
     // Check which ones to remove and add flag
     const selectionsToRemove = question.options.filter(

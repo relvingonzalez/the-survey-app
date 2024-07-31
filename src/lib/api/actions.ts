@@ -41,7 +41,7 @@ const insertOrUpdateByTableName = async <K extends ServerArray>(
     INSERT INTO ${sql(serverTableName)} ${sql(serverResponses)}
     ON CONFLICT (id) 
     DO UPDATE SET
-    ${Object.keys(serverResponses[0]).map(
+    ${Object.keys(serverResponses[0]).filter(k => k !== "flag").map(
       (x, i) => sql`${i ? sql`,` : sql``}${sql(x)} = excluded.${sql(x)}`,
     )}
     RETURNING *`;
@@ -69,6 +69,37 @@ const insertOrUpdateItem = async <K extends ServerArray>(
   return inserted;
 };
 
+const deleteByTableName = async <K extends ServerArray>(
+  sql: postgres.Sql,
+  serverTableName: string,
+  serverResponses: ServerArray[],
+) => {
+
+  // TODO: Figure out how to make this better. Shouldn't have to specify 0. Maybe fix typescript. If updated or deleted it will have an id.
+  return sql<K[]>`
+    DELETE FROM ${sql(serverTableName)} WHERE id IN ${sql(serverResponses.map(r => r.id || 0))} RETURNING *;`;
+};
+
+const deleteByTableIndex = <K extends ServerArray>(
+  sql: postgres.Sql,
+  serverTableIndex: ServerTableIndex,
+  serverResponses: ServerArray[],
+) =>
+  deleteByTableName<K>(
+    sql,
+    tableByType[serverTableIndex],
+    serverResponses,
+  );
+
+  const deleteItem = async <K extends ServerArray>(
+    item: K,
+    tableName: string,
+  ) => {
+    const [inserted] = await deleteByTableName<K>(sql, tableName, [item]);
+  
+    return inserted;
+  };
+
 export async function saveComments(comments: ServerComment[]) {
   const [commentsInserted, commentsUpdated] = await sql.begin(async (sql) => {
     const insertResponses = comments.filter((c) => !c.id);
@@ -95,19 +126,19 @@ export async function saveComments(comments: ServerComment[]) {
 }
 
 export async function saveRoom(room: ServerRoom) {
-  return insertOrUpdateItem(room, "room");
+  return room.flag === 'd' ? deleteItem(room, "room") : insertOrUpdateItem(room, "room");
 }
 
 export async function saveRack(rack: ServerRack) {
-  return insertOrUpdateItem(rack, "rack");
+  return rack.flag === 'd' ? deleteItem(rack, "rack") : insertOrUpdateItem(rack, "rack");
 }
 
 export async function saveHardware(hardware: ServerHardware) {
-  return insertOrUpdateItem(hardware, "hardware");
+  return hardware.flag === "d" ? deleteItem(hardware, "hardware") : insertOrUpdateItem(hardware, "hardware");
 }
 
 export async function saveMoreInfo(moreInfo: ServerMoreInfo) {
-  return insertOrUpdateItem(moreInfo, "more_info");
+  return moreInfo.flag === "d" ? deleteItem(moreInfo, "moreInfo") : insertOrUpdateItem(moreInfo, "more_info");
 }
 
 export async function saveResponseGroup(responseGroup: ServerResponseGroup) {
@@ -126,12 +157,14 @@ export async function saveResponseGroup(responseGroup: ServerResponseGroup) {
 export async function saveResponses(
   groupedResponses: DexieResponseGroupedByResponseType,
 ) {
-  const [responsesInserted, responsesUpdated] = await sql.begin(async (sql) => {
+  const [responsesInserted, responsesUpdated, responsesDeleted] = await sql.begin(async (sql) => {
     const inserted: ServerArray[] = [];
     const updated: ServerArray[] = [];
+    const deleted: ServerArray[] = [];
     Object.entries(groupedResponses).forEach(async ([k, responses]) => {
-      const insertResponses = responses.filter((r) => !r.id);
-      const updateResponses = responses.filter((r) => r.id);
+      const insertResponses = responses.filter((r) => r.flag === 'i');
+      const updateResponses = responses.filter((r) => r.flag === 'u');
+      const deletedResponses = responses.filter((r) => r.flag === 'd');
 
       const insertedPromises = insertResponses.length
         ? await insertOrUpdateByTableIndex(
@@ -149,14 +182,23 @@ export async function saveResponses(
           )
         : [];
 
+        const deletedPromises = deletedResponses.length
+        ? await deleteByTableIndex(
+            sql,
+            k as ServerTableIndex,
+            deletedResponses,
+          )
+        : [];
+
       inserted.push(...insertedPromises);
       updated.push(...updatedPromises);
+      deleted.push(...deletedPromises);
     });
 
-    return [inserted, updated];
+    return [inserted, updated, deleted];
   });
 
-  return [responsesInserted, responsesUpdated];
+  return [responsesInserted, responsesUpdated, responsesDeleted];
 }
 
 export async function saveHardwares(hardwares: ServerHardware[]) {

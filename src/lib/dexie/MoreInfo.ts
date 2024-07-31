@@ -1,10 +1,11 @@
+import { Entity } from "dexie";
 import { ActionFlag } from "../types/dexie";
 import { Coordinate } from "../types/question";
-import { ServerMoreInfo } from "../types/server";
 import { shouldIncludeId, uniqueId } from "../utils/functions";
 import { db } from "./db";
-
-export default class MoreInfo {
+import DexieObject from "./DexieObject";
+import { TheSurveyAppDB } from "./TheSurveyAppDB";
+export default class MoreInfo extends Entity<TheSurveyAppDB> implements DexieObject<MoreInfo> {
   localId!: number;
   tempId!: number;
   flag!: ActionFlag;
@@ -14,22 +15,28 @@ export default class MoreInfo {
   y!: Coordinate;
   info!: string;
 
-  constructor({ ...props }: Partial<MoreInfo>) {
-    Object.assign(this, props);
-    this.id = this.id || uniqueId();
-    this.flag = this.flag || "i";
+  static create({...props}: Partial<MoreInfo>) {
+    const moreInfo = Object.create(MoreInfo.prototype);
+    Object.assign(moreInfo, props);
+    moreInfo.id = moreInfo.id ?? uniqueId();
+    moreInfo.flag = null;
+    moreInfo.moreInfo = "";
+    return moreInfo;
   }
 
-  static deserialize({ ...serverProps }: ServerMoreInfo) {
-    return new MoreInfo({ ...serverProps, flag: "o" });
-  }
 
-  static fromRoom(roomId: number, x: number, y: number) {
-    return new MoreInfo({ roomId, x, y });
-  }
+  static async add({...props}: Partial<MoreInfo>) {
+    const moreInfo = MoreInfo.create(props);
+    const addedId = await db.moreInfos.add(moreInfo);
+    return db.moreInfos.get(addedId);
+  };
 
+  static async bulkAdd(moreInfos: Partial<MoreInfo>[]) {
+    return moreInfos.map(this.add);
+  }
+  
   async save() {
-    this.flag = this.flag === "i" ? "i" : "u";
+    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
     return await db.moreInfos.put(this);
   }
 
@@ -43,13 +50,15 @@ export default class MoreInfo {
     });
   }
 
-  async update(moreInfo: MoreInfo) {
-    return await db.moreInfos.update(this.localId, { ...moreInfo });
+  async update({...props}: Partial<MoreInfo>) {
+    return this.db.moreInfos.update(this.localId, { ...props });
   }
+
 
   serialize() {
     return {
       ...shouldIncludeId(this.id, this.flag),
+      flag: this.flag,
       roomId: this.roomId,
       info: this.info,
       x: this.x,

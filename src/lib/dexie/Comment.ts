@@ -1,9 +1,11 @@
-import { ActionFlag, DexieQuestion } from "../types/dexie";
-import { ServerComment } from "../types/server";
-import { shouldIncludeId, uniqueId } from "../utils/functions";
+import { Entity } from "dexie";
+import { ActionFlag } from "../types/dexie";
+import { shouldIncludeId } from "../utils/functions";
+import DexieObject from "./DexieObject";
+import { TheSurveyAppDB } from "./TheSurveyAppDB";
 import { db } from "./db";
 
-export default class Comment {
+export default class Comment extends Entity<TheSurveyAppDB> implements DexieObject<Comment> {
   localId!: number;
   tempId!: number;
   flag!: ActionFlag;
@@ -13,47 +15,36 @@ export default class Comment {
   responseGroupId!: number;
   comment!: string;
 
-  constructor({ ...props }: Partial<Comment>) {
-    Object.assign(this, props);
-    this.id = this.id || uniqueId();
-    this.flag = this.flag || "i";
-  }
+  static async add({...props}: Partial<Comment>) {
+    const comment = Object.create(Comment.prototype);
+    Object.assign(comment, props);
+    comment.flag = comment.id ? null : 'i';
+    comment.comment = comment.comment ?? "";
+    const addedId = await db.comments.add(comment);
+    return db.comments.get(addedId);
+  };
 
-  static deserialize({ ...serverProps }: ServerComment) {
-    return new Comment({ ...serverProps, flag: "o" });
-  }
-
-  static fromQuestion(
-    { projectId, id }: DexieQuestion,
-    responseGroupId?: number,
-  ) {
-    const comment = new Comment({ projectId, questionId: id });
-    comment.flag = "i";
-    comment.comment = "";
-    if (responseGroupId) {
-      comment.responseGroupId = responseGroupId;
-    }
-    return comment;
+  static async bulkAdd(comments: Partial<Comment>[]) {
+    return comments.map(this.add);
   }
 
   async delete() {
-    return db.transaction("rw", db.comments, () => {
+    return this.db.transaction("rw", this.db.comments, () => {
       if (this.flag === "i") {
-        db.comments.where({ id: this.id }).delete();
+        this.db.comments.where({ id: this.id }).delete();
       } else {
-        db.comments.where({ id: this.id }).modify({ flag: "d" });
+        this.db.comments.where({ id: this.id }).modify({ flag: "d" });
       }
     });
   }
 
   async save() {
-    this.flag = this.flag === "i" ? "i" : "u";
-    return await db.comments.put(this);
+    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
+    return await this.db.comments.put(this);
   }
 
-  async update(value: string) {
-    this.comment = value;
-    this.save();
+  async update({...props}: Partial<Comment>) {
+    return this.db.comments.update(this.localId, { ...props });
   }
 
   serialize() {

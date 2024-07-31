@@ -10,22 +10,12 @@ export type QuestionNumberProps = {
 } & WithQuestionCallback &
   NumberInputProps;
 
-export const createNumberResponse = (
-  question: NumberQuestion,
-  number: number = 0,
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.number = number;
-  return response;
-};
-
 export default function QuestionNumber({
-  question,
   response,
   onAnswered,
   ...props
 }: QuestionNumberProps) {
-  const responseValue = response[0] || createNumberResponse(question);
+  const responseValue = response[0];
   const [value, setValue] = useState<string | number | undefined>(
     responseValue.number,
   );
@@ -35,7 +25,7 @@ export default function QuestionNumber({
     onAnswered(responseValue);
   };
   useEffect(() => {
-    if (!value) {
+    if (!value && responseValue) {
       setValue(responseValue.number);
     }
   }, [responseValue, value]);

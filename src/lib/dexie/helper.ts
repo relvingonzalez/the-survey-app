@@ -38,14 +38,12 @@ export async function populate(data: ServerDownloadSiteData) {
     () => {
       db.siteProjects.add(data.siteProject);
       db.questions.bulkAdd(data.questions);
-      db.responses.bulkAdd(data.responses.map((r) => Response.deserialize(r)));
-      db.comments.bulkAdd(data.comments.map((c) => Comment.deserialize(c)));
-      db.rooms.bulkAdd(data.rooms.map((r) => Room.deserialize(r)));
-      db.moreInfos.bulkAdd(
-        data.moreInfos.map((mI) => MoreInfo.deserialize(mI)),
-      );
-      db.racks.bulkAdd(data.racks.map((r) => Rack.deserialize(r)));
-      db.hardwares.bulkAdd(data.hardwares.map((h) => Hardware.deserialize(h)));
+      Response.bulkAdd(data.responses);
+      Comment.bulkAdd(data.comments);
+      Room.bulkAdd(data.rooms);
+      MoreInfo.bulkAdd(data.moreInfos);
+      Rack.bulkAdd(data.racks);
+      Hardware.bulkAdd(data.hardwares);
     },
   );
 }
@@ -162,7 +160,7 @@ export const getComment = async (
   if (projectId && question) {
     return (
       (await db.comments.get({ projectId, questionId: question?.id })) ||
-      Comment.fromQuestion(question)
+      Comment.add(question)
     );
   }
 };
@@ -171,13 +169,14 @@ export const addComments = async (comments?: Comment[]) => {
   return comments ? await db.comments.bulkAdd(comments) : [];
 };
 
-export const getResponse = (projectId?: number, question?: DexieQuestion) => {
-  // TODO add when flag not equals d?
+export const getResponse = async (projectId?: number, question?: DexieQuestion) => {
   if (projectId && question) {
-    return db.responses
+    const response = await db.responses
       .where({ projectId, questionId: question?.id })
       .and((r) => r.flag !== "d")
       .toArray();
+    
+    return response.length ? response : [Response.create({ projectId, questionId: question.id, responseType: question.responseType })];
   }
 
   return [];
@@ -269,11 +268,11 @@ export const questionResponsesCounts = (
 export const createResponseByQuestion = (
   question: DexieQuestion,
 ): DexieResponse[] => {
-  return [Response.fromQuestion(question)];
+  return [Response.create(question)];
 };
 
 export const getRoomById = async (projectId: number, id?: number) =>
-  id ? await db.rooms.get({ id }) : Room.fromProject(projectId);
+  id ? await db.rooms.get({ id }) : Room.add({ projectId });
 
 export const getMoreInfosByRoomId = async (roomId: number) =>
   await db.moreInfos
@@ -314,7 +313,7 @@ export const updateHardwareList = (hardwareList: Hardware[]) => {
 // Get Updated items which means either insert or update
 const getUpdatedItemsByTable = <K extends DexieStructure>(
   table: EntityTable<K, "localId">,
-) => table.where("flag").anyOf(["i", "u"]).toArray();
+) => table.where("flag").anyOf(["i", "u", "d"]).toArray();
 
 export const getUpdatedRooms = async () => getUpdatedItemsByTable(db.rooms);
 
@@ -335,7 +334,6 @@ export const getUpdatedMoreInfos = async () =>
 export const getUpdatedHardwares = async () =>
   getUpdatedItemsByTable(db.hardwares);
 
-//TODO: investigate error
 export const getGroupedUpdatedAndSerializedResponses = async () => {
   const responses = await getUpdatedResponses();
   const groupedResponses = responses.reduce<DexieResponseGroupedByResponseType>(
@@ -347,6 +345,8 @@ export const getGroupedUpdatedAndSerializedResponses = async () => {
     },
     {},
   );
+
+  console.log(groupedResponses);
   return groupedResponses;
 };
 

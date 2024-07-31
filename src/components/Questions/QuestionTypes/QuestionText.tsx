@@ -15,13 +15,12 @@ export declare function isTextQuestion(
 ): asserts param is TextQuestion;
 
 export default function QuestionText({
-  question,
   response,
   onAnswered,
   ...props
 }: QuestionTextProps) {
-  const responseValue = response[0] || Response.fromQuestion(question);
-  const [value, setValue] = useState(responseValue.text || "");
+  const responseValue = response[0];
+  const [value, setValue] = useState(responseValue.text ?? "");
 
   const handleOnChange = (value: string) => {
     setValue(value);

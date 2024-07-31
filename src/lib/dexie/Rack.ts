@@ -1,10 +1,12 @@
 import { ActionFlag } from "../types/dexie";
-import { ServerRack } from "../types/server";
 import { Coordinate } from "../types/question";
 import { db } from "./db";
 import { shouldIncludeId, uniqueId } from "../utils/functions";
+import { Entity } from "dexie";
+import DexieObject from "./DexieObject";
+import { TheSurveyAppDB } from "./TheSurveyAppDB";
 
-export default class Rack {
+export default class Rack extends Entity<TheSurveyAppDB> implements DexieObject<Rack>{
   localId!: number;
   tempId!: number;
   flag!: ActionFlag;
@@ -15,22 +17,28 @@ export default class Rack {
   comment!: string;
   name!: string;
 
-  constructor({ ...props }: Partial<Rack>) {
-    Object.assign(this, props);
-    this.id = this.id || uniqueId();
-    this.flag = this.flag || "i";
+  static create({...props}: Partial<Rack>) {
+    const rack = Object.create(Rack.prototype);
+    Object.assign(rack, props);
+    rack.id = rack.id ?? uniqueId();
+    rack.flag = null;
+    rack.rack = "";
+    return rack;
   }
 
-  static deserialize({ ...serverProps }: ServerRack) {
-    return new Rack({ ...serverProps, flag: "o" });
-  }
 
-  static fromRoom(roomId: number, x: number, y: number) {
-    return new Rack({ roomId, x, y });
+  static async add({...props}: Partial<Rack>) {
+    const rack = Rack.create(props);
+    const addedId = await db.racks.add(rack);
+    return db.racks.get(addedId);
+  };
+
+  static async bulkAdd(racks: Partial<Rack>[]) {
+    return racks.map(this.add);
   }
 
   async save() {
-    this.flag = this.flag === "i" ? "i" : "u";
+    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
     return await db.racks.put(this);
   }
 
@@ -46,13 +54,14 @@ export default class Rack {
     });
   }
 
-  async update(rack: Rack) {
-    return await db.racks.update(this.localId, { ...rack });
+  async update({...props}: Partial<Rack>) {
+    return this.db.racks.update(this.localId, { ...props });
   }
 
   serialize() {
     return {
       ...shouldIncludeId(this.id, this.flag),
+      flag: this.flag,
       name: this.name,
       roomId: this.roomId,
       comment: this.comment,

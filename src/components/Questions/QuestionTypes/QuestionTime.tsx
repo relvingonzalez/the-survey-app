@@ -14,24 +14,12 @@ export type QuestionTimeProps = {
 } & WithQuestionCallback &
   TimeInputProps;
 
-export const createTimeResponse = (
-  question: TimeQuestion,
-  fromTime: string = "",
-  toTime: string = "",
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.fromTime = fromTime;
-  response.toTime = toTime;
-  return response;
-};
-
 export default function QuestionTime({
-  question,
   response,
   onAnswered,
   ...props
 }: QuestionTimeProps) {
-  const responseValue = response[0] || createTimeResponse(question);
+  const responseValue = response[0];
   const refFrom = useRef<HTMLInputElement>(null);
   const refTo = useRef<HTMLInputElement>(null);
 

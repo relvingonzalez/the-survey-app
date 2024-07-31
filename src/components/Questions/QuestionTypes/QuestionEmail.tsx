@@ -18,29 +18,24 @@ export const emailPatternRegex = new RegExp(
 );
 
 export const createEmailResponse = (
-  question: EmailQuestion,
+  { projectId, id:questionId, responseType }: EmailQuestion,
   email: string = "",
-): Response => {
-  const response = Response.fromQuestion(question);
-  response.email = email;
-  return response;
-};
+) => Response.create({ projectId, questionId, responseType, email });
 
 export default function QuestionEmail({
-  question,
   response,
   onAnswered,
   ...props
 }: QuestionEmailProps) {
-  const responseValue = response[0] || createEmailResponse(question);
-  const [value, setValue] = useState(responseValue.email);
+  const responseValue = response[0];
+  const [value, setValue] = useState(responseValue?.email);
   const handleOnChange = (newValue: string) => {
     setValue(newValue);
     responseValue.email = value;
     onAnswered(responseValue);
   };
   useEffect(() => {
-    if (!value) {
+    if (!value && responseValue) {
       setValue(responseValue.email);
     }
   }, [responseValue, value]);
