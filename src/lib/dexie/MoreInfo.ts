@@ -5,6 +5,7 @@ import { shouldIncludeId, uniqueId } from "../utils/functions";
 import { db } from "./db";
 import DexieObject from "./DexieObject";
 import { TheSurveyAppDB } from "./TheSurveyAppDB";
+import { ServerMoreInfo } from "../types/server";
 export default class MoreInfo extends Entity<TheSurveyAppDB> implements DexieObject<MoreInfo> {
   localId!: number;
   tempId!: number;
@@ -54,6 +55,19 @@ export default class MoreInfo extends Entity<TheSurveyAppDB> implements DexieObj
     return this.db.moreInfos.update(this.localId, { ...props });
   }
 
+  async syncWithServer({ id }: ServerMoreInfo){
+    return this.db.transaction(
+      "rw",
+      [this.db.moreInfos],
+      () => {
+        if (this.flag === 'd') {
+          this.db.moreInfos.where({ localId: this.localId }).delete();
+        } else {
+          this.db.moreInfos.where({ id: this.id }).modify({ id, flag: null });
+        }
+      }
+    );
+  }
 
   serialize() {
     return {

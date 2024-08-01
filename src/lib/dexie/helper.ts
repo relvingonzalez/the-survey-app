@@ -9,10 +9,6 @@ import { db } from "./db";
 import {
   ServerComment,
   ServerDownloadSiteData,
-  ServerHardware,
-  ServerMoreInfo,
-  ServerRack,
-  ServerRoom,
 } from "../types/server";
 import Hardware from "./Hardware";
 import MoreInfo from "./MoreInfo";
@@ -132,27 +128,6 @@ export const updateCommentIds = (comments: ServerComment[]) => {
   });
 };
 
-export const updateResponseGroupIds = (
-  oldResponseGroupId: number,
-  responseGroupId?: number,
-) => {
-  return db.transaction(
-    "rw",
-    [db.responseGroups, db.comments, db.responses],
-    () => {
-      db.responseGroups
-        .where({ id: oldResponseGroupId })
-        .modify({ id: responseGroupId, flag: null });
-      db.comments
-        .where({ responseGroupId: oldResponseGroupId })
-        .modify({ responseGroupId });
-      db.responses
-        .where({ responseGroupId: oldResponseGroupId })
-        .modify({ responseGroupId });
-    },
-  );
-};
-
 export const getComment = async (
   projectId?: number,
   question?: DexieQuestion,
@@ -163,10 +138,6 @@ export const getComment = async (
       Comment.add(question)
     );
   }
-};
-
-export const addComments = async (comments?: Comment[]) => {
-  return comments ? await db.comments.bulkAdd(comments) : [];
 };
 
 export const getResponse = async (projectId?: number, question?: DexieQuestion) => {
@@ -350,40 +321,7 @@ export const getGroupedUpdatedAndSerializedResponses = async () => {
   return groupedResponses;
 };
 
-export const updateRoomIds = ({ id }: Room, { id: newId }: ServerRoom) => {
-  return db.transaction("rw", [db.rooms, db.racks, db.moreInfos], () => {
-    db.rooms.where({ id }).modify({ id: newId, flag: null });
-    db.racks.where({ roomId: id }).modify({ roomId: newId });
-    db.moreInfos.where({ roomId: id }).modify({ roomId: newId });
-  });
-};
-
-export const updateRackIds = ({ id }: Rack, { id: newId }: ServerRack) => {
-  return db.transaction("rw", [db.racks, db.hardwares], () => {
-    db.racks.where({ id }).modify({ id: newId, flag: null });
-    db.hardwares.where({ rackId: id }).modify({ rackId: newId });
-  });
-};
-
-export const updateHardwareIds = (
-  { id }: Hardware,
-  { id: newId }: ServerHardware,
-) => {
-  return db.transaction("rw", [db.hardwares], () => {
-    db.hardwares.where({ id }).modify({ id: newId, flag: null });
-  });
-};
-
-export const updateMoreInfoIds = (
-  { id }: MoreInfo,
-  { id: newId }: ServerMoreInfo,
-) => {
-  return db.transaction("rw", [db.moreInfos], () => {
-    db.moreInfos.where({ id }).modify({ id: newId, flag: null });
-  });
-};
-
-// Delete
+// Get Deleted
 const getDeletedItemsByTable = <K extends DexieStructure>(
   table: EntityTable<K, "localId">,
 ) => table.where({ flag: "d" }).toArray();

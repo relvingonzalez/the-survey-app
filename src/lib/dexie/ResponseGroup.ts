@@ -4,6 +4,7 @@ import { shouldIncludeId, uniqueId } from "../utils/functions";
 import { db } from "./db";
 import DexieObject from "./DexieObject";
 import { TheSurveyAppDB } from "./TheSurveyAppDB";
+import { ServerResponseGroup } from "../types/server";
 
 export default class ResponseGroup extends Entity<TheSurveyAppDB> implements DexieObject<ResponseGroup> {
   localId!: number;
@@ -46,6 +47,28 @@ export default class ResponseGroup extends Entity<TheSurveyAppDB> implements Dex
   async save() {
     this.flag = ["i", null].includes(this.flag) ? "i" : "u";
     return await db.responseGroups.put(this);
+  }
+
+  async syncWithServer({ id: responseGroupId }: ServerResponseGroup){
+    return this.db.transaction(
+      "rw",
+      [this.db.responseGroups, this.db.comments, this.db.responses],
+      () => {
+        if (this.flag === 'd') {
+          this.db.responseGroups.where({ localId: this.localId }).delete();
+        } else {
+          db.responseGroups
+          .where({ id: this.id })
+          .modify({ id: responseGroupId, flag: null });
+        db.comments
+          .where({ responseGroupId: this.id })
+          .modify({ responseGroupId });
+        db.responses
+          .where({ responseGroupId: this.id })
+          .modify({ responseGroupId });
+        }
+      },
+    );
   }
 
   serialize() {

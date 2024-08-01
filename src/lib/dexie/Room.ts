@@ -4,6 +4,7 @@ import { shouldIncludeId, uniqueId } from "../utils/functions";
 import { db } from "./db";
 import DexieObject from "./DexieObject";
 import { TheSurveyAppDB } from "./TheSurveyAppDB";
+import { ServerRoom } from "../types/server";
 
 export default class Room extends Entity<TheSurveyAppDB> implements DexieObject<Room>{
   localId!: number;
@@ -73,6 +74,22 @@ export default class Room extends Entity<TheSurveyAppDB> implements DexieObject<
           value.delete();
         });
       },
+    );
+  }
+
+  async syncWithServer({ id }: ServerRoom){
+    return this.db.transaction(
+      "rw",
+      [this.db.rooms, this.db.racks, this.db.moreInfos],
+      () => {
+        if (this.flag === 'd') {
+          this.db.rooms.where({ localId: this.localId }).delete();
+        } else {
+          db.rooms.where({ id: this.id }).modify({ id, flag: null });
+          db.racks.where({ roomId: this.id }).modify({ roomId: id });
+          db.moreInfos.where({ roomId: this.id }).modify({ roomId: id });
+        }
+      }
     );
   }
 

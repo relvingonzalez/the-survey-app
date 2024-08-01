@@ -9,13 +9,8 @@ import {
   getUpdatedMoreInfos,
   getUpdatedRacks,
   getUpdatedRooms,
-  updateHardwareIds,
-  updateMoreInfoIds,
-  updateRackIds,
-  updateRoomIds,
   getUpdatedResponseGroups,
   updateCommentIds,
-  updateResponseGroupIds,
 } from "@/lib/dexie/helper";
 import {
   saveComments,
@@ -66,7 +61,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       await Promise.all(
         responseGroups.map(async (r) => {
           const [savedResponseGroup] = await saveResponseGroup(r.serialize());
-          return updateResponseGroupIds(r.id, savedResponseGroup.id);
+          return r.syncWithServer(savedResponseGroup);
         }),
       );
 
@@ -103,7 +98,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       await Promise.all(
         rooms.map(async (r) => {
           const savedRoom = await saveRoom(r.serialize());
-          await updateRoomIds(r, savedRoom);
+          return r.syncWithServer(savedRoom);
         }),
       );
 
@@ -117,7 +112,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       await Promise.all(
         racks.map(async (r) => {
           const savedRack = await saveRack(r.serialize());
-          await updateRackIds(r, savedRack);
+          return r.syncWithServer(savedRack);
         }),
       );
 
@@ -128,9 +123,9 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
     if (hardwares.length) {
       handleStatusUpdate(1, progressValue + 5, "Syncing Hardware...");
       await Promise.all(
-        hardwares.map(async (r) => {
-          const savedHardware = await saveHardware(r.serialize());
-          await updateHardwareIds(r, savedHardware);
+        hardwares.map(async (h) => {
+          const savedHardware = await saveHardware(h.serialize());
+          return h.syncWithServer(savedHardware);
         }),
       );
       handleStatusUpdate(2, progressValue + 10, "Syncing Hardwares Complete!");
@@ -143,7 +138,7 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
       await Promise.all(
         moreInfos.map(async (m) => {
           const savedMoreInfo = await saveMoreInfo(m.serialize());
-          await updateMoreInfoIds(m, savedMoreInfo);
+          return m.syncWithServer(savedMoreInfo);
         }),
       );
       handleStatusUpdate(2, progressValue + 10, "Syncing Hardwares Complete!");

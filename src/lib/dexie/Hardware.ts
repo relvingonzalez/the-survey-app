@@ -4,6 +4,7 @@ import { shouldIncludeId, uniqueId } from "../utils/functions";
 import DexieObject from "./DexieObject";
 import { TheSurveyAppDB } from "./TheSurveyAppDB";
 import { db } from "./db";
+import { ServerHardware } from "../types/server";
 
 export default class Hardware extends Entity<TheSurveyAppDB> implements DexieObject<Hardware>{
   localId!: number;
@@ -54,6 +55,19 @@ export default class Hardware extends Entity<TheSurveyAppDB> implements DexieObj
     return this.db.hardwares.update(this.localId, { ...props });
   }
 
+  async syncWithServer({ id }: ServerHardware){
+    return this.db.transaction(
+      "rw",
+      [this.db.hardwares],
+      () => {
+        if (this.flag === 'd') {
+          this.db.hardwares.where({ localId: this.localId }).delete();
+        } else {
+          this.db.hardwares.where({ id: this.id }).modify({ id, flag: null });
+        }
+      }
+    );
+  }
 
   serialize() {
     return {

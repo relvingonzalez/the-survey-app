@@ -5,6 +5,7 @@ import { shouldIncludeId, uniqueId } from "../utils/functions";
 import { Entity } from "dexie";
 import DexieObject from "./DexieObject";
 import { TheSurveyAppDB } from "./TheSurveyAppDB";
+import { ServerRack } from "../types/server";
 
 export default class Rack extends Entity<TheSurveyAppDB> implements DexieObject<Rack>{
   localId!: number;
@@ -56,6 +57,21 @@ export default class Rack extends Entity<TheSurveyAppDB> implements DexieObject<
 
   async update({...props}: Partial<Rack>) {
     return this.db.racks.update(this.localId, { ...props });
+  }
+
+  async syncWithServer({ id }: ServerRack){
+    return this.db.transaction(
+      "rw",
+      [this.db.racks, this.db.hardwares],
+      () => {
+        if (this.flag === 'd') {
+          this.db.racks.where({ localId: this.localId }).delete();
+        } else {
+          this.db.racks.where({ id: this.id }).modify({ id: id, flag: null });
+          this.db.hardwares.where({ rackId: this.id }).modify({ rackId: id });
+        }
+      }
+    );
   }
 
   serialize() {
