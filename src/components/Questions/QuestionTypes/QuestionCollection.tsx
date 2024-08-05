@@ -16,32 +16,27 @@ import {
   TableTfoot,
   Stack,
 } from "@mantine/core";
-import { CollectionQuestion } from "@/lib/types/question";
 import { useState } from "react";
 import { IconLayoutGridAdd, IconTrash, IconX } from "@tabler/icons-react";
 import { WithQuestionCallback } from "../SurveyItem";
 import { useLiveQuery } from "dexie-react-hooks";
-import {
-  createResponseByQuestion,
-  deleteResponseGroup,
-  getCollectionQuestions,
-  getCollectionResponses,
-} from "@/lib/dexie/helper";
-import { DexieQuestion, DexieResponse } from "@/lib/types/dexie";
-import { getDisplayValues, uniqueId } from "@/lib/utils/functions";
+import { deleteResponseGroup } from "@/lib/dexie/helper";
+import { uniqueId } from "@/lib/utils/functions";
 import QuestionByTypeComponent from "../QuestionByTypeComponent";
-import Response from "@/lib/dexie/Response";
-import Comment from "@/lib/dexie/Comment";
-import ResponseGroup from "@/lib/dexie/ResponseGroup";
-// import { v4 as uuidv4 } from "uuid";
+import {
+  Question,
+  Response,
+  Comment,
+  ResponseGroup,
+} from "../../../../internal";
 
 export type QuestionCollectionProps = {
-  question: CollectionQuestion;
+  question: Question;
 } & WithQuestionCallback;
 
 type NewResponseGroupProps = {
-  questions: DexieQuestion[];
-  responses: DexieResponse[];
+  questions: Question[];
+  responses: Response[];
   onAnswered: (r: (Response | undefined)[]) => void;
   onSave: () => void;
   onCancel: () => void;
@@ -54,8 +49,10 @@ function NewResponseGroup({
   onSave,
   onCancel,
 }: NewResponseGroupProps) {
-  const onAnsweredQuestionInEntry = (value?: Response | (Response | undefined)[]) => {
-    if(value) {
+  const onAnsweredQuestionInEntry = (
+    value?: Response | (Response | undefined)[],
+  ) => {
+    if (value) {
       onAnswered(value instanceof Array ? value : [value]);
     }
   };
@@ -75,8 +72,12 @@ function NewResponseGroup({
         <Stack gap="lg">
           {questions.map((q, i) => {
             const { projectId, id: questionId, responseType } = q;
-            const filteredResponses = responses.filter((r) => r.questionId === q.id);
-            const response = filteredResponses.length ? filteredResponses : [Response.create({ questionId, projectId, responseType })];
+            const filteredResponses = responses.filter(
+              (r) => r.questionId === q.id,
+            );
+            const response = filteredResponses.length
+              ? filteredResponses
+              : [Response.create({ questionId, projectId, responseType })];
             return (
               <Stack gap="xs" key={i}>
                 <Text fw={500}>{q.question}</Text>
@@ -98,13 +99,13 @@ function NewResponseGroup({
 }
 
 type EntriesProps = Omit<QuestionCollectionProps, "question" | "onAnswered"> & {
-  questions: DexieQuestion[];
-  responseGroups?: Record<number, DexieResponse[]>;
+  questions: Question[];
+  responseGroups?: Record<number, Response[]>;
   onDelete?: (responseGroupId: number) => void;
 };
 
-export const createCollectionResponses = (questions?: DexieQuestion[]) => {
-  return questions?.flatMap(createResponseByQuestion);
+export const createCollectionResponses = (questions?: Question[]) => {
+  return questions?.flatMap(Response.fromQuestion);
 };
 
 export function Entries({ questions, responseGroups, onDelete }: EntriesProps) {
@@ -119,7 +120,9 @@ export function Entries({ questions, responseGroups, onDelete }: EntriesProps) {
           (r) => r.questionId === q.id,
         );
         return (
-          <TableTd key={j}>{getDisplayValues(responsesToQuestion)}</TableTd>
+          <TableTd key={j}>
+            {Response.getDisplayValues(responsesToQuestion)}
+          </TableTd>
         );
       })}
       {onDelete && (
@@ -159,18 +162,18 @@ export default function QuestionCollection({
   onAnswered,
 }: QuestionCollectionProps) {
   const questions = useLiveQuery(
-    () => getCollectionQuestions(question.projectId, question.collectionId),
+    () => question.getCollectionQuestions(),
     [question],
   );
 
   const responseGroups = useLiveQuery(
-    () => getCollectionResponses(questions),
+    () => Response.getCollectionResponses(questions),
     [questions],
   );
   const [addNew, setAddNew] = useState(
     responseGroups && !Object.keys(responseGroups).length ? true : false,
   );
-  const [newResponseGroup, setNewResponseGroup] = useState<DexieResponse[]>([]);
+  const [newResponseGroup, setNewResponseGroup] = useState<Response[]>([]);
   const onAddNewClick = () => {
     setNewResponseGroup([]);
     setAddNew(true);
@@ -183,9 +186,15 @@ export default function QuestionCollection({
   const handleSaveNewResponseGroup = async () => {
     if (responseGroups && newResponseGroup && questions) {
       const tempResponseGroupId = uniqueId();
-      const comments = await Promise.all(questions.map((q) =>
-        Comment.add({ questionId: q.id, projectId: q.projectId, responseGroupId: tempResponseGroupId})
-      ));
+      const comments = await Promise.all(
+        questions.map((q) =>
+          Comment.add({
+            questionId: q.id,
+            projectId: q.projectId,
+            responseGroupId: tempResponseGroupId,
+          }),
+        ),
+      );
       await ResponseGroup.add({
         projectId: question.projectId,
         collectionId: question.collectionId,
@@ -193,8 +202,9 @@ export default function QuestionCollection({
       });
       onAnswered(
         newResponseGroup.map((r) => {
-          const commentId = comments?.find((c) => c?.questionId === r.questionId)
-            ?.id;
+          const commentId = comments?.find(
+            (c) => c?.questionId === r.questionId,
+          )?.id;
           if (commentId) {
             r.questionResponseId = commentId;
           }
@@ -218,7 +228,9 @@ export default function QuestionCollection({
     }
   };
 
-  const handleAnsweredNewResponseGroup = (responses: ( Response | undefined )[]) => {
+  const handleAnsweredNewResponseGroup = (
+    responses: (Response | undefined)[],
+  ) => {
     console.log(responses);
     const newResponses: Response[] = [...newResponseGroup];
     responses.forEach((r) => {

@@ -1,5 +1,5 @@
 import postgres from "postgres";
-import { DexieComment } from "../types/dexie";
+import { Comment } from "../../../internal";
 
 const sql = postgres(process.env.DATABASE_URL, {
   ssl: "require",
@@ -16,12 +16,12 @@ const sql = postgres(process.env.DATABASE_URL, {
       from: [311298],
 
       //Function that transform values before sending them to the db.
-      serialize: ({
+      serialize: ({ id, questionId, comment, responseGroupId }: Comment) => [
         id,
         questionId,
         comment,
         responseGroupId,
-      }: DexieComment) => [id, questionId, comment, responseGroupId],
+      ],
 
       // Function that transforms values coming from the db.
       parse: ([id, questionId, comment, responseGroupId]: [

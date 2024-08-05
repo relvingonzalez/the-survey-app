@@ -13,8 +13,8 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { db } from "@/lib/dexie/db";
-import { getNextUnansweredQuestion } from "@/lib/dexie/helper";
 import { useQuestionsWithCounts } from "@/lib/hooks/useQuestionsWithCounts";
+import { Question } from "../../../internal";
 
 type SiteOverviewProps = {
   siteCode: string;
@@ -32,8 +32,8 @@ export default function SiteOverview({ siteCode }: SiteOverviewProps) {
     questionResponsesCount,
     processResponsesCount,
   } = useQuestionsWithCounts(site);
-  const nextQuestion = getNextUnansweredQuestion(questions, allResponses);
-  const nextProcess = getNextUnansweredQuestion(processes, allResponses);
+  const nextQuestion = Question.getNextUnanswered(questions, allResponses);
+  const nextProcess = Question.getNextUnanswered(processes, allResponses);
 
   if (!site) {
     return null;

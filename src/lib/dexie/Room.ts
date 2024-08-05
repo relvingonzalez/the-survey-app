@@ -1,12 +1,18 @@
 import { Entity } from "dexie";
-import { ActionFlag } from "../types/dexie";
-import { shouldIncludeId, uniqueId } from "../utils/functions";
-import { db } from "./db";
 import DexieObject from "./DexieObject";
-import { TheSurveyAppDB } from "./TheSurveyAppDB";
 import { ServerRoom } from "../types/server";
+import { saveRoom } from "../api/actions";
+import {
+  ActionFlag,
+  db,
+  getDeletedItemsByTable,
+  getUpdatedItemsByTable,
+  shouldIncludeId,
+  type TheSurveyAppDB,
+  uniqueId,
+} from "../../../internal";
 
-export default class Room extends Entity<TheSurveyAppDB> implements DexieObject<Room>{
+export class Room extends Entity<TheSurveyAppDB> implements DexieObject<Room> {
   localId!: number;
   tempId!: number;
   flag!: ActionFlag;
@@ -15,7 +21,7 @@ export default class Room extends Entity<TheSurveyAppDB> implements DexieObject<
   name!: string;
   comment!: string;
 
-  static create({...props}: Partial<Room>) {
+  static create({ ...props }: Partial<Room>) {
     const room = Object.create(Room.prototype);
     Object.assign(room, props);
     room.id = room.id || uniqueId();
@@ -23,73 +29,96 @@ export default class Room extends Entity<TheSurveyAppDB> implements DexieObject<
     return room;
   }
 
-
-  static async add({...props}: Partial<Room>) {
+  static async add({ ...props }: Partial<Room>) {
     const room = Room.create(props);
     const addedId = await db.rooms.add(room);
     return db.rooms.get(addedId);
-  };
+  }
 
   static async bulkAdd(rooms: Partial<Room>[]) {
-    return rooms.map(this.add);
+    return rooms.map(Room.add);
+  }
+
+  static async getById(projectId: number, id?: number) {
+    return id ? await db.rooms.get({ id }) : Room.add({ projectId });
+  }
+
+  static async getAllUpdated() {
+    return getUpdatedItemsByTable(db.rooms);
+  }
+
+  static async getAllDeleted() {
+    return getDeletedItemsByTable(db.rooms);
+  }
+
+  static async sync() {
+    const rooms = await Room.getAllUpdated();
+    if (rooms.length) {
+      await Promise.all(
+        rooms.map(async (r) => {
+          const savedRoom = await saveRoom(r.serialize());
+          return r.syncFromServer(savedRoom);
+        }),
+      );
+    }
   }
 
   async save() {
     this.flag = ["i", null].includes(this.flag) ? "i" : "u";
-    return await db.rooms.put(this);
+    return await this.db.rooms.put(this);
   }
 
   async delete() {
-    return db.transaction("rw", db.rooms, () => {
+    return this.db.transaction("rw", this.db.rooms, () => {
       if (this.flag === "i") {
-        db.rooms.where({ id: this.id }).delete();
+        this.db.rooms.where({ id: this.id }).delete();
       } else {
-        db.rooms.where({ id: this.id }).modify({ flag: "d" });
+        this.db.rooms.where({ id: this.id }).modify({ flag: "d" });
       }
 
       this.clearRoomTools();
     });
   }
 
-  async update({...props}: Partial<Room>) {
+  async update({ ...props }: Partial<Room>) {
     return this.db.rooms.update(this.localId, { ...props });
   }
 
   async clearRoomTools() {
-    return db.transaction(
+    return this.db.transaction(
       "rw",
-      [db.rooms, db.racks, db.hardwares],
+      [this.db.rooms, this.db.racks, this.db.hardwares],
       async () => {
-        const racks = await db.racks.where({ roomId: this.id }).toArray();
-        db.hardwares
+        const racks = await this.db.racks.where({ roomId: this.id }).toArray();
+        this.db.hardwares
           .where("rackId")
           .anyOf(racks.map((r) => r.id))
           .each(function (value) {
             value.delete();
           });
-        db.racks.where({ roomId: this.id }).each(function (value) {
+        this.db.racks.where({ roomId: this.id }).each(function (value) {
           value.delete();
         });
-        db.moreInfos.where({ roomId: this.id }).each(function (value) {
+        this.db.moreInfos.where({ roomId: this.id }).each(function (value) {
           value.delete();
         });
       },
     );
   }
 
-  async syncWithServer({ id }: ServerRoom){
+  async syncFromServer({ id }: ServerRoom) {
     return this.db.transaction(
       "rw",
       [this.db.rooms, this.db.racks, this.db.moreInfos],
       () => {
-        if (this.flag === 'd') {
+        if (this.flag === "d") {
           this.db.rooms.where({ localId: this.localId }).delete();
         } else {
           db.rooms.where({ id: this.id }).modify({ id, flag: null });
           db.racks.where({ roomId: this.id }).modify({ roomId: id });
           db.moreInfos.where({ roomId: this.id }).modify({ roomId: id });
         }
-      }
+      },
     );
   }
 

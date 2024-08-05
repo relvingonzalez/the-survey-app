@@ -10,10 +10,7 @@ import { useRouter } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/dexie/db";
 import { SiteCode } from "@/lib/types/sites";
-import { getRoomById } from "@/lib/dexie/helper";
-import { DexieRoom } from "@/lib/types/dexie";
-import Room from "@/lib/dexie/Room";
-
+import { Room } from "../../../internal";
 export type RoomPageProps = {
   id?: number;
   siteCode: SiteCode;
@@ -22,12 +19,12 @@ export type RoomPageProps = {
 export default function RoomPage({ id, siteCode }: RoomPageProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode }));
   const projectId = site ? site.projectId : 0;
-  const room = useLiveQuery(() => getRoomById(projectId, id), [projectId, id]);
+  const room = useLiveQuery(() => Room.getById(projectId, id), [projectId, id]);
   const [files, handlers] = useListState<File>([]);
   const [roomPlan, setRoomPlan] = useState<File>();
   const router = useRouter();
 
-  const handleSave = (room: DexieRoom) => {
+  const handleSave = (room: Room) => {
     room.save();
     router.push("./");
   };

@@ -1,32 +1,24 @@
 "use client";
 
 import { ModalProps } from "@mantine/core";
-import { useEffect, useState } from "react";
-import {
-  getGroupedUpdatedAndSerializedResponses,
-  getUpdatedComments,
-  getUpdatedHardwares,
-  getUpdatedMoreInfos,
-  getUpdatedRacks,
-  getUpdatedRooms,
-  getUpdatedResponseGroups,
-  updateCommentIds,
-} from "@/lib/dexie/helper";
-import {
-  saveComments,
-  saveResponseGroup,
-  saveResponses,
-  saveRoom,
-  saveRack,
-  saveHardware,
-  saveMoreInfo,
-} from "@/lib/api/actions";
-import DownloadModal from "./DownloadModal";
 import {
   IconListCheck,
   IconDatabase,
   IconDeviceSdCard,
 } from "@tabler/icons-react";
+import { useState, useEffect } from "react";
+import DownloadModal from "./DownloadModal";
+import {
+  Comment,
+  Hardware,
+  MoreInfo,
+  Rack,
+  Response,
+  ResponseGroup,
+  Room,
+} from "../../internal";
+
+type StatusHandler = (step: number, progress: number, message: string) => void;
 
 const initialText =
   "You are syncing your local data to the server - that might override anything that was done before.";
@@ -37,7 +29,48 @@ const steps = [
   { icon: IconDeviceSdCard, label: "Step 3", description: "Finishing" },
 ];
 
-export default function SyncModal({ opened, ...props }: ModalProps) {
+const sync = async (handleStatusUpdate: StatusHandler) => {
+  const progressValue = 0;
+  handleStatusUpdate(1, 1, "Syncing...");
+
+  handleStatusUpdate(
+    2,
+    progressValue + 5,
+    "Syncing Collection Response Groups...",
+  );
+  await ResponseGroup.sync();
+  handleStatusUpdate(
+    2,
+    progressValue + 10,
+    "Syncing Response Groups Complete!",
+  );
+
+  handleStatusUpdate(1, progressValue + 5, "Syncing Comments...");
+  await Comment.sync();
+  handleStatusUpdate(2, progressValue + 10, "Syncing Comments Complete!");
+
+  handleStatusUpdate(1, progressValue + 5, "Syncing Responses...");
+  await Response.sync();
+  handleStatusUpdate(2, progressValue + 10, "Syncing Responses Complete!");
+
+  handleStatusUpdate(1, progressValue + 5, "Syncing Rooms...");
+  await Room.sync();
+  handleStatusUpdate(2, progressValue + 10, "Syncing Rooms Complete!");
+
+  handleStatusUpdate(1, progressValue + 5, "Syncing Racks...");
+  await Rack.sync();
+  handleStatusUpdate(2, progressValue + 10, "Syncing Racks Complete!");
+
+  handleStatusUpdate(1, progressValue + 5, "Syncing Hardwares...");
+  await Hardware.sync();
+  handleStatusUpdate(2, progressValue + 10, "Syncing Hardwares Complete!");
+
+  handleStatusUpdate(1, progressValue + 5, "Syncing MoreInfos...");
+  await MoreInfo.sync();
+  handleStatusUpdate(2, progressValue + 10, "Syncing MoreInfos Complete!");
+};
+
+export function SyncModal({ opened, ...props }: ModalProps) {
   // get all edited or new comments
   // Try server action
   const [statusText, setStatusText] = useState(initialText);
@@ -48,107 +81,9 @@ export default function SyncModal({ opened, ...props }: ModalProps) {
     setStatusText(text);
     setProgressValue(progress <= 100 ? progress : 100);
   };
-  const sync = async () => {
-    // sync response groups for collection questions
-    const responseGroups = await getUpdatedResponseGroups();
-    if (responseGroups.length) {
-      handleStatusUpdate(
-        2,
-        progressValue + 5,
-        "Syncing Collection Response Groups...",
-      );
 
-      await Promise.all(
-        responseGroups.map(async (r) => {
-          const [savedResponseGroup] = await saveResponseGroup(r.serialize());
-          return r.syncWithServer(savedResponseGroup);
-        }),
-      );
-
-      handleStatusUpdate(
-        2,
-        progressValue + 10,
-        "Syncing Response Groups Complete!",
-      );
-    }
-
-    // sync main responses with comments
-    const comments = await getUpdatedComments();
-    if (comments.length) {
-      handleStatusUpdate(1, progressValue + 5, "Syncing Comments...");
-      const [commentsResult] = await saveComments(
-        comments.map((c) => c.serialize()),
-      );
-      await updateCommentIds(commentsResult);
-      handleStatusUpdate(2, progressValue + 10, "Syncing Comments Complete!");
-    }
-
-    // sync responses types
-    const responsesGroupedByType =
-      await getGroupedUpdatedAndSerializedResponses();
-    const savedResponses = await saveResponses(responsesGroupedByType);
-    console.log(savedResponses);
-    // await updateResponseIds(savedResponses);
-    handleStatusUpdate(2, progressValue + 10, "Syncing Responses Complete!");
-
-    // // sync rooms
-    const rooms = await getUpdatedRooms();
-    if (rooms.length) {
-      handleStatusUpdate(1, progressValue + 5, "Syncing Rooms...");
-      await Promise.all(
-        rooms.map(async (r) => {
-          const savedRoom = await saveRoom(r.serialize());
-          return r.syncWithServer(savedRoom);
-        }),
-      );
-
-      handleStatusUpdate(2, progressValue + 10, "Syncing Rooms Complete!");
-    }
-
-    // sync racks
-    const racks = await getUpdatedRacks();
-    if (racks.length) {
-      handleStatusUpdate(1, progressValue + 5, "Syncing Racks...");
-      await Promise.all(
-        racks.map(async (r) => {
-          const savedRack = await saveRack(r.serialize());
-          return r.syncWithServer(savedRack);
-        }),
-      );
-
-      handleStatusUpdate(2, progressValue + 10, "Syncing Rooms Complete!");
-    }
-    // sync hardware
-    const hardwares = await getUpdatedHardwares();
-    if (hardwares.length) {
-      handleStatusUpdate(1, progressValue + 5, "Syncing Hardware...");
-      await Promise.all(
-        hardwares.map(async (h) => {
-          const savedHardware = await saveHardware(h.serialize());
-          return h.syncWithServer(savedHardware);
-        }),
-      );
-      handleStatusUpdate(2, progressValue + 10, "Syncing Hardwares Complete!");
-    }
-
-    // sync moreInfo
-    const moreInfos = await getUpdatedMoreInfos();
-    if (moreInfos.length) {
-      handleStatusUpdate(1, progressValue + 5, "Syncing More Infos...");
-      await Promise.all(
-        moreInfos.map(async (m) => {
-          const savedMoreInfo = await saveMoreInfo(m.serialize());
-          return m.syncWithServer(savedMoreInfo);
-        }),
-      );
-      handleStatusUpdate(2, progressValue + 10, "Syncing Hardwares Complete!");
-    }
-
-    handleStatusUpdate(3, 100, "Syncing Complete!");
-  };
   const handleOnContinue = () => {
-    handleStatusUpdate(1, 1, "Syncing...");
-    sync();
+    sync(handleStatusUpdate);
   };
   useEffect(() => {
     if (opened) {

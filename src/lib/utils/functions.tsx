@@ -1,7 +1,6 @@
 import { RefObject } from "react";
 import * as changeKeys from "change-case/keys";
-import { ActionFlag, DexieResponse } from "../types/dexie";
-import { dayOptionsById } from "@/components/Questions/QuestionTypes/QuestionDays";
+import { ActionFlag } from "../../../internal";
 
 export const getMousePosition = (
   ref: RefObject<HTMLElement>,
@@ -72,58 +71,6 @@ export function transformEntriesToServer<T extends object, K>(data: T[]) {
 
 export const isString = (value: unknown) =>
   typeof value === "string" || value instanceof String;
-
-export const getDisplayValue = (response?: DexieResponse) => {
-  if (!response) {
-    return "";
-  }
-
-  switch (response.responseType) {
-    case "checkbox":
-      return response.checked ? response.label : "";
-    case "datetime":
-      return response.date?.toDateString();
-    case "days":
-      return dayOptionsById[response.dayId];
-    case "email":
-      return response.email;
-    case "geo":
-      return `${response.lat}, ${response.long}`;
-    case "list":
-      return response.text;
-    case "multiple":
-      return response.text;
-    case "number":
-      return response.number;
-    case "person":
-      return `${response.firstName} ${response.lastName}`;
-    case "phone":
-      return response.phone;
-    case "text":
-      return response.text;
-    case "time":
-      return `From: ${response.fromTime}, To: ${response.toTime}`;
-    case "yes/no":
-      return response.yesNo === null
-        ? "Unknown"
-        : response.yesNo
-          ? "Yes"
-          : "No";
-  }
-};
-
-export const getDisplayValues = (
-  responses?: DexieResponse | DexieResponse[],
-) => {
-  if (responses instanceof Array) {
-    return responses
-      .map(getDisplayValue)
-      .filter((v) => v)
-      .join(", ");
-  } else {
-    return getDisplayValue(responses);
-  }
-};
 
 export const shouldIncludeId = (id?: number, flag?: ActionFlag) =>
   id && flag !== "i" && { id };

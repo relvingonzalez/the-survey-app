@@ -225,7 +225,7 @@ export type TextQuestionWithResponse = TextQuestion & TextResponse;
 export type QuestionWithResponse = TextQuestionWithResponse;
 
 // Response types
-type ListOptions = string[];
+export type ListOptions = string[];
 
 export type ResponseType =
   | "checkbox"

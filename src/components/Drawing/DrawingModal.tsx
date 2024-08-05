@@ -15,15 +15,8 @@ import MoreInfoModal, {
 } from "./CustomTools/MoreInfo/MoreInfoModal";
 import { IconInfoCircleFilled, IconServer2 } from "@tabler/icons-react";
 import RackModal, { RackFormValues } from "./CustomTools/Rack/RackModal";
-import { DexieRack, DexieMoreInfo, DexieHardware } from "@/lib/types/dexie";
-import {
-  getHardwareListByRackId,
-  updateHardwareList,
-} from "@/lib/dexie/helper";
 import { createFormActions } from "@mantine/form";
-import Room from "@/lib/dexie/Room";
-import MoreInfo from "@/lib/dexie/MoreInfo";
-import Rack from "@/lib/dexie/Rack";
+import { Hardware, MoreInfo, Rack, Room } from "../../../internal";
 
 const rackFormActions = createFormActions<RackFormValues>("rack-form");
 const moreInfoFormActions =
@@ -32,11 +25,11 @@ const moreInfoFormActions =
 export type CustomTools =
   | {
       isRoom: true;
-      racks?: DexieRack[];
-      moreInfos?: DexieMoreInfo[];
+      racks?: Rack[];
+      moreInfos?: MoreInfo[];
       room: Room;
-      onSaveRack: (rack: DexieRack) => void;
-      onSaveMoreInfo: (moreInfo: DexieMoreInfo) => void;
+      onSaveRack: (rack: Rack) => void;
+      onSaveMoreInfo: (moreInfo: MoreInfo) => void;
       onClear: () => void;
     }
   | {
@@ -97,7 +90,7 @@ export default function DrawingModal({
         startY: number,
         x: number,
         y: number,
-      ) => MoreInfo.add({ roomId: room?.id, x: x - 12, y: y - 12}),
+      ) => MoreInfo.add({ roomId: room?.id, x: x - 12, y: y - 12 }),
     },
     {
       label: "Rack",
@@ -110,7 +103,7 @@ export default function DrawingModal({
         startY: number,
         x: number,
         y: number,
-      ) => Rack.add({ roomId: room?.id, x: x - 12, y: y - 12}),
+      ) => Rack.add({ roomId: room?.id, x: x - 12, y: y - 12 }),
     },
   ];
   const tools = isRoom
@@ -119,30 +112,30 @@ export default function DrawingModal({
       ? defaultTools.filter((v) => v.value === "freeHand")
       : defaultTools;
 
-  const handleMoreInfoOpen = (moreInfo: DexieMoreInfo) => {
+  const handleMoreInfoOpen = (moreInfo: MoreInfo) => {
     moreInfoFormActions.setFieldValue("moreInfo", moreInfo);
     moreInfoOpen();
   };
-  const handleRackOpen = async (rack: DexieRack) => {
+  const handleRackOpen = async (rack: Rack) => {
     rackFormActions.setFieldValue("rack", rack);
     rackFormActions.setFieldValue(
       "hardwareList",
-      await getHardwareListByRackId(rack.id),
+      await Hardware.getByRack(rack),
     );
     rackOpen();
   };
-  const handleSaveMoreInfo = (moreInfo: DexieMoreInfo) => {
+  const handleSaveMoreInfo = (moreInfo: MoreInfo) => {
     moreInfoClose();
     moreInfo.flag = moreInfo.flag === "i" ? "i" : "u";
     onSaveMoreInfo?.(moreInfo);
   };
-  const handleSaveRack = (rack: DexieRack) => {
+  const handleSaveRack = (rack: Rack) => {
     rackClose();
     rack.flag = rack.flag === "i" ? "i" : "u";
     onSaveRack?.(rack);
   };
-  const handleSaveHardware = (hardwareList: DexieHardware[]) => {
-    updateHardwareList(hardwareList);
+  const handleSaveHardware = (hardwareList: Hardware[]) => {
+    Hardware.updateHardwareList(hardwareList);
   };
 
   return (

@@ -1,14 +1,7 @@
 "use client";
 
 import { db } from "@/lib/dexie/db";
-import {
-  getCollectionQuestions,
-  getCollectionResponses,
-  getMainQuestions,
-} from "@/lib/dexie/helper";
-import { DexieQuestion, DexieResponse } from "@/lib/types/dexie";
 import { SiteCode } from "@/lib/types/sites";
-import { getDisplayValues } from "@/lib/utils/functions";
 import {
   Button,
   Table,
@@ -24,11 +17,12 @@ import { IconSettings } from "@tabler/icons-react";
 import { useLiveQuery } from "dexie-react-hooks";
 import Link from "next/link";
 import { Entries } from "./QuestionTypes/QuestionCollection";
+import { Question, Response } from "../../../internal";
 
 type ItemListProps = {
   isQuestion?: boolean;
-  items: DexieQuestion[];
-  responses: DexieResponse[];
+  items: Question[];
+  responses: Response[];
 };
 
 function ItemList({ items, isQuestion, responses }: ItemListProps) {
@@ -47,7 +41,7 @@ function ItemList({ items, isQuestion, responses }: ItemListProps) {
             <DisplayCollectionValues question={item} />
           ) : (
             <Text size="sm" fw="700">
-              {getDisplayValues(response)}
+              {Response.getDisplayValues(response)}
             </Text>
           )}
         </TableTd>
@@ -83,17 +77,17 @@ function ItemList({ items, isQuestion, responses }: ItemListProps) {
 }
 
 type DisplayCollectionValuesProps = {
-  question: DexieQuestion;
+  question: Question;
 };
 
 function DisplayCollectionValues({ question }: DisplayCollectionValuesProps) {
   const questions = useLiveQuery(
-    () => getCollectionQuestions(question.projectId, question.collectionId),
+    () => question.getCollectionQuestions(),
     [question],
   );
 
   const responseGroups = useLiveQuery(
-    () => getCollectionResponses(questions),
+    () => Response.getCollectionResponses(questions),
     [questions],
   );
 
@@ -112,11 +106,11 @@ export function QuestionList({ siteCode }: QuestionListProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
   const projectId = site ? site.projectId : 0;
   const questions = useLiveQuery(
-    () => getMainQuestions(projectId, "question"),
+    () => Question.getMainQuestions(projectId, "question"),
     [projectId],
   );
   const questionResponses = useLiveQuery(
-    () => db.responses.where({ projectId: projectId }).toArray(),
+    () => Response.getAllByProject(projectId),
     [projectId],
   );
 
@@ -133,11 +127,11 @@ export function ProcessList({ siteCode }: QuestionListProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode: siteCode }));
   const projectId = site ? site.projectId : 0;
   const processes = useLiveQuery(
-    () => getMainQuestions(projectId, "process"),
+    () => Question.getMainQuestions(projectId, "process"),
     [projectId],
   );
   const processResponses = useLiveQuery(
-    () => db.responses.where({ projectId: projectId }).toArray(),
+    () => Response.getAllByProject(projectId),
     [projectId],
   );
 

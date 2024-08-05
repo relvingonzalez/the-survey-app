@@ -9,11 +9,10 @@ import {
 } from "@mantine/core";
 import { MouseEventHandler, useEffect, useState } from "react";
 import { WithQuestionCallback } from "../SurveyItem";
-import { GeoQuestion } from "@/lib/types/question";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionGeoProps = {
-  question: GeoQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback &
   TextInputProps;

@@ -1,11 +1,10 @@
 import { NumberInput, NumberInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import { NumberQuestion } from "@/lib/types/question";
 import { useEffect, useState } from "react";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionNumberProps = {
-  question: NumberQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback &
   NumberInputProps;

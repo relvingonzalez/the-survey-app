@@ -8,16 +8,16 @@ import { useListState } from "@mantine/hooks";
 import { SiteCode } from "@/lib/types/sites";
 import { db } from "@/lib/dexie/db";
 import { useLiveQuery } from "dexie-react-hooks";
-import { DexieQuestion } from "@/lib/types/dexie";
 import { QuestionType } from "@/lib/types/question";
-import { getComment, getResponse } from "@/lib/dexie/helper";
-import Response from "@/lib/dexie/Response";
+import { Comment, Question, Response } from "../../../internal";
 
 export type BaseQuestionProps = {
-  item: DexieQuestion;
+  item: Question;
 };
 
-type OnAnsweredCallback = (response?: Response | (Response | undefined)[]) => void;
+type OnAnsweredCallback = (
+  response?: Response | (Response | undefined)[],
+) => void;
 
 export type WithQuestionCallback = {
   onAnswered: OnAnsweredCallback;
@@ -29,7 +29,11 @@ export type QuestionProps = {
   order: number;
 };
 
-export default function Question({ siteCode, order, type }: QuestionProps) {
+export default function QuestionComponent({
+  siteCode,
+  order,
+  type,
+}: QuestionProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode }));
   const projectId = site ? site.projectId : 0;
   const question = useLiveQuery(
@@ -37,12 +41,12 @@ export default function Question({ siteCode, order, type }: QuestionProps) {
     [projectId, order, type],
   );
   const response = useLiveQuery(
-     () => getResponse(projectId, question),
-    [projectId, question],
+    () => question && Response.getFromQuestion(question),
+    [question],
   );
   const comment = useLiveQuery(
-    () => getComment(projectId, question),
-    [projectId, question],
+    () => question && Comment.getFromQuestion(question),
+    [question],
   );
   const [files, handlers] = useListState<File>([]);
   const handleCommentChange: ChangeEventHandler<HTMLTextAreaElement> &
@@ -57,9 +61,14 @@ export default function Question({ siteCode, order, type }: QuestionProps) {
     }
     const responses = value instanceof Array ? value : [value];
     responses.forEach((r) => {
-      if(r) {
-        r.questionResponseId = r.questionResponseId || comment?.id;
-        r.flag === "d" ? r.delete() : r.save();
+      // If Response exists, delete or save, if not add if flag not d
+      if (r) {
+        if (r.localId) {
+          r.questionResponseId = r.questionResponseId || comment?.id;
+          r.flag === "d" ? r.delete() : r.save();
+        } else {
+          r.flag !== "d" && Response.add(r);
+        }
       }
     });
   };

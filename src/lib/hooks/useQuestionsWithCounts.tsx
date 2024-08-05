@@ -1,6 +1,6 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../dexie/db";
-import { DexieSiteProject } from "../types/dexie";
+import { DexieSiteProject } from "../../../internal";
 
 export const useQuestionsWithCounts = (site?: DexieSiteProject) => {
   const allQuestions = useLiveQuery(() => {

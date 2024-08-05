@@ -1,18 +1,13 @@
 import { TextInput, TextInputProps } from "@mantine/core";
-import { TextQuestion } from "@/lib/types/question";
 import { WithQuestionCallback } from "../SurveyItem";
 import { useState } from "react";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionTextProps = {
-  question: TextQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback &
   TextInputProps;
-
-export declare function isTextQuestion(
-  param: unknown,
-): asserts param is TextQuestion;
 
 export default function QuestionText({
   response,

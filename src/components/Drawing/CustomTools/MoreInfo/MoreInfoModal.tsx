@@ -3,15 +3,15 @@ import { Button, Group, Modal, ModalProps } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import Files from "@/components/files/Files.";
 import { useListState } from "@mantine/hooks";
-import { DexieMoreInfo } from "@/lib/types/dexie";
+import { MoreInfo } from "../../../../../internal";
 
 export type MoreInfoFormValues = {
-  moreInfo: DexieMoreInfo;
+  moreInfo: MoreInfo;
 };
 
 export type MoreInfoProps = ModalProps & {
   existingFiles: File[];
-  onSave: (moreInfo: DexieMoreInfo, files: File[]) => void;
+  onSave: (moreInfo: MoreInfo, files: File[]) => void;
 };
 export default function MoreInfoModal({
   existingFiles = [],
@@ -32,7 +32,7 @@ export default function MoreInfoModal({
     name: "more-info-form",
     validate: {
       moreInfo: {
-        info: (value) => (value ? null : "Invalid comment"),
+        info: (value: string) => (value ? null : "Invalid comment"),
       },
     },
   });

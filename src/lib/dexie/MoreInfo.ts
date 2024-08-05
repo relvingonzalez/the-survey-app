@@ -1,12 +1,22 @@
 import { Entity } from "dexie";
-import { ActionFlag } from "../types/dexie";
 import { Coordinate } from "../types/question";
-import { shouldIncludeId, uniqueId } from "../utils/functions";
-import { db } from "./db";
 import DexieObject from "./DexieObject";
-import { TheSurveyAppDB } from "./TheSurveyAppDB";
 import { ServerMoreInfo } from "../types/server";
-export default class MoreInfo extends Entity<TheSurveyAppDB> implements DexieObject<MoreInfo> {
+import { saveMoreInfo } from "../api/actions";
+import {
+  ActionFlag,
+  db,
+  getDeletedItemsByTable,
+  getUpdatedItemsByTable,
+  Room,
+  shouldIncludeId,
+  type TheSurveyAppDB,
+  uniqueId,
+} from "../../../internal";
+export class MoreInfo
+  extends Entity<TheSurveyAppDB>
+  implements DexieObject<MoreInfo>
+{
   localId!: number;
   tempId!: number;
   flag!: ActionFlag;
@@ -16,7 +26,7 @@ export default class MoreInfo extends Entity<TheSurveyAppDB> implements DexieObj
   y!: Coordinate;
   info!: string;
 
-  static create({...props}: Partial<MoreInfo>) {
+  static create({ ...props }: Partial<MoreInfo>) {
     const moreInfo = Object.create(MoreInfo.prototype);
     Object.assign(moreInfo, props);
     moreInfo.id = moreInfo.id ?? uniqueId();
@@ -25,17 +35,43 @@ export default class MoreInfo extends Entity<TheSurveyAppDB> implements DexieObj
     return moreInfo;
   }
 
-
-  static async add({...props}: Partial<MoreInfo>) {
+  static async add({ ...props }: Partial<MoreInfo>) {
     const moreInfo = MoreInfo.create(props);
     const addedId = await db.moreInfos.add(moreInfo);
     return db.moreInfos.get(addedId);
-  };
+  }
 
   static async bulkAdd(moreInfos: Partial<MoreInfo>[]) {
-    return moreInfos.map(this.add);
+    return moreInfos.map(MoreInfo.add);
   }
-  
+
+  static async getByRoom({ id: roomId }: Room) {
+    return await db.moreInfos
+      .where({ roomId })
+      .and((mI) => mI.flag !== "d")
+      .toArray();
+  }
+
+  static async getAllUpdated() {
+    return getUpdatedItemsByTable(db.moreInfos);
+  }
+
+  static async getAllDeleted() {
+    return getDeletedItemsByTable(db.moreInfos);
+  }
+
+  static async sync() {
+    const moreInfos = await MoreInfo.getAllUpdated();
+    if (moreInfos.length) {
+      await Promise.all(
+        moreInfos.map(async (m) => {
+          const savedMoreInfo = await saveMoreInfo(m.serialize());
+          return m.syncFromServer(savedMoreInfo);
+        }),
+      );
+    }
+  }
+
   async save() {
     this.flag = ["i", null].includes(this.flag) ? "i" : "u";
     return await db.moreInfos.put(this);
@@ -51,22 +87,18 @@ export default class MoreInfo extends Entity<TheSurveyAppDB> implements DexieObj
     });
   }
 
-  async update({...props}: Partial<MoreInfo>) {
+  async update({ ...props }: Partial<MoreInfo>) {
     return this.db.moreInfos.update(this.localId, { ...props });
   }
 
-  async syncWithServer({ id }: ServerMoreInfo){
-    return this.db.transaction(
-      "rw",
-      [this.db.moreInfos],
-      () => {
-        if (this.flag === 'd') {
-          this.db.moreInfos.where({ localId: this.localId }).delete();
-        } else {
-          this.db.moreInfos.where({ id: this.id }).modify({ id, flag: null });
-        }
+  async syncFromServer({ id }: ServerMoreInfo) {
+    return this.db.transaction("rw", [this.db.moreInfos], () => {
+      if (this.flag === "d") {
+        this.db.moreInfos.where({ localId: this.localId }).delete();
+      } else {
+        this.db.moreInfos.where({ id: this.id }).modify({ id, flag: null });
       }
-    );
+    });
   }
 
   serialize() {

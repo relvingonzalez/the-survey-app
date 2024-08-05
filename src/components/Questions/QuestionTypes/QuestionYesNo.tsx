@@ -1,11 +1,10 @@
 import { Radio, RadioProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import { YesNoQuestion } from "@/lib/types/question";
-import Response from "@/lib/dexie/Response";
 import { ChangeEvent } from "react";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionYesNoProps = {
-  question: YesNoQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback &
   RadioProps;

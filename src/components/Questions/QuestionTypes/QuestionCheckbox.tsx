@@ -1,19 +1,24 @@
 import { Checkbox, CheckboxProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import { CheckboxQuestion } from "@/lib/types/question";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionCheckboxProps = {
-  question: CheckboxQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback &
   CheckboxProps;
 
 export const createCheckboxResponse = (
-  { projectId, id: questionId, responseType }: CheckboxQuestion,
+  { projectId, id: questionId, responseType }: Question,
   label: string,
 ) => {
-  return Response.create({ projectId, questionId, responseType, label, checked: false });
+  return Response.create({
+    projectId,
+    questionId,
+    responseType,
+    label,
+    checked: false,
+  });
 };
 
 export default function QuestionCheckbox({
@@ -23,15 +28,16 @@ export default function QuestionCheckbox({
   ...props
 }: QuestionCheckboxProps) {
   const checkedOption = (optionResponse: Response, checked: boolean) => {
-      optionResponse.checked = checked;
-      onAnswered(optionResponse);
+    optionResponse.checked = checked;
+    onAnswered(optionResponse);
   };
-  
+
   return (
     <>
       {question.options.map((option, i) => {
         const optionResponse =
-          response.find((r) => r.label === option) ?? createCheckboxResponse(question, option);
+          response.find((r) => r.label === option) ??
+          createCheckboxResponse(question, option);
         return (
           <Checkbox
             {...props}
@@ -40,7 +46,8 @@ export default function QuestionCheckbox({
             mt="10"
             checked={optionResponse?.checked}
             onChange={(e) => {
-              optionResponse && checkedOption(optionResponse, e.currentTarget.checked);
+              optionResponse &&
+                checkedOption(optionResponse, e.currentTarget.checked);
             }}
           />
         );

@@ -1,11 +1,10 @@
 import { TextInput, TextInputProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import { EmailQuestion } from "@/lib/types/question";
 import { useEffect, useState } from "react";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionEmailProps = {
-  question: EmailQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback &
   TextInputProps;
@@ -18,7 +17,7 @@ export const emailPatternRegex = new RegExp(
 );
 
 export const createEmailResponse = (
-  { projectId, id:questionId, responseType }: EmailQuestion,
+  { projectId, id: questionId, responseType }: Question,
   email: string = "",
 ) => Response.create({ projectId, questionId, responseType, email });
 

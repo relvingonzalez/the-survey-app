@@ -5,11 +5,10 @@ import { TimeInput, TimeInputProps } from "@mantine/dates";
 import { IconClock } from "@tabler/icons-react";
 import { ChangeEvent, useRef } from "react";
 import { WithQuestionCallback } from "../SurveyItem";
-import { TimeQuestion } from "@/lib/types/question";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionTimeProps = {
-  question: TimeQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback &
   TimeInputProps;

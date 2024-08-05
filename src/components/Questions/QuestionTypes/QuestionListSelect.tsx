@@ -1,10 +1,9 @@
 import { Select, SelectProps } from "@mantine/core";
-import { ListQuestion } from "@/lib/types/question";
 import { WithQuestionCallback } from "../SurveyItem";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionListSelectProps = {
-  question: ListQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback &
   SelectProps;

@@ -1,18 +1,17 @@
-import { MultipleQuestion } from "@/lib/types/question";
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionMultipleProps = {
-  question: MultipleQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback &
   MultiSelectProps;
 
 export const createMultipleResponse = (
-  { projectId, id: questionId, responseType }: MultipleQuestion,
+  { projectId, id: questionId, responseType }: Question,
   text = "",
-) => Response.create({ projectId, questionId, responseType, text});
+) => Response.create({ projectId, questionId, responseType, text });
 
 export default function QuestionListSelect({
   question,
@@ -21,12 +20,14 @@ export default function QuestionListSelect({
   ...props
 }: QuestionMultipleProps) {
   const handleOnChange = async (selection: string[]) => {
-    const result = await Promise.all(selection.map((s) => {
-      const res =
-        response.find((r) => r.text === s) ||
-        createMultipleResponse(question, s);
-      return res;
-    }));
+    const result = await Promise.all(
+      selection.map((s) => {
+        const res =
+          response.find((r) => r.text === s) ||
+          createMultipleResponse(question, s);
+        return res;
+      }),
+    );
 
     // Check which ones to remove and add flag
     const selectionsToRemove = question.options.filter(

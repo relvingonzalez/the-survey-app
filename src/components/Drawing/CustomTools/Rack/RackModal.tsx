@@ -23,19 +23,17 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import { DexieHardware, DexieRack } from "@/lib/types/dexie";
-import Hardware from "@/lib/dexie/Hardware";
-import Rack from "@/lib/dexie/Rack";
+import { Hardware, Rack } from "../../../../../internal";
 
 export type RackFormValues = {
-  rack: DexieRack;
-  hardwareList: DexieHardware[];
+  rack: Rack;
+  hardwareList: Hardware[];
 };
 
 export type RackModalProps = ModalProps & {
   existingFiles: File[];
   onSave: (rack: Rack, files: File[]) => void;
-  onSaveHardware: (hardwareList: DexieHardware[]) => void;
+  onSaveHardware: (hardwareList: Hardware[]) => void;
 };
 export default function RackModal({
   existingFiles = [],

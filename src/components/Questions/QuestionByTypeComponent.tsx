@@ -1,4 +1,3 @@
-import { Question } from "@/lib/types/question";
 import QuestionText from "./QuestionTypes/QuestionText";
 import QuestionPhone from "./QuestionTypes/QuestionPhone";
 import QuestionEmail from "./QuestionTypes/QuestionEmail";
@@ -14,7 +13,7 @@ import QuestionPerson from "./QuestionTypes/QuestionPerson";
 import QuestionDays from "./QuestionTypes/QuestionDays";
 import QuestionCollection from "./QuestionTypes/QuestionCollection";
 import { WithQuestionCallback } from "./SurveyItem";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../internal";
 
 export type QuestionTypeProps<T extends Question, K extends Response> = {
   question: T;

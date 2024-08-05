@@ -12,7 +12,7 @@ import {
   Button,
   ActionIcon,
 } from "@mantine/core";
-import { Person, PersonQuestion, Salutation } from "@/lib/types/question";
+import { Person, Salutation } from "@/lib/types/question";
 import { phonePatternRegex } from "./QuestionPhone";
 import { useState } from "react";
 import {
@@ -23,10 +23,10 @@ import {
 } from "@tabler/icons-react";
 import { UseFormReturnType, isEmail, matches, useForm } from "@mantine/form";
 import { WithQuestionCallback } from "../SurveyItem";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionPersonProps = {
-  question: PersonQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback;
 
@@ -42,7 +42,7 @@ export const salutationOptions = salutationLabels.map((_, i) => ({
 }));
 
 export const createPersonResponse = (
-  { projectId, id: questionId, responseType }: PersonQuestion,
+  { projectId, id: questionId, responseType }: Question,
   {
     salutationId = -1,
     firstName = "",
@@ -50,7 +50,17 @@ export const createPersonResponse = (
     email = "",
     phone = "",
   }: Person,
-) => Response.create({ projectId, questionId, responseType, salutationId, firstName, lastName, email, phone });
+) =>
+  Response.create({
+    projectId,
+    questionId,
+    responseType,
+    salutationId,
+    firstName,
+    lastName,
+    email,
+    phone,
+  });
 
 function NewPerson({
   form,

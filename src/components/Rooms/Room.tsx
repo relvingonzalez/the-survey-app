@@ -8,8 +8,7 @@ import ClickableDrawing, {
   ClickableDrawingProps,
 } from "../Drawing/ClickableDrawing";
 import { useLiveQuery } from "dexie-react-hooks";
-import { getMoreInfosByRoomId, getRacksByRoomId } from "@/lib/dexie/helper";
-import Room from "@/lib/dexie/Room";
+import { MoreInfo, Rack, Room } from "../../../internal";
 
 export type RoomProps = FileCallbacks &
   Pick<ClickableDrawingProps, "onSaveDrawing"> & {
@@ -29,8 +28,8 @@ export default function RoomComponent({
   ...filesProps
 }: RoomProps) {
   // Get moreInfos and Racks from room
-  const moreInfos = useLiveQuery(() => getMoreInfosByRoomId(room.id));
-  const racks = useLiveQuery(() => getRacksByRoomId(room.id));
+  const moreInfos = useLiveQuery(() => MoreInfo.getByRoom(room));
+  const racks = useLiveQuery(() => Rack.getByRoom(room));
   const form = useForm({
     initialValues: {
       name: room?.name || "",

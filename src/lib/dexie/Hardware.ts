@@ -1,12 +1,22 @@
 import { Entity } from "dexie";
-import { ActionFlag } from "../types/dexie";
-import { shouldIncludeId, uniqueId } from "../utils/functions";
 import DexieObject from "./DexieObject";
-import { TheSurveyAppDB } from "./TheSurveyAppDB";
-import { db } from "./db";
 import { ServerHardware } from "../types/server";
+import { saveHardware } from "../api/actions";
+import {
+  ActionFlag,
+  db,
+  getDeletedItemsByTable,
+  getUpdatedItemsByTable,
+  Rack,
+  shouldIncludeId,
+  type TheSurveyAppDB,
+  uniqueId,
+} from "../../../internal";
 
-export default class Hardware extends Entity<TheSurveyAppDB> implements DexieObject<Hardware>{
+export class Hardware
+  extends Entity<TheSurveyAppDB>
+  implements DexieObject<Hardware>
+{
   localId!: number;
   tempId!: number;
   flag!: ActionFlag;
@@ -18,7 +28,7 @@ export default class Hardware extends Entity<TheSurveyAppDB> implements DexieObj
   details!: string;
 
   // Create type object without inserting
-  static create({...props}: Partial<Hardware>) {
+  static create({ ...props }: Partial<Hardware>) {
     const hardware = Object.create(Hardware.prototype);
     Object.assign(hardware, props);
     hardware.id = hardware.id ?? uniqueId();
@@ -26,14 +36,59 @@ export default class Hardware extends Entity<TheSurveyAppDB> implements DexieObj
     return hardware;
   }
 
-  static async add({...props}: Partial<Hardware>) {
+  static async add({ ...props }: Partial<Hardware>) {
     const hardware = Hardware.create(props);
     const addedId = await db.hardwares.add(hardware);
     return db.hardwares.get(addedId);
-  };
+  }
 
   static async bulkAdd(hardwares: Partial<Hardware>[]) {
-    return hardwares.map(this.add);
+    return hardwares.map(Hardware.add);
+  }
+
+  static async getByRack({ id: rackId }: Rack) {
+    return await db.hardwares
+      .where({ rackId })
+      .and((h) => h.flag !== "d")
+      .toArray();
+  }
+
+  static async getAllUpdated() {
+    return getUpdatedItemsByTable(db.hardwares);
+  }
+
+  static async getAllDeleted() {
+    return getDeletedItemsByTable(db.hardwares);
+  }
+
+  static updateHardwareList(hardwareList: Hardware[]) {
+    return db.transaction("rw", db.hardwares, async () => {
+      // If new list does not have one that existed, either edit the flag to d if old, or delete it if new
+      db.hardwares
+        .where("id")
+        .noneOf(hardwareList.map((h) => h.id))
+        .and((h) => h.flag === "i")
+        .delete();
+      db.hardwares
+        .where("id")
+        .noneOf(hardwareList.map((h) => h.id))
+        .and((h) => h.flag !== "i")
+        .modify({ flag: "d" });
+      // If new list has one that didn't exist, put
+      db.hardwares.bulkPut(hardwareList);
+    });
+  }
+
+  static async sync() {
+    const hardwares = await Hardware.getAllUpdated();
+    if (hardwares.length) {
+      await Promise.all(
+        hardwares.map(async (h) => {
+          const savedHardware = await saveHardware(h.serialize());
+          return h.syncFromServer(savedHardware);
+        }),
+      );
+    }
   }
 
   async delete() {
@@ -51,22 +106,18 @@ export default class Hardware extends Entity<TheSurveyAppDB> implements DexieObj
     return await this.db.hardwares.put(this);
   }
 
-  async update({...props}: Partial<Hardware>) {
+  async update({ ...props }: Partial<Hardware>) {
     return this.db.hardwares.update(this.localId, { ...props });
   }
 
-  async syncWithServer({ id }: ServerHardware){
-    return this.db.transaction(
-      "rw",
-      [this.db.hardwares],
-      () => {
-        if (this.flag === 'd') {
-          this.db.hardwares.where({ localId: this.localId }).delete();
-        } else {
-          this.db.hardwares.where({ id: this.id }).modify({ id, flag: null });
-        }
+  async syncFromServer({ id }: ServerHardware) {
+    return this.db.transaction("rw", [this.db.hardwares], () => {
+      if (this.flag === "d") {
+        this.db.hardwares.where({ localId: this.localId }).delete();
+      } else {
+        this.db.hardwares.where({ id: this.id }).modify({ id, flag: null });
       }
-    );
+    });
   }
 
   serialize() {

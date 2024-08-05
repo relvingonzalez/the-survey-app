@@ -1,10 +1,10 @@
-import { Day, DaysQuestion } from "@/lib/types/question";
+import { Day } from "@/lib/types/question";
 import { Chip, ChipGroup, Group } from "@mantine/core";
 import { WithQuestionCallback } from "../SurveyItem";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionDaysProps = {
-  question: DaysQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback;
 
@@ -57,7 +57,7 @@ export function isDayArray(days: Day[] | string[]): days is Day[] {
 }
 
 export const createDaysResponse = (
-  { projectId, id: questionId, responseType }: DaysQuestion,
+  { projectId, id: questionId, responseType }: Question,
   dayId: number,
 ) => Response.create({ projectId, questionId, responseType, dayId });
 
@@ -69,18 +69,23 @@ export default function QuestionDays({
   const value = response.map((v) => dayOptionsById[v.dayId]);
   const handleSelected = async (selection: string[]) => {
     if (isDayArray(selection)) {
-      const result = await Promise.all(selection.map(
-        (s) =>
-          response.find((r) => dayOptionsById[r.dayId] === s) ??
-          createDaysResponse(question, dayOptionsByDay[s]),
-      ));
+      const result = await Promise.all(
+        selection.map(
+          (s) =>
+            response.find((r) => dayOptionsById[r.dayId] === s) ??
+            createDaysResponse(question, dayOptionsByDay[s]),
+        ),
+      );
 
       // Check which ones to remove and add flag
       const selectionsToRemove = daysOptions.filter(
         (o) => !selection.includes(o),
       );
       const responsesToRemove = response
-        .filter((r) => selectionsToRemove.includes(dayOptionsById[r.dayId])|| !r.dayId) 
+        .filter(
+          (r) =>
+            selectionsToRemove.includes(dayOptionsById[r.dayId]) || !r.dayId,
+        )
         .map((r) => {
           r.flag = "d";
           return r;

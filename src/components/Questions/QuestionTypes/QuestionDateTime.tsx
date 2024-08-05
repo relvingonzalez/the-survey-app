@@ -1,10 +1,9 @@
 import { DateTimePicker, DateTimePickerProps } from "@mantine/dates";
 import { WithQuestionCallback } from "../SurveyItem";
-import { DateTimeQuestion } from "@/lib/types/question";
-import Response from "@/lib/dexie/Response";
+import { Question, Response } from "../../../../internal";
 
 export type QuestionDateTimeProps = {
-  question: DateTimeQuestion;
+  question: Question;
   response: Response[];
 } & WithQuestionCallback &
   DateTimePickerProps;

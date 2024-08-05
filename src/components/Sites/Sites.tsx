@@ -17,12 +17,12 @@ import {
 } from "@mantine/core";
 import { IconDownload, IconSettingsFilled } from "@tabler/icons-react";
 import Link from "next/link";
-import { DexieSiteProject } from "@/lib/types/dexie";
 import DownloadModal from "../DownloadModal";
 import { useDisclosure } from "@mantine/hooks";
 import { useState } from "react";
 import { useQuestionsWithCounts } from "@/lib/hooks/useQuestionsWithCounts";
 import { ServerSiteProject } from "@/lib/types/server";
+import { DexieSiteProject } from "../../../internal";
 
 type SitesProps = {
   sites: ServerSiteProject[] | DexieSiteProject[];

@@ -1,7 +1,6 @@
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "../dexie/db";
 import { QuestionType } from "../types/question";
-import { getPrevQuestion, getNextQuestion } from "../dexie/helper";
 
 export const useQuestionNavigation = (
   projectId: number,
@@ -12,15 +11,9 @@ export const useQuestionNavigation = (
     () => db.questions.get({ projectId, order, questionType }),
     [projectId, questionType, order],
   );
-  const prev = useLiveQuery(
-    () => getPrevQuestion(projectId, questionType, current),
-    [projectId, current, questionType],
-  );
+  const prev = useLiveQuery(() => current?.getPrev(), [current]);
 
-  const next = useLiveQuery(
-    () => getNextQuestion(projectId, questionType, current),
-    [projectId, current, questionType],
-  );
+  const next = useLiveQuery(() => current?.getNext(), [current]);
 
   return {
     current,
