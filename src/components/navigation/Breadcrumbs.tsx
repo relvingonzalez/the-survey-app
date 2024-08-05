@@ -42,7 +42,7 @@ export default function NavBreadcrumbs({ navLinks }: WithNavLinkProps) {
   }
 
   return (
-    <Breadcrumbs style={{ flexWrap: "wrap" }} px="md" pt="md" mb="20">
+    <Breadcrumbs style={{ flexWrap: "wrap" }} pr="md" pt="md" mb="20">
       {breadcrumbs}
     </Breadcrumbs>
   );
