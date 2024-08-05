@@ -78,7 +78,7 @@ export class Rack extends Entity<TheSurveyAppDB> implements DexieObject<Rack> {
 
   async delete() {
     return this.db.transaction("rw", [this.db.racks, this.db.hardwares], () => {
-      if (this.flag === "i") {
+      if (this.flag === "i" || this.flag === null) {
         this.db.racks.where({ id: this.id }).delete();
       } else {
         this.db.racks.where({ id: this.id }).modify({ flag: "d" });

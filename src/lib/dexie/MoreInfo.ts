@@ -79,7 +79,7 @@ export class MoreInfo
 
   async delete() {
     return db.transaction("rw", db.moreInfos, () => {
-      if (this.flag === "i") {
+      if (this.flag === "i" || this.flag === null) {
         db.moreInfos.where({ id: this.id }).delete();
       } else {
         db.moreInfos.where({ id: this.id }).modify({ flag: "d" });

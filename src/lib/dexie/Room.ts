@@ -70,7 +70,7 @@ export class Room extends Entity<TheSurveyAppDB> implements DexieObject<Room> {
 
   async delete() {
     return this.db.transaction("rw", this.db.rooms, () => {
-      if (this.flag === "i") {
+      if (this.flag === "i" || this.flag === null) {
         this.db.rooms.where({ id: this.id }).delete();
       } else {
         this.db.rooms.where({ id: this.id }).modify({ flag: "d" });

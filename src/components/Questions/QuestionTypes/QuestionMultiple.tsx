@@ -33,13 +33,21 @@ export default function QuestionListSelect({
     const selectionsToRemove = question.options.filter(
       (o) => !selection.includes(o),
     );
-    const responsesToRemove = response
-      .filter((r) => r.text && selectionsToRemove.includes(r.text))
-      .map((s) => {
-        s.flag = "d";
-        return s;
-      });
-    onAnswered([...result, ...responsesToRemove]);
+    // const responsesToRemove = response
+    //   .filter((r) => r.text && selectionsToRemove.includes(r.text))
+    //   .map((s) => {
+    //     s.flag = "d";
+    //     return s;
+    //   });
+    // onAnswered([...result, ...responsesToRemove]);
+
+    response.forEach((r) => {
+      if (r.text && selectionsToRemove.includes(r.text)) {
+        r.delete();
+      }
+    });
+
+    onAnswered(result);
   };
   return (
     <MultiSelect

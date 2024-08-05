@@ -79,8 +79,6 @@ export default function QuestionGeo({
     }
   }, [responseValue, value]);
 
-  console.log(responseValue);
-
   return (
     <>
       <Group>

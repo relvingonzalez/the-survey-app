@@ -93,7 +93,7 @@ export class Hardware
 
   async delete() {
     return db.transaction("rw", db.hardwares, () => {
-      if (this.flag === "i") {
+      if (this.flag === "i" || this.flag === null) {
         db.hardwares.where({ id: this.id }).delete();
       } else {
         db.hardwares.where({ id: this.id }).modify({ flag: "d" });

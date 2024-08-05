@@ -204,7 +204,7 @@ export class Response
 
   async delete() {
     return this.db.transaction("rw", this.db.responses, () => {
-      if (this.flag === "i") {
+      if (this.flag === "i" || this.flag === null) {
         this.db.responses.where({ localId: this.localId }).delete();
       } else if (this.localId) {
         this.db.responses

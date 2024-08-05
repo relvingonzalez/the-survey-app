@@ -182,8 +182,9 @@ export default function QuestionPerson({
   };
 
   const onDeletePerson = (r: Response) => {
-    r.flag = "d";
-    onAnswered(r);
+    // r.flag = "d";
+    // onAnswered(r);
+    r.delete();
   };
 
   const form = useForm({

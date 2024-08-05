@@ -219,19 +219,19 @@ export default function QuestionCollection({
   const onDeleteEntriesAnswer = (i: number) => {
     if (responseGroups) {
       deleteResponseGroup(i);
-      onAnswered(
-        responseGroups[i].map((r) => {
-          r.flag = "d";
-          return r;
-        }),
-      );
+      // onAnswered(
+      //   responseGroups[i].map((r) => {
+      //     r.flag = "d";
+      //     return r;
+      //   }),
+      // );
+      responseGroups[i].forEach((r) => r.delete());
     }
   };
 
   const handleAnsweredNewResponseGroup = (
     responses: (Response | undefined)[],
   ) => {
-    console.log(responses);
     const newResponses: Response[] = [...newResponseGroup];
     responses.forEach((r) => {
       if (r) {

@@ -55,7 +55,7 @@ export class ResponseGroup
       "rw",
       [this.db.responseGroups, this.db.comments, this.db.responses],
       () => {
-        if (this.flag === "i") {
+        if (this.flag === "i" || this.flag === null) {
           this.db.responseGroups.where({ id: this.id }).delete();
         } else {
           this.db.responseGroups.where({ id: this.id }).modify({ flag: "d" });

@@ -63,8 +63,8 @@ export default function QuestionComponent({
     responses.forEach((r) => {
       // If Response exists, delete or save, if not add if flag not d
       if (r) {
+        r.questionResponseId = r.questionResponseId || comment?.id;
         if (r.localId) {
-          r.questionResponseId = r.questionResponseId || comment?.id;
           r.flag === "d" ? r.delete() : r.save();
         } else {
           r.flag !== "d" && Response.add(r);

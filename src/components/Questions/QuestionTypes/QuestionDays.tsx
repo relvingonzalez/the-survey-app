@@ -81,17 +81,24 @@ export default function QuestionDays({
       const selectionsToRemove = daysOptions.filter(
         (o) => !selection.includes(o),
       );
-      const responsesToRemove = response
-        .filter(
-          (r) =>
-            selectionsToRemove.includes(dayOptionsById[r.dayId]) || !r.dayId,
-        )
-        .map((r) => {
-          r.flag = "d";
-          return r;
-        });
+      // const responsesToRemove = response
+      //   .filter(
+      //     (r) =>
+      //       selectionsToRemove.includes(dayOptionsById[r.dayId]) || !r.dayId,
+      //   )
+      //   .map((r) => {
+      //     r.flag = "d";
+      //     return r;
+      //   });
 
-      onAnswered([...result, ...responsesToRemove]);
+      response.forEach((r) => {
+        if (selectionsToRemove.includes(dayOptionsById[r.dayId]) || !r.dayId) {
+          r.delete();
+        }
+      });
+
+      // onAnswered([...result, ...responsesToRemove]);
+      onAnswered(result);
     }
   };
 
