@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { ServerDownloadSiteData } from "../types/server";
-import { EntityTable } from "dexie";
+import { EntityTable, IDType, InsertType, UpdateSpec } from "dexie";
 import {
   Question,
   DexieStructure,
@@ -10,6 +10,8 @@ import {
   MoreInfo,
   Rack,
   Room,
+  ResponseGroup,
+  uniqueId,
 } from "../../../internal";
 export async function populate(data: ServerDownloadSiteData) {
   return db.transaction(
@@ -26,13 +28,13 @@ export async function populate(data: ServerDownloadSiteData) {
     ],
     () => {
       db.siteProjects.add(data.siteProject);
-      Question.bulkAdd(data.questions);
-      Response.bulkAdd(data.responses);
-      Comment.bulkAdd(data.comments);
-      Room.bulkAdd(data.rooms);
-      MoreInfo.bulkAdd(data.moreInfos);
-      Rack.bulkAdd(data.racks);
-      Hardware.bulkAdd(data.hardwares);
+      Question.bulkAddFromServer(data.questions);
+      Response.bulkAddFromServer(data.responses);
+      Comment.bulkAddFromServer(data.comments);
+      Room.bulkAddFromServer(data.rooms);
+      MoreInfo.bulkAddFromServer(data.moreInfos);
+      Rack.bulkAddFromServer(data.racks);
+      Hardware.bulkAddFromServer(data.hardwares);
     },
   );
 }
@@ -66,7 +68,10 @@ export async function deleteProject(projectId: number) {
 }
 
 export const deleteResponseGroup = async (id: number) => {
-  return await db.responseGroups.where({ id }).modify({ flag: "d" });
+  const currentResponseGroup = await db.responseGroups.get({ id });
+  return currentResponseGroup
+    ? db.responseGroups.where({ id }).modify({ flag: "d" })
+    : ResponseGroup.add({ id, flag: "d" });
 };
 
 export const questionResponsesCounts = (
@@ -101,3 +106,55 @@ export const getUpdatedItemsByTable = <K extends DexieStructure>(
 export const getDeletedItemsByTable = <K extends DexieStructure>(
   table: EntityTable<K, "localId">,
 ) => table.where({ flag: "d" }).toArray();
+
+// Get Deleted
+export const addItem = async <K extends DexieStructure>(
+  table: EntityTable<K, "localId">,
+  item: K,
+) => {
+  const addedId = await table.add(item);
+  return table.get(addedId);
+};
+
+export const addItemsFromServer = <K extends DexieStructure>(
+  addFn: (item: Partial<K>) => Promise<K | undefined>,
+  items: Partial<K>[],
+) => {
+  return items.map((v) => addFn({ ...v, flag: "o" }));
+};
+
+export const addItems = <K extends DexieStructure>(
+  addFn: (item: Partial<K>) => Promise<K | undefined>,
+  items: Partial<K>[],
+) => {
+  return items.map(addFn);
+};
+
+export const createItem = <K extends DexieStructure>(
+  item: K,
+  props: Partial<K>,
+) => {
+  const response: K = Object.create(item);
+  Object.assign(response, props);
+  response.id = response.id ?? uniqueId();
+  response.flag = response.flag ?? "i";
+  return response;
+};
+
+export const saveItem = <K extends DexieStructure>(
+  table: EntityTable<K, "localId">,
+  item: K,
+) => {
+  return table.put({
+    ...item,
+    flag: ["i", null].includes(item.flag) ? "i" : "u",
+  });
+};
+
+export const updateItem = <K extends DexieStructure>(
+  table: EntityTable<K, "localId">,
+  localId: IDType<K, "localId">,
+  props: UpdateSpec<InsertType<K, "localId">>,
+) => {
+  return table.update(localId, props);
+};

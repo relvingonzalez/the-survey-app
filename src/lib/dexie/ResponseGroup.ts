@@ -4,12 +4,17 @@ import DexieObject from "./DexieObject";
 import { saveResponseGroup } from "../api/actions";
 import {
   ActionFlag,
+  addItem,
+  addItems,
+  addItemsFromServer,
+  createItem,
   db,
   getDeletedItemsByTable,
   getUpdatedItemsByTable,
+  saveItem,
   shouldIncludeId,
+  updateItem,
   type TheSurveyAppDB,
-  uniqueId,
 } from "../../../internal";
 export class ResponseGroup
   extends Entity<TheSurveyAppDB>
@@ -21,13 +26,20 @@ export class ResponseGroup
   collectionId!: number;
   projectId!: number;
 
-  static async add({ ...props }: Partial<ResponseGroup>) {
-    const responseGroup = Object.create(ResponseGroup.prototype);
-    Object.assign(responseGroup, props);
-    responseGroup.id = responseGroup.id ?? uniqueId();
-    responseGroup.flag = "i";
-    const addedId = await db.responseGroups.add(responseGroup);
-    return db.responseGroups.get(addedId);
+  static create({ ...props }: Partial<ResponseGroup>) {
+    return createItem(ResponseGroup.prototype, props);
+  }
+
+  static add({ ...props }: Partial<ResponseGroup>) {
+    return addItem(db.responseGroups, ResponseGroup.create(props));
+  }
+
+  static async bulkAdd(responseGroups: Partial<ResponseGroup>[]) {
+    return addItems(ResponseGroup.add, responseGroups);
+  }
+
+  static async bulkAddFromServer(responseGroups: Partial<ResponseGroup>[]) {
+    return addItemsFromServer(ResponseGroup.add, responseGroups);
   }
 
   static async getAllUpdated() {
@@ -43,13 +55,20 @@ export class ResponseGroup
     if (responseGroups.length) {
       await Promise.all(
         responseGroups.map(async (r) => {
-          const [savedResponseGroup] = await saveResponseGroup(r.serialize());
+          const savedResponseGroup = await saveResponseGroup(r.serialize());
           return r.syncFromServer(savedResponseGroup);
         }),
       );
     }
   }
 
+  async save() {
+    return saveItem(this.db.responseGroups, this);
+  }
+
+  async update(props: Partial<ResponseGroup>) {
+    return updateItem(this.db.responseGroups, this.localId, props);
+  }
   async delete() {
     return this.db.transaction(
       "rw",
@@ -61,20 +80,9 @@ export class ResponseGroup
           this.db.responseGroups.where({ id: this.id }).modify({ flag: "d" });
         }
         this.db.comments.where({ responseGroupId: this.id }).delete();
-        this.db.responses.where({ responseGroupId: this.id }).delete();
+        this.db.responseGroups.where({ responseGroupId: this.id }).delete();
       },
     );
-  }
-
-  async update(props: Partial<ResponseGroup>) {
-    return await this.db.responseGroups.update(this.localId, {
-      ...props,
-    });
-  }
-
-  async save() {
-    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
-    return await this.db.responseGroups.put(this);
   }
 
   async syncFromServer({ id: responseGroupId }: ServerResponseGroup) {
@@ -87,7 +95,7 @@ export class ResponseGroup
         } else {
           this.db.responseGroups
             .where({ id: this.id })
-            .modify({ id: responseGroupId, flag: null });
+            .modify({ id: responseGroupId, flag: "o" });
           this.db.comments
             .where({ responseGroupId: this.id })
             .modify({ responseGroupId });

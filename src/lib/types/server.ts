@@ -132,6 +132,7 @@ export type ServerDownloadSiteData = {
 };
 
 export type ServerResponseGroup = {
+  flag?: ActionFlag;
   id?: number;
   collectionId: number;
 };

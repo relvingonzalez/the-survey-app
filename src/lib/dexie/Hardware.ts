@@ -4,13 +4,18 @@ import { ServerHardware } from "../types/server";
 import { saveHardware } from "../api/actions";
 import {
   ActionFlag,
+  addItem,
+  addItems,
+  addItemsFromServer,
+  createItem,
   db,
   getDeletedItemsByTable,
   getUpdatedItemsByTable,
   Rack,
+  saveItem,
   shouldIncludeId,
+  updateItem,
   type TheSurveyAppDB,
-  uniqueId,
 } from "../../../internal";
 
 export class Hardware
@@ -27,23 +32,20 @@ export class Hardware
   toSlot!: string;
   details!: string;
 
-  // Create type object without inserting
   static create({ ...props }: Partial<Hardware>) {
-    const hardware = Object.create(Hardware.prototype);
-    Object.assign(hardware, props);
-    hardware.id = hardware.id ?? uniqueId();
-    hardware.flag = null;
-    return hardware;
+    return createItem(Hardware.prototype, props);
   }
 
-  static async add({ ...props }: Partial<Hardware>) {
-    const hardware = Hardware.create(props);
-    const addedId = await db.hardwares.add(hardware);
-    return db.hardwares.get(addedId);
+  static add({ ...props }: Partial<Hardware>) {
+    return addItem(db.hardwares, Hardware.create(props));
   }
 
   static async bulkAdd(hardwares: Partial<Hardware>[]) {
-    return hardwares.map(Hardware.add);
+    return addItems(Hardware.add, hardwares);
+  }
+
+  static async bulkAddFromServer(hardwares: Partial<Hardware>[]) {
+    return addItemsFromServer(Hardware.add, hardwares);
   }
 
   static async getByRack({ id: rackId }: Rack) {
@@ -102,12 +104,11 @@ export class Hardware
   }
 
   async save() {
-    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
-    return await this.db.hardwares.put(this);
+    return saveItem(this.db.hardwares, this);
   }
 
-  async update({ ...props }: Partial<Hardware>) {
-    return this.db.hardwares.update(this.localId, { ...props });
+  async update(props: Partial<Hardware>) {
+    return updateItem(this.db.hardwares, this.localId, props);
   }
 
   async syncFromServer({ id }: ServerHardware) {
@@ -115,7 +116,7 @@ export class Hardware
       if (this.flag === "d") {
         this.db.hardwares.where({ localId: this.localId }).delete();
       } else {
-        this.db.hardwares.where({ id: this.id }).modify({ id, flag: null });
+        this.db.hardwares.where({ id: this.id }).modify({ id, flag: "o" });
       }
     });
   }

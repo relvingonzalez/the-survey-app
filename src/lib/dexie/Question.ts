@@ -1,10 +1,20 @@
 import { Entity } from "dexie";
 import { ListOptions, QuestionType, ResponseType } from "../types/question";
-import { Response, TheSurveyAppDB, db } from "../../../internal";
+import {
+  ActionFlag,
+  Response,
+  TheSurveyAppDB,
+  addItem,
+  addItems,
+  addItemsFromServer,
+  createItem,
+  db,
+} from "../../../internal";
 
 export class Question extends Entity<TheSurveyAppDB> {
   id!: number;
   localId!: number;
+  flag!: ActionFlag;
   projectId!: number;
   rackId!: number;
   collectionId!: number;
@@ -15,17 +25,20 @@ export class Question extends Entity<TheSurveyAppDB> {
   questionType!: QuestionType;
   options!: ListOptions;
 
-  static async add({ ...props }: Partial<Question>) {
-    const question = Object.create(Question.prototype);
-    Object.assign(question, props);
-    question.flag = question.id ? null : "i";
-    question.question = question.question ?? "";
-    const addedId = await db.questions.add(question);
-    return db.questions.get(addedId);
+  static create({ ...props }: Partial<Question>) {
+    return createItem(Question.prototype, props);
+  }
+
+  static add({ ...props }: Partial<Question>) {
+    return addItem(db.questions, Question.create(props));
   }
 
   static async bulkAdd(questions: Partial<Question>[]) {
-    return questions.map(Question.add);
+    return addItems(Question.add, questions);
+  }
+
+  static async bulkAddFromServer(questions: Partial<Question>[]) {
+    return addItemsFromServer(Question.add, questions);
   }
 
   static getNextUnanswered(questions?: Question[], responses?: Response[]) {

@@ -1,3 +1,5 @@
+import { ActionFlag } from "./dexie";
+
 export type Coordinate = number;
 
 // Value option types
@@ -68,6 +70,7 @@ export type QuestionValue =
 // Response by Question Type
 export type Comment = {
   id?: number;
+  flag?: ActionFlag;
   questionId: number;
   projectId: number;
   responseGroupId?: number;

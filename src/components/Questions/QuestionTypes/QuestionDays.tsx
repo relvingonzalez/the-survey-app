@@ -1,12 +1,12 @@
 import { Day } from "@/lib/types/question";
 import { Chip, ChipGroup, Group } from "@mantine/core";
-import { WithQuestionCallback } from "../SurveyItem";
+import { WithQuestionCallbacks } from "../SurveyItem";
 import { Question, Response } from "../../../../internal";
 
 export type QuestionDaysProps = {
   question: Question;
   response: Response[];
-} & WithQuestionCallback;
+} & WithQuestionCallbacks;
 
 type DayOption = {
   name: Day;
@@ -65,40 +65,29 @@ export default function QuestionDays({
   question,
   response,
   onAnswered,
+  onDeleted,
 }: QuestionDaysProps) {
   const value = response.map((v) => dayOptionsById[v.dayId]);
   const handleSelected = async (selection: string[]) => {
     if (isDayArray(selection)) {
-      const result = await Promise.all(
-        selection.map(
+      if (selection.length >= response.length) {
+        const result = selection.map(
           (s) =>
             response.find((r) => dayOptionsById[r.dayId] === s) ??
             createDaysResponse(question, dayOptionsByDay[s]),
-        ),
-      );
-
-      // Check which ones to remove and add flag
-      const selectionsToRemove = daysOptions.filter(
-        (o) => !selection.includes(o),
-      );
-      // const responsesToRemove = response
-      //   .filter(
-      //     (r) =>
-      //       selectionsToRemove.includes(dayOptionsById[r.dayId]) || !r.dayId,
-      //   )
-      //   .map((r) => {
-      //     r.flag = "d";
-      //     return r;
-      //   });
-
-      response.forEach((r) => {
-        if (selectionsToRemove.includes(dayOptionsById[r.dayId]) || !r.dayId) {
-          r.delete();
-        }
-      });
-
-      // onAnswered([...result, ...responsesToRemove]);
-      onAnswered(result);
+        );
+        onAnswered(result);
+      } else {
+        // Check which ones to remove
+        const selectionsToRemove = daysOptions.filter(
+          (o) => !selection.includes(o),
+        );
+        const responsesToRemove = response.filter(
+          (r) =>
+            selectionsToRemove.includes(dayOptionsById[r.dayId]) || !r.dayId,
+        );
+        onDeleted(responsesToRemove);
+      }
     }
   };
 

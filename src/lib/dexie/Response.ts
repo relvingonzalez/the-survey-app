@@ -18,13 +18,18 @@ import { dayOptionsById } from "@/components/Questions/QuestionTypes/QuestionDay
 import { saveResponses } from "../api/actions";
 import {
   ActionFlag,
+  addItem,
+  addItems,
+  addItemsFromServer,
+  createItem,
   db,
   DexieResponseGroupedByResponseType,
   getDeletedItemsByTable,
   getUpdatedItemsByTable,
+  saveItem,
   shouldIncludeId,
+  updateItem,
   type TheSurveyAppDB,
-  uniqueId,
 } from "../../../internal";
 
 export class Response
@@ -58,17 +63,11 @@ export class Response
   long!: number | null;
 
   static create({ ...props }: Partial<Response>) {
-    const response = Object.create(Response.prototype);
-    Object.assign(response, props);
-    response.id = response.id ?? uniqueId();
-    response.flag = null;
-    return response;
+    return createItem(Response.prototype, props);
   }
 
-  static async add({ ...props }: Partial<Response>) {
-    const response = Response.create(props);
-    const addedId = await db.responses.add(response);
-    return db.responses.get(addedId);
+  static add({ ...props }: Partial<Response>) {
+    return addItem(db.responses, Response.create(props));
   }
 
   static fromQuestion({ projectId, id, responseType }: Question) {
@@ -76,13 +75,16 @@ export class Response
   }
 
   static async bulkAdd(responses: Partial<Response>[]) {
-    return responses.map(Response.add);
+    return addItems(Response.add, responses);
+  }
+
+  static async bulkAddFromServer(responses: Partial<Response>[]) {
+    return addItemsFromServer(Response.add, responses);
   }
 
   static async getCollectionResponses(
     questions?: Question[],
   ): Promise<Record<number, Response[]>> {
-    // groupBy groupId or whatever
     let result = {};
     if (questions) {
       const ids = questions.map((q) => q.id);
@@ -129,7 +131,7 @@ export class Response
   static async getAllByProject(projectId: number) {
     return db.responses
       .where({ projectId })
-      .and((r) => ["i", "u", null].includes(r.flag))
+      .and((r) => r.flag !== "d")
       .toArray();
   }
 
@@ -215,12 +217,11 @@ export class Response
   }
 
   async save() {
-    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
-    return await this.db.responses.put(this);
+    return saveItem(this.db.responses, this);
   }
 
-  async update({ ...props }: Partial<Response>) {
-    return this.db.responses.update(this.localId, { ...props });
+  async update(props: Partial<Response>) {
+    return updateItem(this.db.responses, this.localId, props);
   }
 
   private baseServerProps() {

@@ -12,18 +12,18 @@ import QuestionTime from "./QuestionTypes/QuestionTime";
 import QuestionPerson from "./QuestionTypes/QuestionPerson";
 import QuestionDays from "./QuestionTypes/QuestionDays";
 import QuestionCollection from "./QuestionTypes/QuestionCollection";
-import { WithQuestionCallback } from "./SurveyItem";
+import { WithQuestionCallbacks } from "./SurveyItem";
 import { Question, Response } from "../../../internal";
 
 export type QuestionTypeProps<T extends Question, K extends Response> = {
   question: T;
   response: K[];
-} & WithQuestionCallback;
+} & WithQuestionCallbacks;
 
 export default function QuestionByTypeComponent<
   Q extends Question,
   R extends Response,
->({ question, response, onAnswered }: QuestionTypeProps<Q, R>) {
+>({ question, response, onAnswered, onDeleted }: QuestionTypeProps<Q, R>) {
   return (
     <>
       {question.responseType === "text" && (
@@ -80,6 +80,7 @@ export default function QuestionByTypeComponent<
           question={question}
           response={response}
           onAnswered={onAnswered}
+          onDeleted={onDeleted}
         />
       )}
       {question.responseType === "geo" && (
@@ -108,6 +109,7 @@ export default function QuestionByTypeComponent<
           question={question}
           response={response}
           onAnswered={onAnswered}
+          onDeleted={onDeleted}
         />
       )}
       {question.responseType === "person" && (
@@ -115,10 +117,15 @@ export default function QuestionByTypeComponent<
           question={question}
           response={response}
           onAnswered={onAnswered}
+          onDeleted={onDeleted}
         />
       )}
       {question.responseType === "collection" && (
-        <QuestionCollection question={question} onAnswered={onAnswered} />
+        <QuestionCollection
+          question={question}
+          onAnswered={onAnswered}
+          onDeleted={onDeleted}
+        />
       )}
     </>
   );

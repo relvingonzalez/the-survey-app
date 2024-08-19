@@ -1,11 +1,11 @@
 import { MultiSelect, MultiSelectProps } from "@mantine/core";
-import { WithQuestionCallback } from "../SurveyItem";
+import { WithQuestionCallbacks } from "../SurveyItem";
 import { Question, Response } from "../../../../internal";
 
 export type QuestionMultipleProps = {
   question: Question;
   response: Response[];
-} & WithQuestionCallback &
+} & WithQuestionCallbacks &
   MultiSelectProps;
 
 export const createMultipleResponse = (
@@ -17,37 +17,28 @@ export default function QuestionListSelect({
   question,
   response,
   onAnswered,
+  onDeleted,
   ...props
 }: QuestionMultipleProps) {
   const handleOnChange = async (selection: string[]) => {
-    const result = await Promise.all(
-      selection.map((s) => {
+    if (selection.length >= response.length) {
+      const result = selection.map((s) => {
         const res =
           response.find((r) => r.text === s) ||
           createMultipleResponse(question, s);
         return res;
-      }),
-    );
-
-    // Check which ones to remove and add flag
-    const selectionsToRemove = question.options.filter(
-      (o) => !selection.includes(o),
-    );
-    // const responsesToRemove = response
-    //   .filter((r) => r.text && selectionsToRemove.includes(r.text))
-    //   .map((s) => {
-    //     s.flag = "d";
-    //     return s;
-    //   });
-    // onAnswered([...result, ...responsesToRemove]);
-
-    response.forEach((r) => {
-      if (r.text && selectionsToRemove.includes(r.text)) {
-        r.delete();
-      }
-    });
-
-    onAnswered(result);
+      });
+      onAnswered(result);
+    } else {
+      // Check which ones to remove and add flag
+      const selectionsToRemove = question.options.filter(
+        (o) => !selection.includes(o),
+      );
+      const responsesToRemove = response.filter(
+        (r) => r.text && selectionsToRemove.includes(r.text),
+      );
+      onDeleted(responsesToRemove);
+    }
   };
   return (
     <MultiSelect
@@ -58,7 +49,7 @@ export default function QuestionListSelect({
       data={question.options}
       value={response
         .filter((r) => r.flag !== "d" && r.text)
-        .map((r) => r.text || "")}
+        .map((r) => r.text ?? "")}
       onChange={handleOnChange}
     />
   );

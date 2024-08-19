@@ -36,13 +36,15 @@ const insertOrUpdateByTableName = async <K extends ServerArray>(
   serverTableName: string,
   serverResponses: ServerArray[],
 ) => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const newArray = serverResponses.map(({ flag, ...item }) => item);
   const result: K[] = await sql<K[]>`
-    INSERT INTO ${sql(serverTableName)} ${sql(serverResponses)}
+    INSERT INTO ${sql(serverTableName)} ${sql(newArray)}
     ON CONFLICT (id) 
     DO UPDATE SET
-    ${Object.keys(serverResponses[0])
-      .filter((k) => k !== "flag")
-      .map((x, i) => sql`${i ? sql`,` : sql``}${sql(x)} = excluded.${sql(x)}`)}
+    ${Object.keys(newArray[0]).map(
+      (x, i) => sql`${i ? sql`,` : sql``}${sql(x)} = excluded.${sql(x)}`,
+    )}
     RETURNING *`;
 
   return result;
@@ -76,7 +78,7 @@ const deleteByTableName = async <K extends ServerArray>(
   // TODO: Figure out how to make this better. Shouldn't have to specify 0. Maybe fix typescript. If updated or deleted it will have an id.
   return sql<K[]>`
     DELETE FROM ${sql(serverTableName)} WHERE id IN ${sql(
-      serverResponses.map((r) => r.id || 0),
+      serverResponses.map((r) => r.id ?? 0),
     )} RETURNING *;`;
 };
 
@@ -145,11 +147,9 @@ export async function saveMoreInfo(moreInfo: ServerMoreInfo) {
 }
 
 export async function saveResponseGroup(responseGroup: ServerResponseGroup) {
-  const result: ServerResponseGroup[] =
-    await sql`INSERT INTO response_group ${sql(responseGroup, "collectionId")} 
-    RETURNING *;`;
-
-  return result;
+  return responseGroup.flag === "d"
+    ? deleteItem(responseGroup, "responseGroup")
+    : insertOrUpdateItem(responseGroup, "response_group");
 }
 
 export async function saveComment(comment: ServerComment) {

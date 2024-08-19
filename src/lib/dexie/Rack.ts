@@ -5,13 +5,18 @@ import { ServerRack } from "../types/server";
 import { saveRack } from "../api/actions";
 import {
   ActionFlag,
+  addItem,
+  addItems,
+  addItemsFromServer,
+  createItem,
   db,
   getDeletedItemsByTable,
   getUpdatedItemsByTable,
   Room,
+  saveItem,
   shouldIncludeId,
+  updateItem,
   type TheSurveyAppDB,
-  uniqueId,
 } from "../../../internal";
 
 export class Rack extends Entity<TheSurveyAppDB> implements DexieObject<Rack> {
@@ -26,22 +31,19 @@ export class Rack extends Entity<TheSurveyAppDB> implements DexieObject<Rack> {
   name!: string;
 
   static create({ ...props }: Partial<Rack>) {
-    const rack = Object.create(Rack.prototype);
-    Object.assign(rack, props);
-    rack.id = rack.id ?? uniqueId();
-    rack.flag = null;
-    rack.rack = "";
-    return rack;
+    return createItem(Rack.prototype, props);
   }
 
-  static async add({ ...props }: Partial<Rack>) {
-    const rack = Rack.create(props);
-    const addedId = await db.racks.add(rack);
-    return db.racks.get(addedId);
+  static add({ ...props }: Partial<Rack>) {
+    return addItem(db.racks, Rack.create(props));
   }
 
   static async bulkAdd(racks: Partial<Rack>[]) {
-    return racks.map(Rack.add);
+    return addItems(Rack.add, racks);
+  }
+
+  static async bulkAddFromServer(racks: Partial<Rack>[]) {
+    return addItemsFromServer(Rack.add, racks);
   }
 
   static async getByRoom({ id: roomId }: Room) {
@@ -72,8 +74,11 @@ export class Rack extends Entity<TheSurveyAppDB> implements DexieObject<Rack> {
   }
 
   async save() {
-    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
-    return await this.db.racks.put(this);
+    return saveItem(this.db.racks, this);
+  }
+
+  async update(props: Partial<Rack>) {
+    return updateItem(this.db.racks, this.localId, props);
   }
 
   async delete() {
@@ -88,16 +93,12 @@ export class Rack extends Entity<TheSurveyAppDB> implements DexieObject<Rack> {
     });
   }
 
-  async update({ ...props }: Partial<Rack>) {
-    return this.db.racks.update(this.localId, { ...props });
-  }
-
   async syncFromServer({ id }: ServerRack) {
     return this.db.transaction("rw", [this.db.racks, this.db.hardwares], () => {
       if (this.flag === "d") {
         this.db.racks.where({ localId: this.localId }).delete();
       } else {
-        this.db.racks.where({ id: this.id }).modify({ id: id, flag: null });
+        this.db.racks.where({ id: this.id }).modify({ id: id, flag: "o" });
         this.db.hardwares.where({ rackId: this.id }).modify({ rackId: id });
       }
     });

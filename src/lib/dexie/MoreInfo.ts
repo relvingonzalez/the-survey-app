@@ -5,13 +5,18 @@ import { ServerMoreInfo } from "../types/server";
 import { saveMoreInfo } from "../api/actions";
 import {
   ActionFlag,
+  addItem,
+  addItems,
+  addItemsFromServer,
+  createItem,
   db,
   getDeletedItemsByTable,
   getUpdatedItemsByTable,
   Room,
+  saveItem,
   shouldIncludeId,
+  updateItem,
   type TheSurveyAppDB,
-  uniqueId,
 } from "../../../internal";
 export class MoreInfo
   extends Entity<TheSurveyAppDB>
@@ -27,22 +32,19 @@ export class MoreInfo
   info!: string;
 
   static create({ ...props }: Partial<MoreInfo>) {
-    const moreInfo = Object.create(MoreInfo.prototype);
-    Object.assign(moreInfo, props);
-    moreInfo.id = moreInfo.id ?? uniqueId();
-    moreInfo.flag = null;
-    moreInfo.moreInfo = "";
-    return moreInfo;
+    return createItem(MoreInfo.prototype, { ...props, info: "" });
   }
 
-  static async add({ ...props }: Partial<MoreInfo>) {
-    const moreInfo = MoreInfo.create(props);
-    const addedId = await db.moreInfos.add(moreInfo);
-    return db.moreInfos.get(addedId);
+  static add({ ...props }: Partial<MoreInfo>) {
+    return addItem(db.moreInfos, MoreInfo.create(props));
   }
 
   static async bulkAdd(moreInfos: Partial<MoreInfo>[]) {
-    return moreInfos.map(MoreInfo.add);
+    return addItems(MoreInfo.add, moreInfos);
+  }
+
+  static async bulkAddFromServer(moreInfos: Partial<MoreInfo>[]) {
+    return addItemsFromServer(MoreInfo.add, moreInfos);
   }
 
   static async getByRoom({ id: roomId }: Room) {
@@ -73,8 +75,11 @@ export class MoreInfo
   }
 
   async save() {
-    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
-    return await db.moreInfos.put(this);
+    return saveItem(this.db.moreInfos, this);
+  }
+
+  async update(props: Partial<MoreInfo>) {
+    return updateItem(this.db.moreInfos, this.localId, props);
   }
 
   async delete() {
@@ -87,16 +92,12 @@ export class MoreInfo
     });
   }
 
-  async update({ ...props }: Partial<MoreInfo>) {
-    return this.db.moreInfos.update(this.localId, { ...props });
-  }
-
   async syncFromServer({ id }: ServerMoreInfo) {
     return this.db.transaction("rw", [this.db.moreInfos], () => {
       if (this.flag === "d") {
         this.db.moreInfos.where({ localId: this.localId }).delete();
       } else {
-        this.db.moreInfos.where({ id: this.id }).modify({ id, flag: null });
+        this.db.moreInfos.where({ id: this.id }).modify({ id, flag: "o" });
       }
     });
   }

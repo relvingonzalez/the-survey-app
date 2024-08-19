@@ -4,12 +4,18 @@ import { ServerComment } from "../types/server";
 import { saveComment } from "../api/actions";
 import {
   ActionFlag,
+  addItem,
+  addItems,
+  addItemsFromServer,
+  createItem,
   db,
   getDeletedItemsByTable,
   getUpdatedItemsByTable,
   type Question,
+  saveItem,
   shouldIncludeId,
   type TheSurveyAppDB,
+  updateItem,
 } from "../../../internal";
 
 export class Comment
@@ -25,17 +31,38 @@ export class Comment
   responseGroupId!: number;
   comment!: string;
 
-  static async add({ ...props }: Partial<Comment>) {
-    const comment = Object.create(Comment.prototype);
-    Object.assign(comment, props);
-    comment.flag = comment.id ? null : "i";
-    comment.comment = comment.comment ?? "";
-    const addedId = await db.comments.add(comment);
-    return db.comments.get(addedId);
+  // static create({ ...props }: Partial<Comment>) {
+  //   const comment = Object.create(Comment.prototype);
+  //   Object.assign(comment, props);
+  //   comment.flag = comment.id ? null : "i";
+  //   comment.comment = comment.comment ?? "";
+  //   return comment;
+  // }
+
+  // static async add({ ...props }: Partial<Comment>) {
+  //   const comment = Comment.create(props);
+  //   const addedId = await db.comments.add(comment);
+  //   return db.comments.get(addedId);
+  // }
+
+  // static async bulkAdd(comments: Partial<Comment>[]) {
+  //   return comments.map(Comment.add);
+  // }
+
+  static create({ ...props }: Partial<Comment>) {
+    return createItem(Comment.prototype, props);
+  }
+
+  static add({ ...props }: Partial<Comment>) {
+    return addItem(db.comments, Comment.create(props));
   }
 
   static async bulkAdd(comments: Partial<Comment>[]) {
-    return comments.map(Comment.add);
+    return addItems(Comment.add, comments);
+  }
+
+  static async bulkAddFromServer(comments: Partial<Comment>[]) {
+    return addItemsFromServer(Comment.add, comments);
   }
 
   static async getAllUpdated() {
@@ -78,12 +105,11 @@ export class Comment
   }
 
   async save() {
-    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
-    return await this.db.comments.put(this);
+    return saveItem(this.db.comments, this);
   }
 
-  async update({ ...props }: Partial<Comment>) {
-    return this.db.comments.update(this.localId, { ...props });
+  async update(props: Partial<Comment>) {
+    return updateItem(this.db.comments, this.localId, props);
   }
 
   async syncFromServer({ id, questionId, responseGroupId }: ServerComment) {
@@ -91,9 +117,11 @@ export class Comment
       "rw",
       [this.db.comments, this.db.responses],
       () => {
-        db.comments.where({ localId: this.localId }).modify({ id, flag: null });
+        this.db.comments
+          .where({ localId: this.localId })
+          .modify({ id, flag: "o" });
 
-        db.responses
+        this.db.responses
           .where({ questionId, responseGroupId })
           .modify({ questionResponseId: id });
       },

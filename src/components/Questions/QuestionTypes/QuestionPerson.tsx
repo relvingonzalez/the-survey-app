@@ -22,13 +22,13 @@ import {
   IconUserPlus,
 } from "@tabler/icons-react";
 import { UseFormReturnType, isEmail, matches, useForm } from "@mantine/form";
-import { WithQuestionCallback } from "../SurveyItem";
+import { WithQuestionCallbacks } from "../SurveyItem";
 import { Question, Response } from "../../../../internal";
 
 export type QuestionPersonProps = {
   question: Question;
   response: Response[];
-} & WithQuestionCallback;
+} & WithQuestionCallbacks;
 
 const salutationLabels = ["Mr", "Ms"];
 const salutationValues = ["1", "2"];
@@ -165,6 +165,7 @@ export default function QuestionPerson({
   question,
   response,
   onAnswered,
+  onDeleted,
 }: QuestionPersonProps) {
   const [addNew, setAddNew] = useState(false);
   const onAddNewClick = () => {
@@ -182,9 +183,7 @@ export default function QuestionPerson({
   };
 
   const onDeletePerson = (r: Response) => {
-    // r.flag = "d";
-    // onAnswered(r);
-    r.delete();
+    onDeleted(r);
   };
 
   const form = useForm({

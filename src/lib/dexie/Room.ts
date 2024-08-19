@@ -4,12 +4,17 @@ import { ServerRoom } from "../types/server";
 import { saveRoom } from "../api/actions";
 import {
   ActionFlag,
+  addItem,
+  addItems,
+  addItemsFromServer,
+  createItem,
   db,
   getDeletedItemsByTable,
   getUpdatedItemsByTable,
+  saveItem,
   shouldIncludeId,
+  updateItem,
   type TheSurveyAppDB,
-  uniqueId,
 } from "../../../internal";
 
 export class Room extends Entity<TheSurveyAppDB> implements DexieObject<Room> {
@@ -21,22 +26,38 @@ export class Room extends Entity<TheSurveyAppDB> implements DexieObject<Room> {
   name!: string;
   comment!: string;
 
+  // static create({ ...props }: Partial<Room>) {
+  //   const room = Object.create(Room.prototype);
+  //   Object.assign(room, props);
+  //   room.id = room.id || uniqueId();
+  //   room.flag = null;
+  //   return room;
+  // }
+
+  // static async add({ ...props }: Partial<Room>) {
+  //   const room = Room.create(props);
+  //   const addedId = await db.rooms.add(room);
+  //   return db.rooms.get(addedId);
+  // }
+
+  // static async bulkAdd(rooms: Partial<Room>[]) {
+  //   return rooms.map(Room.add);
+  // }
+
   static create({ ...props }: Partial<Room>) {
-    const room = Object.create(Room.prototype);
-    Object.assign(room, props);
-    room.id = room.id || uniqueId();
-    room.flag = null;
-    return room;
+    return createItem(Room.prototype, props);
   }
 
-  static async add({ ...props }: Partial<Room>) {
-    const room = Room.create(props);
-    const addedId = await db.rooms.add(room);
-    return db.rooms.get(addedId);
+  static add({ ...props }: Partial<Room>) {
+    return addItem(db.rooms, Room.create(props));
   }
 
   static async bulkAdd(rooms: Partial<Room>[]) {
-    return rooms.map(Room.add);
+    return addItems(Room.add, rooms);
+  }
+
+  static async bulkAddFromServer(rooms: Partial<Room>[]) {
+    return addItemsFromServer(Room.add, rooms);
   }
 
   static async getById(projectId: number, id?: number) {
@@ -64,8 +85,11 @@ export class Room extends Entity<TheSurveyAppDB> implements DexieObject<Room> {
   }
 
   async save() {
-    this.flag = ["i", null].includes(this.flag) ? "i" : "u";
-    return await this.db.rooms.put(this);
+    return saveItem(this.db.rooms, this);
+  }
+
+  async update(props: Partial<Room>) {
+    return updateItem(this.db.rooms, this.localId, props);
   }
 
   async delete() {
@@ -78,10 +102,6 @@ export class Room extends Entity<TheSurveyAppDB> implements DexieObject<Room> {
 
       this.clearRoomTools();
     });
-  }
-
-  async update({ ...props }: Partial<Room>) {
-    return this.db.rooms.update(this.localId, { ...props });
   }
 
   async clearRoomTools() {
@@ -114,7 +134,7 @@ export class Room extends Entity<TheSurveyAppDB> implements DexieObject<Room> {
         if (this.flag === "d") {
           this.db.rooms.where({ localId: this.localId }).delete();
         } else {
-          db.rooms.where({ id: this.id }).modify({ id, flag: null });
+          db.rooms.where({ id: this.id }).modify({ id, flag: "o" });
           db.racks.where({ roomId: this.id }).modify({ roomId: id });
           db.moreInfos.where({ roomId: this.id }).modify({ roomId: id });
         }

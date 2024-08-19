@@ -18,8 +18,6 @@ import {
   Room,
 } from "../../internal";
 
-type StatusHandler = (step: number, progress: number, message: string) => void;
-
 const initialText =
   "You are syncing your local data to the server - that might override anything that was done before.";
 
@@ -29,50 +27,7 @@ const steps = [
   { icon: IconDeviceSdCard, label: "Step 3", description: "Finishing" },
 ];
 
-const sync = async (handleStatusUpdate: StatusHandler) => {
-  const progressValue = 0;
-  handleStatusUpdate(1, 1, "Syncing...");
-
-  handleStatusUpdate(
-    2,
-    progressValue + 5,
-    "Syncing Collection Response Groups...",
-  );
-  await ResponseGroup.sync();
-  handleStatusUpdate(
-    2,
-    progressValue + 10,
-    "Syncing Response Groups Complete!",
-  );
-
-  handleStatusUpdate(1, progressValue + 5, "Syncing Comments...");
-  await Comment.sync();
-  handleStatusUpdate(2, progressValue + 10, "Syncing Comments Complete!");
-
-  handleStatusUpdate(1, progressValue + 5, "Syncing Responses...");
-  await Response.sync();
-  handleStatusUpdate(2, progressValue + 10, "Syncing Responses Complete!");
-
-  handleStatusUpdate(1, progressValue + 5, "Syncing Rooms...");
-  await Room.sync();
-  handleStatusUpdate(2, progressValue + 10, "Syncing Rooms Complete!");
-
-  handleStatusUpdate(1, progressValue + 5, "Syncing Racks...");
-  await Rack.sync();
-  handleStatusUpdate(2, progressValue + 10, "Syncing Racks Complete!");
-
-  handleStatusUpdate(1, progressValue + 5, "Syncing Hardwares...");
-  await Hardware.sync();
-  handleStatusUpdate(2, progressValue + 10, "Syncing Hardwares Complete!");
-
-  handleStatusUpdate(1, progressValue + 5, "Syncing MoreInfos...");
-  await MoreInfo.sync();
-  handleStatusUpdate(2, progressValue + 10, "Syncing MoreInfos Complete!");
-};
-
 export function SyncModal({ opened, ...props }: ModalProps) {
-  // get all edited or new comments
-  // Try server action
   const [statusText, setStatusText] = useState(initialText);
   const [progressValue, setProgressValue] = useState(0);
   const [active, setActive] = useState(0);
@@ -82,8 +37,50 @@ export function SyncModal({ opened, ...props }: ModalProps) {
     setProgressValue(progress <= 100 ? progress : 100);
   };
 
+  const sync = async () => {
+    const progressValue = 0;
+    handleStatusUpdate(1, 1, "Syncing...");
+
+    handleStatusUpdate(
+      2,
+      progressValue + 5,
+      "Syncing Collection Response Groups...",
+    );
+    await ResponseGroup.sync();
+    handleStatusUpdate(
+      2,
+      progressValue + 10,
+      "Syncing Response Groups Complete!",
+    );
+
+    handleStatusUpdate(1, progressValue + 5, "Syncing Comments...");
+    await Comment.sync();
+    handleStatusUpdate(2, progressValue + 10, "Syncing Comments Complete!");
+
+    handleStatusUpdate(1, progressValue + 5, "Syncing Responses...");
+    await Response.sync();
+    handleStatusUpdate(2, progressValue + 10, "Syncing Responses Complete!");
+
+    handleStatusUpdate(1, progressValue + 5, "Syncing Rooms...");
+    await Room.sync();
+    handleStatusUpdate(2, progressValue + 10, "Syncing Rooms Complete!");
+
+    handleStatusUpdate(1, progressValue + 5, "Syncing Racks...");
+    await Rack.sync();
+    handleStatusUpdate(2, progressValue + 10, "Syncing Racks Complete!");
+
+    handleStatusUpdate(1, progressValue + 5, "Syncing Hardwares...");
+    await Hardware.sync();
+    handleStatusUpdate(2, progressValue + 10, "Syncing Hardwares Complete!");
+
+    handleStatusUpdate(1, progressValue + 5, "Syncing MoreInfos...");
+    await MoreInfo.sync();
+    handleStatusUpdate(2, progressValue + 10, "Syncing MoreInfos Complete!");
+    handleStatusUpdate(3, 100, "Syncing Complete!");
+  };
+
   const handleOnContinue = () => {
-    sync(handleStatusUpdate);
+    sync();
   };
   useEffect(() => {
     if (opened) {

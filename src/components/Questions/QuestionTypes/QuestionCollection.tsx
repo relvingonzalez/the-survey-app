@@ -18,7 +18,7 @@ import {
 } from "@mantine/core";
 import { useState } from "react";
 import { IconLayoutGridAdd, IconTrash, IconX } from "@tabler/icons-react";
-import { WithQuestionCallback } from "../SurveyItem";
+import { QuestionCallback, WithQuestionCallbacks } from "../SurveyItem";
 import { useLiveQuery } from "dexie-react-hooks";
 import { deleteResponseGroup } from "@/lib/dexie/helper";
 import { uniqueId } from "@/lib/utils/functions";
@@ -32,30 +32,23 @@ import {
 
 export type QuestionCollectionProps = {
   question: Question;
-} & WithQuestionCallback;
+} & WithQuestionCallbacks;
 
 type NewResponseGroupProps = {
   questions: Question[];
   responses: Response[];
-  onAnswered: (r: (Response | undefined)[]) => void;
   onSave: () => void;
   onCancel: () => void;
-};
+} & WithQuestionCallbacks;
 
 function NewResponseGroup({
   questions,
   responses,
   onAnswered,
+  onDeleted,
   onSave,
   onCancel,
 }: NewResponseGroupProps) {
-  const onAnsweredQuestionInEntry = (
-    value?: Response | (Response | undefined)[],
-  ) => {
-    if (value) {
-      onAnswered(value instanceof Array ? value : [value]);
-    }
-  };
   return (
     <Card mt="10" withBorder shadow="sm" radius="md">
       <CardSection withBorder inheritPadding py="xs">
@@ -84,7 +77,8 @@ function NewResponseGroup({
                 <QuestionByTypeComponent
                   question={q}
                   response={response}
-                  onAnswered={onAnsweredQuestionInEntry}
+                  onAnswered={onAnswered}
+                  onDeleted={onDeleted}
                 />
               </Stack>
             );
@@ -98,7 +92,10 @@ function NewResponseGroup({
   );
 }
 
-type EntriesProps = Omit<QuestionCollectionProps, "question" | "onAnswered"> & {
+type EntriesProps = Omit<
+  QuestionCollectionProps,
+  "question" | "onAnswered" | "onDeleted"
+> & {
   questions: Question[];
   responseGroups?: Record<number, Response[]>;
   onDelete?: (responseGroupId: number) => void;
@@ -160,6 +157,7 @@ export function Entries({ questions, responseGroups, onDelete }: EntriesProps) {
 export default function QuestionCollection({
   question,
   onAnswered,
+  onDeleted,
 }: QuestionCollectionProps) {
   const questions = useLiveQuery(
     () => question.getCollectionQuestions(),
@@ -219,32 +217,31 @@ export default function QuestionCollection({
   const onDeleteEntriesAnswer = (i: number) => {
     if (responseGroups) {
       deleteResponseGroup(i);
-      // onAnswered(
-      //   responseGroups[i].map((r) => {
-      //     r.flag = "d";
-      //     return r;
-      //   }),
-      // );
-      responseGroups[i].forEach((r) => r.delete());
+      onDeleted(responseGroups[i]);
     }
   };
 
-  const handleAnsweredNewResponseGroup = (
-    responses: (Response | undefined)[],
-  ) => {
+  const handleAnsweredNewResponseGroup: QuestionCallback = (value) => {
     const newResponses: Response[] = [...newResponseGroup];
+    const responses = value instanceof Array ? value : [value];
     responses.forEach((r) => {
       if (r) {
         const foundIndex = newResponses.findIndex((nR) => nR.id === r.id);
         if (foundIndex > -1) {
           newResponses[foundIndex].setProps(r);
         } else {
-          r.id = uniqueId();
           newResponses.push(r);
         }
       }
     });
     setNewResponseGroup(newResponses);
+  };
+
+  const handleDeletedNewResponseGroup: QuestionCallback = (value) => {
+    const removed = value instanceof Array ? value : [value];
+    setNewResponseGroup(
+      newResponseGroup.filter((nR) => !removed.find((r) => r?.id === nR.id)),
+    );
   };
 
   if (!questions) {
@@ -264,6 +261,7 @@ export default function QuestionCollection({
           questions={questions}
           responses={newResponseGroup}
           onAnswered={handleAnsweredNewResponseGroup}
+          onDeleted={handleDeletedNewResponseGroup}
           onSave={handleSaveNewResponseGroup}
           onCancel={resetAddNew}
         />

@@ -15,12 +15,17 @@ export type BaseQuestionProps = {
   item: Question;
 };
 
-type OnAnsweredCallback = (
+export type QuestionCallback = (
   response?: Response | (Response | undefined)[],
 ) => void;
 
 export type WithQuestionCallback = {
-  onAnswered: OnAnsweredCallback;
+  onAnswered: QuestionCallback;
+};
+
+export type WithQuestionCallbacks = {
+  onAnswered: QuestionCallback;
+  onDeleted: QuestionCallback;
 };
 
 export type QuestionProps = {
@@ -55,21 +60,22 @@ export default function QuestionComponent({
       comment?.update({ comment: value });
     }
   };
-  const handleAnswered: OnAnsweredCallback = (value) => {
+  const handleAnswered: QuestionCallback = (value) => {
     if (!comment || !value) {
       return;
     }
     const responses = value instanceof Array ? value : [value];
     responses.forEach((r) => {
-      // If Response exists, delete or save, if not add if flag not d
       if (r) {
         r.questionResponseId = r.questionResponseId || comment?.id;
-        if (r.localId) {
-          r.flag === "d" ? r.delete() : r.save();
-        } else {
-          r.flag !== "d" && Response.add(r);
-        }
+        r.localId ? r.save() : Response.add(r);
       }
+    });
+  };
+  const handleDeleted: QuestionCallback = (value) => {
+    const responses = value instanceof Array ? value : [value];
+    responses.forEach((r) => {
+      r && r.delete();
     });
   };
   const handleFileDelete = (i: number) => {
@@ -89,6 +95,7 @@ export default function QuestionComponent({
         question={question}
         response={response}
         onAnswered={handleAnswered}
+        onDeleted={handleDeleted}
       />
       <QuestionComment
         mt="10"
