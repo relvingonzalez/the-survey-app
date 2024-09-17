@@ -8,7 +8,6 @@ export default async function ExistingRoomPage({
   params: { siteCode: SiteCode };
 }) {
   console.log(siteCode);
-  //const site = await getSite(siteCode);
 
   return <SignaturesPage siteCode={siteCode} />;
 }

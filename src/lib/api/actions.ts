@@ -36,15 +36,14 @@ const insertOrUpdateByTableName = async <K extends ServerArray>(
   serverTableName: string,
   serverResponses: ServerArray[],
 ) => {
+  //TODO:Would be better if flag wasnt here to begin with. Remove before passing array
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const newArray = serverResponses.map(({ flag, ...item }) => item);
   const result: K[] = await sql<K[]>`
     INSERT INTO ${sql(serverTableName)} ${sql(newArray)}
     ON CONFLICT (id) 
     DO UPDATE SET
-    ${Object.keys(newArray[0]).map(
-      (x, i) => sql`${i ? sql`,` : sql``}${sql(x)} = excluded.${sql(x)}`,
-    )}
+    ${Object.keys(newArray[0]).map((x, i) => sql`${i ? sql`,` : sql``}${sql(x)} = excluded.${sql(x)}`)}
     RETURNING *`;
 
   return result;

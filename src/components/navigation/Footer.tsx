@@ -1,7 +1,7 @@
-import { Button, Center } from "@mantine/core";
+import { Center } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { IconRefresh } from "@tabler/icons-react";
 import { SyncModal } from "../../../internal";
+import SyncButton from "../Sync/SyncButton";
 
 export default function NavFooter() {
   const [opened, { open, close }] = useDisclosure(false);
@@ -9,15 +9,9 @@ export default function NavFooter() {
     <>
       <SyncModal opened={opened} onClose={close} />
       <Center className="bg-yellow">
-        <Button
-          className="border-0 bg-transparent"
+        <SyncButton
           onClick={open}
-          leftSection={<IconRefresh />}
-          loading={opened}
-          loaderProps={{ type: "dots" }}
-        >
-          Sync
-        </Button>
+          loading={opened}/>
       </Center>
     </>
   );

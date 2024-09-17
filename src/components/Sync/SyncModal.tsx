@@ -7,7 +7,7 @@ import {
   IconDeviceSdCard,
 } from "@tabler/icons-react";
 import { useState, useEffect } from "react";
-import DownloadModal from "./DownloadModal";
+import DownloadModal from "../DownloadModal";
 import {
   Comment,
   Hardware,
@@ -16,7 +16,7 @@ import {
   Response,
   ResponseGroup,
   Room,
-} from "../../internal";
+} from "../../../internal";
 
 const initialText =
   "You are syncing your local data to the server - that might override anything that was done before.";
