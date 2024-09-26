@@ -144,7 +144,6 @@ export default function DrawingModal({
         onClose={moreInfoClose}
         onSave={handleSaveMoreInfo}
         opened={moreInfoModalOpened}
-        existingFiles={[]}
         zIndex={300}
       />
       <RackModal
@@ -152,7 +151,6 @@ export default function DrawingModal({
         onSave={handleSaveRack}
         onSaveHardware={handleSaveHardware}
         opened={rackModalOpened}
-        existingFiles={[]}
         zIndex={300}
       />
 

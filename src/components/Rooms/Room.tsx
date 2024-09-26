@@ -8,13 +8,13 @@ import ClickableDrawing, {
   ClickableDrawingProps,
 } from "../Drawing/ClickableDrawing";
 import { useLiveQuery } from "dexie-react-hooks";
-import { MoreInfo, Rack, Room } from "../../../internal";
+import { MoreInfo, Rack, Room, SurveyFile } from "../../../internal";
 
 export type RoomProps = FileCallbacks &
   Pick<ClickableDrawingProps, "onSaveDrawing"> & {
     room: Room;
-    files: File[];
-    plan?: File;
+    files: SurveyFile[];
+    plan?: SurveyFile;
     onSave: (room: Room) => void;
     onDelete: (room: Room) => void;
   };

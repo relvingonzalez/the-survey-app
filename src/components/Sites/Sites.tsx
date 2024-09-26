@@ -160,7 +160,7 @@ export function DownloadSites({
   const continueDownload = async (site: ServerSiteProject) => {
     try {
       handleStatusUpdate(2, 33, "Downloading Data");
-      const response = await fetch(`download/${site.id}/api/`, {
+      const response = await fetch(`api/download/${site.id}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",

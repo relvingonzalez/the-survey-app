@@ -9,6 +9,7 @@ import {
   Rack,
   Room,
   DexieSiteProject,
+  SurveyFile,
 } from "../../../internal";
 
 export class TheSurveyAppDB extends Dexie {
@@ -21,10 +22,11 @@ export class TheSurveyAppDB extends Dexie {
   responseGroups!: EntityTable<ResponseGroup, "localId">;
   rooms!: EntityTable<Room, "localId">;
   siteProjects!: Table<DexieSiteProject>;
+  surveyFiles!: EntityTable<SurveyFile, "localId">;
 
   constructor() {
     super("theSurveyApp");
-    this.version(59).stores({
+    this.version(62).stores({
       comments:
         "++localId, &id, projectId, questionId, responseGroupId, [projectId+questionType], [projectId+questionId], flag, [flag+responseGroupId], [questionId+responseGroupId]",
       hardwares: "++localId, &id, projectId, rackId, flag",
@@ -37,6 +39,8 @@ export class TheSurveyAppDB extends Dexie {
       responseGroups: "++localId, &id, projectId, collectionId, flag",
       rooms: "++localId, &id, projectId, name, flag",
       siteProjects: "++localId, projectId, &id, name, siteCode",
+      surveyFiles:
+        "++localId, projectId, &id, questionResponseId, roomId, rackId, moreInfoId, signatureTypeId, isPlan, flag",
     });
 
     this.comments.mapToClass(Comment);
@@ -47,5 +51,6 @@ export class TheSurveyAppDB extends Dexie {
     this.responses.mapToClass(Response);
     this.responseGroups.mapToClass(ResponseGroup);
     this.rooms.mapToClass(Room);
+    this.surveyFiles.mapToClass(SurveyFile);
   }
 }

@@ -16,6 +16,7 @@ import {
   Response,
   ResponseGroup,
   Room,
+  SurveyFile,
 } from "../../../internal";
 
 const initialText =
@@ -76,6 +77,11 @@ export function SyncModal({ opened, ...props }: ModalProps) {
     handleStatusUpdate(1, progressValue + 5, "Syncing MoreInfos...");
     await MoreInfo.sync();
     handleStatusUpdate(2, progressValue + 10, "Syncing MoreInfos Complete!");
+
+    // TODO: update questionResponseId, roomId, moreInfoId, RackId, etc for newly created responses
+    handleStatusUpdate(1, progressValue + 5, "Syncing files...");
+    await SurveyFile.sync();
+    handleStatusUpdate(2, progressValue + 10, "Syncing Files Complete!");
     handleStatusUpdate(3, 100, "Syncing Complete!");
   };
 

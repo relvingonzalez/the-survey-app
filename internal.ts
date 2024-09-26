@@ -7,6 +7,7 @@ export * from "@/lib/dexie/Rack";
 export * from "@/lib/dexie/ResponseGroup";
 export * from "@/lib/dexie/Room";
 export * from "@/lib/dexie/Response";
+export * from "@/lib/dexie/SurveyFile";
 export * from "./src/components/Sync/SyncModal";
 export * from "@/lib/dexie/db";
 export * from "./src/lib/dexie/TheSurveyAppDB";

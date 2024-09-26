@@ -5,10 +5,11 @@ import DrawingModal, {
   DrawingModalProps,
 } from "../Drawing/DrawingModal";
 import { useDisclosure } from "@mantine/hooks";
+import { SurveyFile } from "../../../internal";
 
 type ClickableDrawingBaseProps = {
   onSaveDrawing: (file: File) => void;
-  file?: File;
+  file?: SurveyFile;
   fallbackSrc?: string;
 };
 

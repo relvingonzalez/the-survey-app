@@ -12,6 +12,7 @@ import {
   Room,
   ResponseGroup,
   uniqueId,
+  SurveyFile,
 } from "../../../internal";
 export async function populate(data: ServerDownloadSiteData) {
   return db.transaction(
@@ -25,11 +26,13 @@ export async function populate(data: ServerDownloadSiteData) {
       db.moreInfos,
       db.racks,
       db.hardwares,
+      db.surveyFiles,
     ],
     () => {
       db.siteProjects.add(data.siteProject);
       Question.bulkAddFromServer(data.questions);
       Response.bulkAddFromServer(data.responses);
+      SurveyFile.bulkAddFromServer(data.files);
       Comment.bulkAddFromServer(data.comments);
       Room.bulkAddFromServer(data.rooms);
       MoreInfo.bulkAddFromServer(data.moreInfos);
@@ -63,6 +66,7 @@ export async function deleteProject(projectId: number) {
       db.racks.where({ projectId }).delete();
       db.hardwares.where({ projectId }).delete();
       db.responseGroups.where({ projectId }).delete();
+      db.surveyFiles.where({ projectId }).delete();
     },
   );
 }

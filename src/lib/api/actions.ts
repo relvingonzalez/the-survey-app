@@ -13,7 +13,10 @@ import {
   ServerMoreInfo,
 } from "../types/server";
 import postgres from "postgres";
-import { DexieResponseGroupedByResponseType } from "../../../internal";
+import {
+  DexieResponseGroupedByResponseType,
+  SurveyFile,
+} from "../../../internal";
 
 const tableByType: TableByQuestionType = {
   geo: "geo_question_response",
@@ -43,7 +46,9 @@ const insertOrUpdateByTableName = async <K extends ServerArray>(
     INSERT INTO ${sql(serverTableName)} ${sql(newArray)}
     ON CONFLICT (id) 
     DO UPDATE SET
-    ${Object.keys(newArray[0]).map((x, i) => sql`${i ? sql`,` : sql``}${sql(x)} = excluded.${sql(x)}`)}
+    ${Object.keys(newArray[0]).map(
+      (x, i) => sql`${i ? sql`,` : sql``}${sql(x)} = excluded.${sql(x)}`,
+    )}
     RETURNING *`;
 
   return result;
@@ -231,4 +236,41 @@ export async function saveHardwares(hardwares: ServerHardware[]) {
   });
 
   return [hardwaresInserted, hardwaresUpdated];
+}
+
+const getFileTableName = (surveyFile: Omit<SurveyFile, "File">) => {
+  if (surveyFile.questionResponseId) {
+    return "question_response_file";
+  } else if (surveyFile.roomId) {
+    return "room_file";
+  } else if (surveyFile.rackId) {
+    return "rack_file";
+  } else if (surveyFile.moreInfoId) {
+    return "more_info_file";
+  } else {
+    return "signature";
+  }
+};
+
+export async function saveFile(surveyFile: Omit<SurveyFile, "File">) {
+  if (surveyFile.flag === "i") {
+    const [insertedFile] = await insertOrUpdateByTableName(sql, "file", [
+      surveyFile.serializeBaseSurveyFile(),
+    ]);
+    // save by table
+    await insertOrUpdateByTableName(sql, getFileTableName(surveyFile), [
+      surveyFile.serialize(),
+    ]);
+    return { ...surveyFile, id: insertedFile.id };
+  } else if (surveyFile.flag === "u") {
+    // update annotation;
+    await insertOrUpdateByTableName(sql, "file", [
+      surveyFile.serializeBaseSurveyFile(),
+    ]);
+    return surveyFile;
+  } else {
+    // delete
+    await deleteByTableName(sql, "file", [surveyFile]);
+    return surveyFile;
+  }
 }

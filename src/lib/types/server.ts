@@ -129,6 +129,7 @@ export type ServerDownloadSiteData = {
   hardwares: ServerHardware[];
   responses: QuestionResponse[];
   comments: ServerComment[];
+  files: ServerFileView[];
 };
 
 export type ServerResponseGroup = {
@@ -155,9 +156,53 @@ export const createServerData = () => ({
   hardwares: [],
   responses: [],
   comments: [],
+  files: [],
 });
 
 export type ServerTableIndex = Exclude<ResponseType, "collection">;
 
 export type TableByQuestionType = Record<ServerTableIndex, string>;
 export type ServerArray = ServerComment | ServerRoom | ServerQuestionResponse;
+
+export type ServerFile = {
+  id?: number;
+  url: string;
+  annotation: string;
+};
+
+export type ServerQuestionResponseFile = {
+  id?: number;
+  fileId?: number;
+  questionResponseId: number;
+};
+
+export type ServerRoomFile = {
+  id?: number;
+  fileId?: number;
+  roomId: number;
+  isPlan: boolean;
+};
+
+export type ServerRackFile = {
+  id?: number;
+  fileId?: number;
+  rackId: number;
+};
+
+export type ServerMoreInfoFile = {
+  id?: number;
+  fileId?: number;
+  moreInfoId: number;
+};
+
+export type ServerSignature = {
+  id?: number;
+  fileId?: number;
+  signatureTypeId: number;
+};
+
+export type ServerFileView = ServerFile &
+  ServerRoomFile &
+  ServerRackFile &
+  ServerMoreInfoFile &
+  ServerSignature;

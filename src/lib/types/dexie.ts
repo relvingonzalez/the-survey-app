@@ -8,6 +8,7 @@ import {
   Response,
   ResponseGroup,
   Room,
+  SurveyFile,
 } from "../../../internal";
 
 // delete, update, insert
@@ -30,4 +31,5 @@ export type DexieStructure =
   | MoreInfo
   | Hardware
   | ResponseGroup
-  | Hardware;
+  | Hardware
+  | SurveyFile;

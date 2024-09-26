@@ -9,9 +9,7 @@ export default function NavFooter() {
     <>
       <SyncModal opened={opened} onClose={close} />
       <Center className="bg-yellow">
-        <SyncButton
-          onClick={open}
-          loading={opened}/>
+        <SyncButton onClick={open} loading={opened} />
       </Center>
     </>
   );

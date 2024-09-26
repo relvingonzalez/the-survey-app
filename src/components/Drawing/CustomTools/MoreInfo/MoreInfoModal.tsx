@@ -2,31 +2,21 @@ import Comment from "@/components/Comment";
 import { Button, Group, Modal, ModalProps } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import Files from "@/components/files/Files.";
-import { useListState } from "@mantine/hooks";
-import { MoreInfo } from "../../../../../internal";
+import { MoreInfo, SurveyFile } from "../../../../../internal";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export type MoreInfoFormValues = {
   moreInfo: MoreInfo;
 };
 
 export type MoreInfoProps = ModalProps & {
-  existingFiles: File[];
-  onSave: (moreInfo: MoreInfo, files: File[]) => void;
+  onSave: (moreInfo: MoreInfo, files: SurveyFile[]) => void;
 };
 export default function MoreInfoModal({
-  existingFiles = [],
   onSave,
   onClose,
   ...modalProps
 }: MoreInfoProps) {
-  const [files, handlers] = useListState<File>(existingFiles);
-  const handleFileDelete = (i: number) => {
-    handlers.remove(i);
-  };
-  const handleSelectedFiles = (newFiles: File[]) => {
-    handlers.append(...newFiles);
-  };
-
   const form = useForm<MoreInfoFormValues>({
     mode: "uncontrolled",
     name: "more-info-form",
@@ -36,6 +26,22 @@ export default function MoreInfoModal({
       },
     },
   });
+
+  const files = useLiveQuery(
+    () => SurveyFile.getByMoreInfo(form.getValues().moreInfo),
+    [form],
+    [],
+  );
+
+  // Check how to handle add or remove files before and after saving
+  // What happens if removing or adding before saving.
+  const handleFileDelete = (i: number) => {
+    files[i].delete();
+  };
+  const handleSelectedFiles = (newFiles: File[]) => {
+    const moreInfoId = form.getValues().moreInfo.id;
+    newFiles.map((f) => SurveyFile.add({ moreInfoId, file: f }));
+  };
 
   const handleSubmit = (values: MoreInfoFormValues) => {
     onSave(values.moreInfo, files);

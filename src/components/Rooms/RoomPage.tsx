@@ -4,13 +4,11 @@
 // Rooms/id/page component as server component
 import RoomComponent from "@/components/Rooms/Room";
 import { Card, Stack, Title } from "@mantine/core";
-import { useListState } from "@mantine/hooks";
-import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
 import { db } from "@/lib/dexie/db";
 import { SiteCode } from "@/lib/types/sites";
-import { Room } from "../../../internal";
+import { Room, SurveyFile } from "../../../internal";
 export type RoomPageProps = {
   id?: number;
   siteCode: SiteCode;
@@ -20,9 +18,34 @@ export default function RoomPage({ id, siteCode }: RoomPageProps) {
   const site = useLiveQuery(() => db.siteProjects.get({ siteCode }));
   const projectId = site ? site.projectId : 0;
   const room = useLiveQuery(() => Room.getById(projectId, id), [projectId, id]);
-  const [files, handlers] = useListState<File>([]);
-  const [roomPlan, setRoomPlan] = useState<File>();
+
   const router = useRouter();
+
+  const roomPlan = useLiveQuery(
+    () => room && SurveyFile.getPlanByRoom(room),
+    [room],
+    SurveyFile.create({ projectId, roomId: room?.id }),
+  );
+
+  const files = useLiveQuery(
+    () => room && SurveyFile.getByRoom(room),
+    [room],
+    [],
+  );
+
+  if (!room || !files || !roomPlan) {
+    return null;
+  }
+
+  // Check how to handle add or remove files before and after saving
+  // What happens if removing or adding before saving.
+  const handleDeleteFile = (i: number) => {
+    files[i].delete();
+  };
+  const handleSelectFiles = (newFiles: File[]) => {
+    const roomId = room.id;
+    newFiles.map((f) => SurveyFile.add({ roomId, file: f }));
+  };
 
   const handleSave = (room: Room) => {
     room.save();
@@ -32,20 +55,20 @@ export default function RoomPage({ id, siteCode }: RoomPageProps) {
     room.delete();
     router.push("./");
   };
-  const handleSelectFiles = (newFiles: File[]) => {
-    handlers.append(...newFiles);
-  };
-  const handleDeleteFile = (i: number) => {
-    handlers.remove(i);
-  };
+
   const handleSaveDrawing = (file: File) => {
-    // TODO: save to indexedDB
-    setRoomPlan(file);
+    roomPlan.file = file;
+    roomPlan.save();
   };
 
-  if (!room) {
-    return null;
-  }
+  // const [files, handlers] = useListState<File>([]);
+  // const [roomPlan, setRoomPlan] = useState<File>();
+  // const handleSelectFiles = (newFiles: File[]) => {
+  //   handlers.append(...newFiles);
+  // };
+  // const handleDeleteFile = (i: number) => {
+  //   handlers.remove(i);
+  // };
 
   return (
     <Stack mb="80">

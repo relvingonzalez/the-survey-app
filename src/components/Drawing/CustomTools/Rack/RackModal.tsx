@@ -23,7 +23,8 @@ import {
   IconTrash,
   IconX,
 } from "@tabler/icons-react";
-import { Hardware, Rack } from "../../../../../internal";
+import { Hardware, Rack, SurveyFile } from "../../../../../internal";
+import { useLiveQuery } from "dexie-react-hooks";
 
 export type RackFormValues = {
   rack: Rack;
@@ -31,27 +32,25 @@ export type RackFormValues = {
 };
 
 export type RackModalProps = ModalProps & {
-  existingFiles: File[];
-  onSave: (rack: Rack, files: File[]) => void;
+  onSave: (rack: Rack, files: SurveyFile[]) => void;
   onSaveHardware: (hardwareList: Hardware[]) => void;
 };
 export default function RackModal({
-  existingFiles = [],
   onSave,
   onSaveHardware,
   onClose,
   ...modalProps
 }: RackModalProps) {
-  const [files, handlers] = useListState<File>(existingFiles);
   const [edit, handlersEdit] = useListState<{ index: number; value: Hardware }>(
     [],
   );
-  const handleFileDelete = (i: number) => {
-    handlers.remove(i);
-  };
-  const handleSelectedFiles = (newFiles: File[]) => {
-    handlers.append(...newFiles);
-  };
+  // const [files, handlers] = useListState<File>(existingFiles);
+  // const handleFileDelete = (i: number) => {
+  //   handlers.remove(i);
+  // };
+  // const handleSelectedFiles = (newFiles: File[]) => {
+  //   handlers.append(...newFiles);
+  // };
 
   const form = useForm<RackFormValues>({
     mode: "uncontrolled",
@@ -68,6 +67,22 @@ export default function RackModal({
       },
     },
   });
+
+  const files = useLiveQuery(
+    () => SurveyFile.getByRack(form.getValues().rack),
+    [form],
+    [],
+  );
+
+  // Check how to handle add or remove files before and after saving
+  // What happens if removing or adding before saving.
+  const handleFileDelete = (i: number) => {
+    files[i].delete();
+  };
+  const handleSelectedFiles = (newFiles: File[]) => {
+    const moreInfoId = form.getValues().rack.id;
+    newFiles.map((f) => SurveyFile.add({ moreInfoId, file: f }));
+  };
 
   const handleSubmit = (values: RackFormValues) => {
     onSave(values.rack, files);

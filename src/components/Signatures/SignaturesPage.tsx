@@ -1,31 +1,40 @@
 "use client";
 
 import { Flex, Stack, Title } from "@mantine/core";
-import { useState } from "react";
 import ClickableDrawing from "../Drawing/ClickableDrawing";
 import { SiteCode } from "@/lib/types/sites";
+import { useLiveQuery } from "dexie-react-hooks";
+import { db, SurveyFile } from "../../../internal";
 
 export type SignaturesPageProps = {
   siteCode?: SiteCode;
 };
 
 export default function SignaturesPage({ siteCode }: SignaturesPageProps) {
-  console.log(siteCode);
-  const eSignature = new File([], "engineer.jpg");
-  const cSignature = new File([], "customer.jpg");
+  const site = useLiveQuery(() => db.siteProjects.get({ siteCode }));
+  const projectId = site ? site.projectId : 0;
 
-  const [engineerSignature, setEngineerSignature] = useState<File | undefined>(
-    eSignature,
+  const engineerSignature = useLiveQuery(
+    () => SurveyFile.getSignatureByType(projectId, "engineer"),
+    [projectId],
   );
-  const [customerSignature, setCustomerSignature] = useState<File | undefined>(
-    cSignature,
+
+  const customerSignature = useLiveQuery(
+    () => SurveyFile.getSignatureByType(projectId, "customer"),
+    [projectId],
   );
 
   const handleSaveEngineerSignature = (file: File) => {
-    setEngineerSignature(file);
+    if (engineerSignature) {
+      engineerSignature.file = file;
+      engineerSignature?.save();
+    }
   };
   const handleSaveCustomerSignature = (file: File) => {
-    setCustomerSignature(file);
+    if (customerSignature) {
+      customerSignature.file = file;
+      customerSignature?.save();
+    }
   };
 
   return (

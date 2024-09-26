@@ -10,6 +10,7 @@ import {
   ServerHardware,
   createServerData,
   ServerDownloadSiteData,
+  ServerFileView,
 } from "@/lib/types/server";
 
 export async function GET(
@@ -36,6 +37,10 @@ export async function GET(
   data["comments"] = await sql<
     ServerComment[]
   >`SELECT * FROM comment WHERE project_id = ${projectId}`;
+
+  data["files"] = await sql<
+    ServerFileView[]
+  >`SELECT * FROM files WHERE project_id = ${projectId}`;
 
   // step seven download available rooms
   data["rooms"] = await sql<

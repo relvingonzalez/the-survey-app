@@ -4,12 +4,11 @@ import QuestionComment from "../Comment";
 import QuestionByTypeComponent from "./QuestionByTypeComponent";
 import { ChangeEventHandler } from "react";
 import Files from "../files/Files.";
-import { useListState } from "@mantine/hooks";
 import { SiteCode } from "@/lib/types/sites";
 import { db } from "@/lib/dexie/db";
 import { useLiveQuery } from "dexie-react-hooks";
 import { QuestionType } from "@/lib/types/question";
-import { Comment, Question, Response } from "../../../internal";
+import { Comment, Question, Response, SurveyFile } from "../../../internal";
 
 export type BaseQuestionProps = {
   item: Question;
@@ -53,7 +52,10 @@ export default function QuestionComponent({
     () => question && Comment.getFromQuestion(question),
     [question],
   );
-  const [files, handlers] = useListState<File>([]);
+  const files = useLiveQuery(
+    () => comment && SurveyFile.getByResponse(comment),
+    [question, comment],
+  );
   const handleCommentChange: ChangeEventHandler<HTMLTextAreaElement> &
     ((value: string) => void) = (value) => {
     if (typeof value === "string") {
@@ -79,10 +81,19 @@ export default function QuestionComponent({
     });
   };
   const handleFileDelete = (i: number) => {
-    handlers.remove(i);
+    if (files) {
+      files[i].delete();
+    }
   };
   const handleSelectedFiles = (newFiles: File[]) => {
-    handlers.append(...newFiles);
+    if (response) {
+      newFiles.forEach((f) => {
+        SurveyFile.add({
+          questionResponseId: response[0].questionResponseId,
+          file: f,
+        });
+      });
+    }
   };
 
   if (!question || !comment || !response?.length) {

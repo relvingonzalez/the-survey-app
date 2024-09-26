@@ -4,6 +4,7 @@ import { FileButton, Group, Text } from "@mantine/core";
 import { IconPhoto, IconTrash, IconWriting } from "@tabler/icons-react";
 import DrawingModal from "../Drawing/DrawingModal";
 import { useDisclosure } from "@mantine/hooks";
+import { SurveyFile } from "../../../internal";
 
 const acceptTypes =
   ".doc,.docx,.zip,.pdf,.xls,.xlsx,.ppt,.pptx,.mp3,.wav,.tgz,image/*";
@@ -58,7 +59,7 @@ export function Gallery({ files, onDeleteFile }: GalleryProps) {
 
 export type FilesProps = BoxProps &
   FileCallbacks & {
-    files: File[];
+    files?: SurveyFile[];
     hideFileButton?: boolean;
     hideDrawingButton?: boolean;
   };
@@ -72,6 +73,7 @@ export default function Files({
 }: FilesProps) {
   const galleryFiles = useGalleryFiles(files);
   const [opened, { open, close }] = useDisclosure(false);
+  console.log(files, galleryFiles);
 
   return (
     <Box {...boxProps}>
@@ -107,7 +109,7 @@ export default function Files({
         )}
       </Group>
 
-      {files.length > 0 && (
+      {files && files.length > 0 && (
         <Text size="sm" my="sm">
           Attachments:
         </Text>
