@@ -16,7 +16,7 @@ const APP_TITLE_TEMPLATE = "%s - PWA App";
 const APP_DESCRIPTION = "Best PWA app in the world!";
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://the-survey-app.vercel.app/'),
+  metadataBase: new URL("https://the-survey-app.vercel.app/"),
   applicationName: APP_NAME,
   title: {
     default: APP_DEFAULT_TITLE,

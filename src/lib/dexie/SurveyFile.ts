@@ -123,8 +123,6 @@ export class SurveyFile
     if (surveyFiles.length) {
       await Promise.all(
         surveyFiles.map(async (r) => {
-          // Classes cannot be sent, so need to send File somehow.
-          // maybe this saveFile only should activate after saving file initially
           await r.uploadFile();
           const savedFile = await saveFile(r.serializeWithoutFile());
           return r.syncFromServer(savedFile);
@@ -135,10 +133,9 @@ export class SurveyFile
 
   async uploadFile() {
     if (this.flag === "i") {
-      const presignedURL = new URL("api/presigned", window.location.href);
-      presignedURL.searchParams.set("fileName", this.file.name);
-      presignedURL.searchParams.set("contentType", this.file.type);
-      return fetch(presignedURL.toString())
+      return fetch(
+        `/the-survey-app/api/presigned?fileName=${this.file.name}&contentType=${this.file.type}`,
+      )
         .then((res) => res.json())
         .then(async (res) => {
           const body = new Blob([this.file], {

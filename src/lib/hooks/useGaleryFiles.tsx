@@ -68,7 +68,6 @@ export const useGalleryFile = (file?: SurveyFile): GalleryFile | undefined => {
   const [galleryFile, setGalleryFile] = useState<GalleryFile>();
 
   useEffect(() => {
-    console.log("file changed");
     if (file) {
       setGalleryFile(transformFileToGalleryFile(file));
     }

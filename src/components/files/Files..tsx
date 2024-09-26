@@ -73,7 +73,6 @@ export default function Files({
 }: FilesProps) {
   const galleryFiles = useGalleryFiles(files);
   const [opened, { open, close }] = useDisclosure(false);
-  console.log(files, galleryFiles);
 
   return (
     <Box {...boxProps}>
