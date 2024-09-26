@@ -55,6 +55,7 @@ export async function deleteProject(projectId: number) {
       db.racks,
       db.hardwares,
       db.responseGroups,
+      db.surveyFiles,
     ],
     () => {
       db.siteProjects.where({ projectId }).delete();

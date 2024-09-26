@@ -69,7 +69,7 @@ export default function RackModal({
   });
 
   const files = useLiveQuery(
-    () => SurveyFile.getByRack(form.getValues().rack),
+    () => form.getValues().rack && SurveyFile.getByRack(form.getValues().rack),
     [form],
     [],
   );

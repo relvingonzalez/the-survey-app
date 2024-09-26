@@ -28,7 +28,7 @@ export default function MoreInfoModal({
   });
 
   const files = useLiveQuery(
-    () => SurveyFile.getByMoreInfo(form.getValues().moreInfo),
+    () => form.getValues().moreInfo && SurveyFile.getByMoreInfo(form.getValues().moreInfo),
     [form],
     [],
   );

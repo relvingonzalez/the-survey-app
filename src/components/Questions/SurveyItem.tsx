@@ -89,6 +89,7 @@ export default function QuestionComponent({
     if (response) {
       newFiles.forEach((f) => {
         SurveyFile.add({
+          projectId,
           questionResponseId: response[0].questionResponseId,
           file: f,
         });
