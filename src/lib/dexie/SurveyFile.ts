@@ -26,7 +26,7 @@ import {
   updateItem,
   type TheSurveyAppDB,
 } from "../../../internal";
-import { saveFile } from "../api/actions";
+import { deleteFile, saveFile, updateFile } from "../api/actions";
 
 export class SurveyFile
   extends Entity<TheSurveyAppDB>
@@ -118,14 +118,29 @@ export class SurveyFile
     return getDeletedItemsByTable(db.surveyFiles);
   }
 
+  static manageFileSave(surveyFile: SurveyFile) {
+    switch (surveyFile.flag) {
+      case "i":
+        return saveFile(
+          surveyFile.getFileTableName(),
+          surveyFile.serializeBaseSurveyFile(),
+          surveyFile.serialize(),
+        );
+      case "u":
+        return updateFile(surveyFile.serializeBaseSurveyFile());
+      default:
+        return deleteFile(surveyFile.serializeBaseSurveyFile());
+    }
+  }
+
   static async sync() {
     const surveyFiles = await SurveyFile.getAllUpdated();
     if (surveyFiles.length) {
       await Promise.all(
-        surveyFiles.map(async (r) => {
-          await r.uploadFile();
-          const savedFile = await saveFile(r.serializeWithoutFile());
-          return r.syncFromServer(savedFile);
+        surveyFiles.map(async (f) => {
+          await f.uploadFile();
+          const savedFile = await SurveyFile.manageFileSave(f);
+          return f.syncFromServer(savedFile);
         }),
       );
     }
@@ -190,22 +205,25 @@ export class SurveyFile
     );
   }
 
-  serializeBaseSurveyFile() {
-    return {
-      ...this.baseServerProps(),
-      url: this.url,
-      annotation: this.annotation,
-    };
-  }
-
-  serializeWithoutFile() {
-    return Object.assign({}, this, { file: undefined });
+  private getFileTableName() {
+    if (this.questionResponseId) {
+      return "question_response_file";
+    } else if (this.roomId) {
+      return "room_file";
+    } else if (this.rackId) {
+      return "rack_file";
+    } else if (this.moreInfoId) {
+      return "more_info_file";
+    } else {
+      return "signature";
+    }
   }
 
   private baseServerProps() {
     return {
       ...shouldIncludeId(this.id, this.flag),
       flag: this.flag,
+      projectId: this.projectId,
     };
   }
 
@@ -242,6 +260,14 @@ export class SurveyFile
     return {
       ...this.baseServerProps(),
       signatureTypeId: this.signatureTypeId,
+    };
+  }
+
+  serializeBaseSurveyFile() {
+    return {
+      ...this.baseServerProps(),
+      url: this.url,
+      annotation: this.annotation,
     };
   }
 

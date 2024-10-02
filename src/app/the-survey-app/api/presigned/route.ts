@@ -5,6 +5,8 @@ export async function GET(request: NextRequest) {
   const accessKeyId = process.env.AWS_KEY_ID;
   const secretAccessKey = process.env.AWS_SECRET_ACCESS_KEY;
   const s3BucketName = process.env.AWS_S3_BUCKET_NAME;
+
+  console.log(accessKeyId, secretAccessKey, s3BucketName);
   if (!accessKeyId || !secretAccessKey || !s3BucketName) {
     return new Response(null, { status: 500 });
   }
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
     return new Response(null, { status: 500 });
   }
   const client = new S3Client({
-    region: "eu-north-1",
+    region: "us-east-2",
     credentials: {
       accessKeyId,
       secretAccessKey,

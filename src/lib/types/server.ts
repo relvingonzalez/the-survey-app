@@ -206,3 +206,10 @@ export type ServerFileView = ServerFile &
   ServerRackFile &
   ServerMoreInfoFile &
   ServerSignature;
+
+export type SerializedFile =
+  | ServerQuestionResponseFile
+  | ServerRoomFile
+  | ServerRackFile
+  | ServerMoreInfoFile
+  | ServerSignature;

@@ -11,12 +11,11 @@ import {
   ServerRoom,
   ServerRack,
   ServerMoreInfo,
+  SerializedFile,
+  ServerFile,
 } from "../types/server";
 import postgres from "postgres";
-import {
-  DexieResponseGroupedByResponseType,
-  SurveyFile,
-} from "../../../internal";
+import { DexieResponseGroupedByResponseType } from "../../../internal";
 
 const tableByType: TableByQuestionType = {
   geo: "geo_question_response",
@@ -238,39 +237,27 @@ export async function saveHardwares(hardwares: ServerHardware[]) {
   return [hardwaresInserted, hardwaresUpdated];
 }
 
-const getFileTableName = (surveyFile: Omit<SurveyFile, "File">) => {
-  if (surveyFile.questionResponseId) {
-    return "question_response_file";
-  } else if (surveyFile.roomId) {
-    return "room_file";
-  } else if (surveyFile.rackId) {
-    return "rack_file";
-  } else if (surveyFile.moreInfoId) {
-    return "more_info_file";
-  } else {
-    return "signature";
-  }
-};
+export async function saveFile(
+  fileTableName: string,
+  surveyFile: ServerFile,
+  serializedFile: SerializedFile,
+) {
+  const [insertedFile] = await insertOrUpdateByTableName(sql, "file", [
+    surveyFile,
+  ]);
+  // save by table
+  await insertOrUpdateByTableName(sql, fileTableName, [serializedFile]);
+  return { ...surveyFile, id: insertedFile.id };
+}
 
-export async function saveFile(surveyFile: Omit<SurveyFile, "File">) {
-  if (surveyFile.flag === "i") {
-    const [insertedFile] = await insertOrUpdateByTableName(sql, "file", [
-      surveyFile.serializeBaseSurveyFile(),
-    ]);
-    // save by table
-    await insertOrUpdateByTableName(sql, getFileTableName(surveyFile), [
-      surveyFile.serialize(),
-    ]);
-    return { ...surveyFile, id: insertedFile.id };
-  } else if (surveyFile.flag === "u") {
-    // update annotation;
-    await insertOrUpdateByTableName(sql, "file", [
-      surveyFile.serializeBaseSurveyFile(),
-    ]);
-    return surveyFile;
-  } else {
-    // delete
-    await deleteByTableName(sql, "file", [surveyFile]);
-    return surveyFile;
-  }
+export async function updateFile(surveyFile: ServerFile) {
+  // update annotation;
+  await insertOrUpdateByTableName(sql, "file", [surveyFile]);
+  return surveyFile;
+}
+
+export async function deleteFile(surveyFile: ServerFile) {
+  // delete
+  await deleteByTableName(sql, "file", [surveyFile]);
+  return surveyFile;
 }
