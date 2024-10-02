@@ -246,7 +246,7 @@ export async function saveFile(
     surveyFile,
   ]);
   // save by table
-  await insertOrUpdateByTableName(sql, fileTableName, [serializedFile]);
+  await insertOrUpdateByTableName(sql, fileTableName, [ { ...serializedFile, fileId: insertedFile.id}]);
   return { ...surveyFile, id: insertedFile.id };
 }
 

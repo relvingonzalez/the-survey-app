@@ -162,22 +162,25 @@ export const createServerData = () => ({
 export type ServerTableIndex = Exclude<ResponseType, "collection">;
 
 export type TableByQuestionType = Record<ServerTableIndex, string>;
-export type ServerArray = ServerComment | ServerRoom | ServerQuestionResponse;
+export type ServerArray = ServerComment | ServerRoom | ServerQuestionResponse | ServerFile | ServerQuestionResponseFile | ServerRoomFile | ServerRackFile | ServerMoreInfoFile | ServerSignature;
 
 export type ServerFile = {
   id?: number;
+  flag?: ActionFlag;
   url: string;
   annotation: string;
 };
 
 export type ServerQuestionResponseFile = {
   id?: number;
+  flag?: ActionFlag;
   fileId?: number;
   questionResponseId: number;
 };
 
 export type ServerRoomFile = {
   id?: number;
+  flag?: ActionFlag;
   fileId?: number;
   roomId: number;
   isPlan: boolean;
@@ -185,18 +188,21 @@ export type ServerRoomFile = {
 
 export type ServerRackFile = {
   id?: number;
+  flag?: ActionFlag;
   fileId?: number;
   rackId: number;
 };
 
 export type ServerMoreInfoFile = {
   id?: number;
+  flag?: ActionFlag;
   fileId?: number;
   moreInfoId: number;
 };
 
 export type ServerSignature = {
   id?: number;
+  flag?: ActionFlag;
   fileId?: number;
   signatureTypeId: number;
 };
