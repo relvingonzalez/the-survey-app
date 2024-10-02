@@ -42,10 +42,12 @@ const getImgUrl = (extension: string, f: SurveyFile) => {
   }
 };
 
-const getFileExtension = (f: File) => f.name.split(".").pop() || "png";
+const getFileExtension = (f: SurveyFile) => {
+    return f.file ? f.file.name.split(".").pop() || "png" : f.url.split(".").pop() || "png";
+  }
 
 const transformFileToGalleryFile = (f: SurveyFile) => {
-  const extension = getFileExtension(f.file);
+  const extension = getFileExtension(f);
   const url = getImgUrl(extension, f);
   return { ...f.file, url, extension };
 };
