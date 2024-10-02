@@ -223,7 +223,6 @@ export class SurveyFile
     return {
       ...shouldIncludeId(this.id, this.flag),
       flag: this.flag,
-      projectId: this.projectId,
     };
   }
 
@@ -266,6 +265,7 @@ export class SurveyFile
   serializeBaseSurveyFile() {
     return {
       ...this.baseServerProps(),
+      projectId: this.projectId,
       url: this.url,
       annotation: this.annotation,
     };
