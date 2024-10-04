@@ -36,13 +36,18 @@ const getImgUrl = (extension: string, f: SurveyFile) => {
         imgUrl = "/audio_thumb.png";
         break;
       default:
-        imgUrl = URL.createObjectURL(f.file);
+        if(f.file) {
+          imgUrl = URL.createObjectURL(f.file);
+        }
     }
     return imgUrl;
   }
 };
 
 const getFileExtension = (f: SurveyFile) => {
+    if(!f.file && !f.url) {
+      return "";
+    }
     return f.file ? f.file.name.split(".").pop() || "png" : f.url.split(".").pop() || "png";
   }
 

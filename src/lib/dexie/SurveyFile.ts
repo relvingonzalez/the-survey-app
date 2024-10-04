@@ -76,11 +76,11 @@ export class SurveyFile
       .toArray();
   }
 
-  static async getPlanByRoom({ id: roomId }: Room) {
+  static async getPlanByRoom({ id: roomId, projectId }: Room) {
     return await db.surveyFiles
       .where({ roomId })
       .and((r) => r.isPlan && r.flag !== "d")
-      .first();
+      .first() ?? SurveyFile.create({ projectId, roomId });
   }
 
   static async getByRack({ id: rackId }: Rack) {

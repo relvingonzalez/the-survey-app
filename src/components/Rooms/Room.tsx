@@ -28,8 +28,8 @@ export default function RoomComponent({
   ...filesProps
 }: RoomProps) {
   // Get moreInfos and Racks from room
-  const moreInfos = useLiveQuery(() => MoreInfo.getByRoom(room));
-  const racks = useLiveQuery(() => Rack.getByRoom(room));
+  const moreInfos = useLiveQuery(() => MoreInfo.getByRoom(room), [room], []);
+  const racks = useLiveQuery(() => Rack.getByRoom(room), [room], []);
   const form = useForm({
     initialValues: {
       name: room?.name || "",
@@ -41,10 +41,6 @@ export default function RoomComponent({
       name: (value: string) => (value ? null : "Room name is required"),
     },
   });
-
-  if (!racks || !moreInfos) {
-    return null;
-  }
 
   return (
     <>

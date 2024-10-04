@@ -24,7 +24,6 @@ export default function RoomPage({ id, siteCode }: RoomPageProps) {
   const roomPlan = useLiveQuery(
     () => room && SurveyFile.getPlanByRoom(room),
     [room],
-    SurveyFile.create({ projectId, roomId: room?.id }),
   );
 
   const files = useLiveQuery(
@@ -37,8 +36,6 @@ export default function RoomPage({ id, siteCode }: RoomPageProps) {
     return null;
   }
 
-  // Check how to handle add or remove files before and after saving
-  // What happens if removing or adding before saving.
   const handleDeleteFile = (i: number) => {
     files[i].delete();
   };
@@ -60,15 +57,6 @@ export default function RoomPage({ id, siteCode }: RoomPageProps) {
     roomPlan.file = file;
     roomPlan.save();
   };
-
-  // const [files, handlers] = useListState<File>([]);
-  // const [roomPlan, setRoomPlan] = useState<File>();
-  // const handleSelectFiles = (newFiles: File[]) => {
-  //   handlers.append(...newFiles);
-  // };
-  // const handleDeleteFile = (i: number) => {
-  //   handlers.remove(i);
-  // };
 
   return (
     <Stack mb="80">
