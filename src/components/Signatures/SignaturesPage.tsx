@@ -27,13 +27,13 @@ export default function SignaturesPage({ siteCode }: SignaturesPageProps) {
   const handleSaveEngineerSignature = (file: File) => {
     if (engineerSignature) {
       engineerSignature.file = file;
-      engineerSignature?.save();
+      engineerSignature.localId ? engineerSignature.save() : SurveyFile.add(engineerSignature);
     }
   };
   const handleSaveCustomerSignature = (file: File) => {
     if (customerSignature) {
       customerSignature.file = file;
-      customerSignature?.save();
+      customerSignature.localId ? customerSignature.save() : SurveyFile.add(customerSignature);
     }
   };
 

@@ -40,7 +40,7 @@ export class TheSurveyAppDB extends Dexie {
       rooms: "++localId, &id, projectId, name, flag",
       siteProjects: "++localId, projectId, &id, name, siteCode",
       surveyFiles:
-        "++localId, projectId, &id, questionResponseId, roomId, rackId, moreInfoId, signatureTypeId, isPlan, flag",
+        "++localId, projectId, &id, questionResponseId, roomId, rackId, moreInfoId, signatureTypeId, isPlan, flag, [projectId+signatureTypeId]",
     });
 
     this.comments.mapToClass(Comment);
